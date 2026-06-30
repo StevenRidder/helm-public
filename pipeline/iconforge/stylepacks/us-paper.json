@@ -1,0 +1,37 @@
+{
+  "id": "us-paper",
+  "stroke_width": 1.4,
+  "corner_radius": 0,
+  "fill_mode": "filled",
+  "line_treatment": "crisp",
+  "shadow": false,
+  "palettes": {
+    "day": {
+      "black": "#1b1b1b",
+      "yellow": "#f2c200",
+      "red": "#d21f26",
+      "green": "#16823a",
+      "white": "#ffffff",
+      "magenta": "#c2249a",
+      "ink": "#1b1b1b"
+    },
+    "dusk": {
+      "black": "#2b2b33",
+      "yellow": "#c7a32a",
+      "red": "#ad353e",
+      "green": "#2f7447",
+      "white": "#e7e5de",
+      "magenta": "#97417f",
+      "ink": "#2b2b33"
+    },
+    "night": {
+      "black": "#3a3a44",
+      "yellow": "#6c6322",
+      "red": "#79313a",
+      "green": "#285538",
+      "white": "#8b8881",
+      "magenta": "#5d3a57",
+      "ink": "#6a6a74"
+    }
+  }
+}

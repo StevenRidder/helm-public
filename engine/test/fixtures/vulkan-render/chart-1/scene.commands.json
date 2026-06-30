@@ -1,0 +1,326 @@
+{
+  "schema_version": "vulkan.render_scene.v0",
+  "scene_id": "chart-1-day-standard-z12",
+  "source_epoch": "synthetic-chart-1@2026-06-28",
+  "render_view": {
+    "projection": "web_mercator_tile",
+    "geographic_bbox": {
+      "west": -81.805,
+      "south": 24.495,
+      "east": -81.795,
+      "north": 24.505
+    },
+    "center": {
+      "lon": -81.8,
+      "lat": 24.5
+    },
+    "scale_denom": 12000,
+    "rotation_deg": 0,
+    "pixel_size": [
+      8,
+      8
+    ],
+    "device_pixel_ratio": 1,
+    "overzoom": false,
+    "overscan_px": 1
+  },
+  "display_state": {
+    "palette": "day",
+    "display_category": "standard",
+    "safety_depth_m": 10,
+    "shallow_contour_m": 5,
+    "safety_contour_m": 10,
+    "deep_contour_m": 20,
+    "show_text": true,
+    "show_soundings": true,
+    "show_lights": true,
+    "simplified_symbols": false,
+    "two_shade_depth": false,
+    "language": "en",
+    "units": "metric"
+  },
+  "resource_table": {
+    "symbols": [
+      {
+        "resource_id": "sym.boyspp",
+        "logical_size": [
+          12,
+          12
+        ],
+        "anchor": [
+          6,
+          6
+        ],
+        "source": "synthetic-symbol"
+      }
+    ],
+    "line_styles": [
+      {
+        "resource_id": "line.depth-contour",
+        "dash": [
+          3,
+          2
+        ]
+      }
+    ],
+    "area_patterns": [],
+    "fonts": [
+      {
+        "resource_id": "font.chart-label",
+        "family": "fixture-sans",
+        "size_px": 10
+      }
+    ],
+    "raster_textures": [
+      {
+        "resource_id": "raster.debug-collar",
+        "logical_size": [
+          8,
+          8
+        ],
+        "source": "synthetic-raster"
+      }
+    ],
+    "geometry_buffers": [],
+    "palettes": [
+      {
+        "resource_id": "palette.day",
+        "name": "day"
+      }
+    ]
+  },
+  "command_groups": [
+    {
+      "group_id": "background-raster",
+      "chart_priority": 0,
+      "s52_layer": "raster_base",
+      "quilt_rank": 0,
+      "commands": [
+        {
+          "type": "draw_raster_sheet",
+          "command_id": "cmd.raster.debug-collar",
+          "texture_ref": "raster.debug-collar",
+          "source_quad": [
+            [
+              0,
+              0
+            ],
+            [
+              8,
+              0
+            ],
+            [
+              8,
+              8
+            ],
+            [
+              0,
+              8
+            ]
+          ],
+          "target_quad": [
+            [
+              0,
+              0
+            ],
+            [
+              8,
+              0
+            ],
+            [
+              8,
+              8
+            ],
+            [
+              0,
+              8
+            ]
+          ],
+          "opacity": 1,
+          "collar_policy": "retained-for-debug",
+          "coverage_policy": "fixture-full-tile",
+          "provenance_refs": [
+            "prov.raster.debug-collar"
+          ]
+        }
+      ]
+    },
+    {
+      "group_id": "s52-base",
+      "chart_priority": 1,
+      "s52_layer": "area",
+      "quilt_rank": 1,
+      "commands": [
+        {
+          "type": "fill_area",
+          "command_id": "cmd.area.depare-1",
+          "rings": [
+            [
+              [
+                1,
+                1
+              ],
+              [
+                7,
+                1
+              ],
+              [
+                7,
+                7
+              ],
+              [
+                1,
+                7
+              ],
+              [
+                1,
+                1
+              ]
+            ]
+          ],
+          "coordinate_space": "target",
+          "fill": {
+            "palette_ref": "palette.day",
+            "color": "#b9d7e8"
+          },
+          "pattern_ref": null,
+          "opacity": 1,
+          "clip_ref": null,
+          "provenance_refs": [
+            "prov.depare-1"
+          ]
+        },
+        {
+          "type": "stroke_line",
+          "command_id": "cmd.line.depcnt-10",
+          "polyline": [
+            [
+              1,
+              5
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              7,
+              5
+            ]
+          ],
+          "coordinate_space": "target",
+          "role": "depth_contour",
+          "contour_m": 10,
+          "stroke": {
+            "color": "#4a6f8a"
+          },
+          "line_style_ref": "line.depth-contour",
+          "width_px": 1,
+          "join": "round",
+          "cap": "round",
+          "dash_phase": 0,
+          "symbol_spacing": null,
+          "provenance_refs": [
+            "prov.depcnt-10"
+          ]
+        },
+        {
+          "type": "place_symbol",
+          "command_id": "cmd.symbol.boyspp-1",
+          "symbol_ref": "sym.boyspp",
+          "position": [
+            5,
+            3
+          ],
+          "coordinate_space": "target",
+          "anchor": [
+            6,
+            6
+          ],
+          "rotation_deg": 0,
+          "scale": 1,
+          "declutter_key": "boy-synthetic-1",
+          "priority": 80,
+          "provenance_refs": [
+            "prov.boyspp-1"
+          ]
+        },
+        {
+          "type": "draw_text",
+          "command_id": "cmd.text.boyspp-label",
+          "text": "Synthetic buoy",
+          "text_run_refs": [],
+          "position": [
+            5,
+            2
+          ],
+          "coordinate_space": "target",
+          "anchor": "center",
+          "rotation_deg": 0,
+          "font_ref": "font.chart-label",
+          "halo": {
+            "color": "#ffffff",
+            "width_px": 1
+          },
+          "priority": 70,
+          "collision_box": [
+            2,
+            1,
+            8,
+            3
+          ],
+          "provenance_refs": [
+            "prov.boyspp-1"
+          ]
+        },
+        {
+          "type": "draw_sounding",
+          "command_id": "cmd.sounding.soundg-1",
+          "depth_m": 7.4,
+          "formatted_text": "7.4",
+          "position": [
+            3,
+            6
+          ],
+          "coordinate_space": "target",
+          "font_ref": "font.chart-label",
+          "priority": 60,
+          "safety_class": "shoal",
+          "provenance_refs": [
+            "prov.soundg-1"
+          ]
+        }
+      ]
+    }
+  ],
+  "provenance_table": [
+    {
+      "provenance_id": "prov.raster.debug-collar",
+      "source_chart_id": "SYNTH-CHART-1"
+    },
+    {
+      "provenance_id": "prov.depare-1",
+      "source_chart_id": "SYNTH-CHART-1"
+    },
+    {
+      "provenance_id": "prov.depcnt-10",
+      "source_chart_id": "SYNTH-CHART-1"
+    },
+    {
+      "provenance_id": "prov.boyspp-1",
+      "source_chart_id": "SYNTH-CHART-1"
+    },
+    {
+      "provenance_id": "prov.soundg-1",
+      "source_chart_id": "SYNTH-CHART-1"
+    }
+  ],
+  "diagnostics": [
+    {
+      "severity": "info",
+      "code": "fixture.synthetic",
+      "message": "Synthetic command-stream fixture; not a nautical chart.",
+      "provenance_refs": [],
+      "suggested_action": "Use for schema and harness regression only."
+    }
+  ]
+}

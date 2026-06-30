@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="PredictWind Offshore" xmlns="http://www.topografix.com/GPX/1/1">
+  <metadata><name>PredictWind demo route — Key West</name></metadata>
+  <rte>
+    <name>PW Optimal Route (demo)</name>
+    <rtept lat="24.34" lon="-82.00"><name>Start</name></rtept>
+    <rtept lat="24.45" lon="-81.92"><name>WP1</name></rtept>
+    <rtept lat="24.55" lon="-81.80"><name>WP2</name></rtept>
+    <rtept lat="24.62" lon="-81.66"><name>WP3</name></rtept>
+    <rtept lat="24.66" lon="-81.55"><name>Finish</name></rtept>
+  </rte>
+  <wpt lat="24.566" lon="-81.807"><name>Key West Bight</name></wpt>
+</gpx>

@@ -1,0 +1,194 @@
+diff --git a/cli/CMakeLists.txt b/cli/CMakeLists.txt
+index 1909f44..ae59f3e 100644
+--- a/cli/CMakeLists.txt
++++ b/cli/CMakeLists.txt
+@@ -90,3 +90,189 @@ if (APPLE)
+                                XCODE_ATTRIBUTE_ENABLE_HARDENED_RUNTIME YES
+   )
+ endif ()
++
++# ---- Helm Phase-1 spike: headless nav-core probe (mirrors opencpn-cmd) ----
++add_executable(helm-spike helm_spike.cpp api_shim.cpp)
++set_property(TARGET helm-spike PROPERTY ENABLE_EXPORTS ON)
++target_include_directories(helm-spike PRIVATE
++  ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/gui/include)
++target_compile_definitions(helm-spike PUBLIC USE_MOCK_DEFS)
++if (TARGET ocpn::wxcurl)
++  target_link_libraries(helm-spike PRIVATE ocpn::wxcurl)
++else ()
++  target_link_libraries(helm-spike PRIVATE ${SYS_WXCURL_LIBRARIES})
++endif ()
++target_link_libraries(helm-spike PRIVATE ${wxWidgets_LIBRARIES})
++if (TARGET ocpn::wxsvg)
++  target_link_libraries(helm-spike PRIVATE ocpn::wxsvg)
++endif ()
++target_link_libraries(helm-spike PRIVATE ocpn::serial ocpn::tinyxml ocpn::filesystem ocpn::gl-headers)
++if (HAVE_LIBUDEV)
++  target_link_libraries(helm-spike PRIVATE ocpn::libudev)
++endif ()
++target_link_libraries(helm-spike PRIVATE ocpn::model ocpn::model-src)
++# ---- Chart spike: headless S-57 ENC -> PNG (DC path, no GL) ----------------
++# Append to /tmp/opencpn/cli/CMakeLists.txt (after the helm-spike block).
++#
++# Compiles a hand-picked slice of gui/src (the s57chart render subgraph) plus
++# chart_spike.cpp + chart_stubs.cpp, links the in-tree static libs + model-src
++# + wxWidgets. ocpnUSE_GL is left UNDEFINED so the GL branches drop out.
++
++set(CHART_SPIKE_GUI_SRC
++  ${PROJECT_SOURCE_DIR}/gui/src/s57chart.cpp
++  ${PROJECT_SOURCE_DIR}/gui/src/s57obj.cpp
++  # NOTE: gui/src/s57_ocpn_utils.cpp is intentionally NOT compiled. It is a dead
++  # file (only its header is in the real GUI_SRC) and it RE-defines the three
++  # s57_*LightSectors() helpers that s57chart.cpp already defines -> duplicate
++  # symbols, plus it has a pi_rule_list type mismatch. The render path needs
++  # none of its symbols.
++  ${PROJECT_SOURCE_DIR}/gui/src/senc_manager.cpp
++  ${PROJECT_SOURCE_DIR}/gui/src/o_senc.cpp
++  ${PROJECT_SOURCE_DIR}/gui/src/ocpndc.cpp
++  ${PROJECT_SOURCE_DIR}/gui/src/viewport.cpp
++  ${PROJECT_SOURCE_DIR}/gui/src/ocpn_region.cpp
++  ${PROJECT_SOURCE_DIR}/gui/src/color_handler.cpp
++  # ocpnUSE_GL is defined for the whole tree (and is BAKED into the prebuilt
++  # libs' ABI -- e.g. s52plib has GL-only members), so we keep it ON and instead
++  # satisfy the GL globals these files reference. These three are small, self-
++  # contained TUs that DEFINE those globals + the DC pixel cache:
++  ${PROJECT_SOURCE_DIR}/gui/src/ocpn_pixel.cpp       # ocpnMemDC, ocpnBitmap (DC path)
++  ${PROJECT_SOURCE_DIR}/gui/src/shaders.cpp          # shader-program globals, preamble
++  ${PROJECT_SOURCE_DIR}/gui/src/ocpn_gl_options.cpp  # g_GLOptions
++)
++
++# ---- ocpn::chart-render — first-class static library for the headless S-52
++#      renderer (Step 6). Was a per-executable gui/src slice + stubs; now a
++#      reusable library that chart-spike AND helm-tiles link. OCPN_HEADLESS
++#      severs the plugin dynamic_cast, so NO faked RTTI (chart_typeinfo.cpp) is
++#      needed. PUBLIC usage requirements (includes/defs/libs) flow to consumers,
++#      and GetpSharedDataLocation() lives in chart_stubs.cpp so the library has
++#      no back-reference to its host executable.
++add_library(helm-chartrender STATIC ${CHART_SPIKE_GUI_SRC} chart_stubs.cpp)
++target_include_directories(helm-chartrender PUBLIC
++  ${PROJECT_SOURCE_DIR}/include
++  ${PROJECT_SOURCE_DIR}/gui/include
++  ${PROJECT_SOURCE_DIR}/gui/include/gui
++  ${PROJECT_SOURCE_DIR}/gui/src/s57/include
++  ${PROJECT_SOURCE_DIR}/libs/s52plib/src
++  ${PROJECT_SOURCE_DIR}/libs/s57-charts/include
++  ${PROJECT_SOURCE_DIR}/libs/geoprim/include
++  ${PROJECT_SOURCE_DIR}/libs/ssl_sha1/include)
++target_compile_definitions(helm-chartrender PUBLIC USE_MOCK_DEFS OCPN_HEADLESS)
++target_link_libraries(helm-chartrender PUBLIC
++  ocpn::s52plib ocpn::s57-charts ocpn::geoprim ocpn::iso8211 ocpn::gl-headers
++  ocpn::model-src ocpn::model ssl::sha1
++  ocpn::serial ocpn::tinyxml ocpn::filesystem
++  ${wxWidgets_LIBRARIES})
++if (TARGET ocpn::wxcurl)
++  target_link_libraries(helm-chartrender PUBLIC ocpn::wxcurl)
++endif ()
++if (TARGET ocpn::wxsvg)
++  target_link_libraries(helm-chartrender PUBLIC ocpn::wxsvg)
++endif ()
++if (HAVE_LIBUDEV)
++  target_link_libraries(helm-chartrender PUBLIC ocpn::libudev)
++endif ()
++add_library(ocpn::chart-render ALIAS helm-chartrender)
++
++# chart-spike: the proof harness, now just a main linking the library.
++add_executable(chart-spike chart_spike.cpp)
++set_property(TARGET chart-spike PROPERTY ENABLE_EXPORTS ON)
++target_link_libraries(chart-spike PRIVATE ocpn::chart-render)
++
++# ---- Helm tides: OpenCPN harmonic tide/current engine behind a headless wrapper ----
++set(HELM_TIDES_GUI_SRC
++  ${PROJECT_SOURCE_DIR}/gui/src/tcmgr.cpp
++  ${PROJECT_SOURCE_DIR}/gui/src/tc_data_source.cpp
++  ${PROJECT_SOURCE_DIR}/gui/src/tc_data_factory.cpp
++  ${PROJECT_SOURCE_DIR}/gui/src/tcds_ascii_harmonic.cpp
++  ${PROJECT_SOURCE_DIR}/gui/src/tcds_binary_harmonic.cpp
++  ${PROJECT_SOURCE_DIR}/gui/src/station_data.cpp
++  ${PROJECT_SOURCE_DIR}/gui/src/idx_entry.cpp
++  ${PROJECT_SOURCE_DIR}/model/src/logger.cpp
++)
++add_library(helm-tides STATIC ${HELM_TIDES_GUI_SRC} helm_tides.cpp helm_tides_stubs.cpp)
++target_include_directories(helm-tides PUBLIC
++  ${PROJECT_SOURCE_DIR}/include
++  ${PROJECT_SOURCE_DIR}/model/include
++  ${PROJECT_SOURCE_DIR}/gui/include
++  ${PROJECT_SOURCE_DIR}/gui/include/gui
++  ${PROJECT_SOURCE_DIR}/resources)
++target_compile_definitions(helm-tides PUBLIC USE_MOCK_DEFS OCPN_HEADLESS)
++target_link_libraries(helm-tides PUBLIC ${wxWidgets_LIBRARIES})
++target_link_libraries(helm-tides PUBLIC ocpn::rapidjson)
++add_library(ocpn::tides ALIAS helm-tides)
++
++add_executable(helm-tides-smoke helm_tides_smoke.cpp)
++set_property(TARGET helm-tides-smoke PROPERTY ENABLE_EXPORTS ON)
++target_link_libraries(helm-tides-smoke PRIVATE ocpn::tides)
++
++add_executable(helm-tides-fetch helm_tides_fetch.cpp)
++set_property(TARGET helm-tides-fetch PROPERTY ENABLE_EXPORTS ON)
++target_include_directories(helm-tides-fetch PRIVATE ${PROJECT_SOURCE_DIR}/libs/IXWebSocket)
++target_link_libraries(helm-tides-fetch PRIVATE ocpn::tides ixwebsocket)
++
++# ---- Helm S-52 atlas builder: deterministic symbol/pattern/line-style assets ----
++add_library(helm-s52-atlas STATIC helm_s52_atlas.cpp)
++target_compile_features(helm-s52-atlas PUBLIC cxx_std_11)
++
++add_executable(helm-s52-atlas-builder helm_s52_atlas_builder.cpp)
++set_property(TARGET helm-s52-atlas-builder PROPERTY ENABLE_EXPORTS ON)
++target_link_libraries(helm-s52-atlas-builder PRIVATE helm-s52-atlas)
++
++add_executable(helm-s52-atlas-smoke helm_s52_atlas_smoke.cpp)
++set_property(TARGET helm-s52-atlas-smoke PROPERTY ENABLE_EXPORTS ON)
++target_link_libraries(helm-s52-atlas-smoke PRIVATE helm-s52-atlas)
++
++# ---- Helm Engine skeleton: model/ nav core -> nav-state WebSocket (127.0.0.1:8081) ----
++add_executable(helm-engine helm_engine.cpp api_shim.cpp)
++set_property(TARGET helm-engine PROPERTY ENABLE_EXPORTS ON)
++target_include_directories(helm-engine PRIVATE
++  ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/gui/include
++  ${PROJECT_SOURCE_DIR}/libs/IXWebSocket)
++target_compile_definitions(helm-engine PUBLIC USE_MOCK_DEFS)
++if (TARGET ocpn::wxcurl)
++  target_link_libraries(helm-engine PRIVATE ocpn::wxcurl)
++else ()
++  target_link_libraries(helm-engine PRIVATE ${SYS_WXCURL_LIBRARIES})
++endif ()
++target_link_libraries(helm-engine PRIVATE ${wxWidgets_LIBRARIES})
++if (TARGET ocpn::wxsvg)
++  target_link_libraries(helm-engine PRIVATE ocpn::wxsvg)
++endif ()
++target_link_libraries(helm-engine PRIVATE ocpn::serial ocpn::tinyxml ocpn::filesystem ocpn::gl-headers)
++if (HAVE_LIBUDEV)
++  target_link_libraries(helm-engine PRIVATE ocpn::libudev)
++endif ()
++target_link_libraries(helm-engine PRIVATE ocpn::model ocpn::model-src)
++target_link_libraries(helm-engine PRIVATE ixwebsocket)
++
++# ---- Helm tile server: S-52 ENC -> HTTP tiles (clones the chart-spike slice) ----
++add_executable(helm-tiles helm_tiles.cpp)
++set_property(TARGET helm-tiles PROPERTY ENABLE_EXPORTS ON)
++target_include_directories(helm-tiles PRIVATE ${PROJECT_SOURCE_DIR}/libs/IXWebSocket)
++target_link_libraries(helm-tiles PRIVATE ocpn::chart-render ixwebsocket)
++
++# ---- Helm local pack daemon: BYO MBTiles/PMTiles catalog + range/tile serving ----
++add_executable(helm-packd helm_packd.cpp)
++set_property(TARGET helm-packd PROPERTY ENABLE_EXPORTS ON)
++target_compile_features(helm-packd PRIVATE cxx_std_17)
++target_include_directories(helm-packd PRIVATE ${PROJECT_SOURCE_DIR}/libs/IXWebSocket)
++target_link_libraries(helm-packd PRIVATE ixwebsocket ocpn::sqlite ocpn::rapidjson)
++
++# ---- Helm basemap cache/proxy: optional online-fill + remote-pack tile cache ----
++add_executable(helm-basemap-cache helm_basemap_cache.cpp)
++set_property(TARGET helm-basemap-cache PROPERTY ENABLE_EXPORTS ON)
++target_compile_features(helm-basemap-cache PRIVATE cxx_std_17)
++target_include_directories(helm-basemap-cache PRIVATE ${PROJECT_SOURCE_DIR}/libs/IXWebSocket)
++target_link_libraries(helm-basemap-cache PRIVATE ixwebsocket)
++
++# ---- Helm one-origin server: nav WS + S-52 tile HTTP + static UI on ONE port ----
++add_executable(helm-server helm_server.cpp)
++set_property(TARGET helm-server PROPERTY ENABLE_EXPORTS ON)
++target_include_directories(helm-server PRIVATE ${PROJECT_SOURCE_DIR}/libs/IXWebSocket)
++target_link_libraries(helm-server PRIVATE ocpn::chart-render ocpn::tides ixwebsocket)
++
++# ---- Vulkan renderer fixture checker: standalone C++ command/golden harness ----
++add_executable(helm-vulkan-fixture-check helm_vulkan_fixture_check.cpp)
++set_property(TARGET helm-vulkan-fixture-check PROPERTY ENABLE_EXPORTS ON)

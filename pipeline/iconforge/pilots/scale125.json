@@ -1,0 +1,2455 @@
+{
+  "id": "scale125",
+  "title": "125-asset Icon Forge scale batch",
+  "source": "~/.helm/runtime/s57data/chartsymbols.xml",
+  "target_assets": 125,
+  "selected_assets": 125,
+  "quotas": {
+    "buoy_beacon_marks": 45,
+    "lights_daymarks_topmarks": 20,
+    "wreck_rock_obstruction": 25,
+    "areas_patterns_lines": 25,
+    "ugly_attribute_edges": 10
+  },
+  "family_counts": {
+    "buoy_beacon_marks": 45,
+    "wreck_rock_obstruction": 25,
+    "areas_patterns_lines": 25,
+    "lights_daymarks_topmarks": 20,
+    "ugly_attribute_edges": 10
+  },
+  "asset_kind_counts": {
+    "symbol": 96,
+    "line-style": 17,
+    "conditional-procedure": 3,
+    "pattern": 9
+  },
+  "selection_rules": [
+    "Select from chartsymbols.xml lookup rows, not by hand.",
+    "Prefer whole hard families and sibling-rich cases.",
+    "Prefer attribute-driven and conditional-symbology rows.",
+    "Keep area patterns and line styles in scope.",
+    "Each selected row carries lookup provenance and stress reasons."
+  ],
+  "next_batch_outputs": {
+    "styles": 2,
+    "palettes": 3,
+    "svg_outputs": 250,
+    "png_outputs": 750
+  },
+  "entries": [
+    {
+      "id": "BOYCAR_BOYCAR01_1022",
+      "asset": "BOYCAR01",
+      "asset_kind": "symbol",
+      "family": "buoy_beacon_marks",
+      "object_class": "BOYCAR",
+      "lookup_id": "1022",
+      "rcid": "31074",
+      "conditions": [
+        "CATCAM1"
+      ],
+      "instruction": "SY(BOYCAR01);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "cardinal buoy, north, simplified",
+      "stress_reasons": [
+        "buoy_beacon_marks",
+        "attribute_driven_mark_variant",
+        "cardinal_orientation"
+      ]
+    },
+    {
+      "id": "BOYCAR_BOYCAR02_1023",
+      "asset": "BOYCAR02",
+      "asset_kind": "symbol",
+      "family": "buoy_beacon_marks",
+      "object_class": "BOYCAR",
+      "lookup_id": "1023",
+      "rcid": "31075",
+      "conditions": [
+        "CATCAM2"
+      ],
+      "instruction": "SY(BOYCAR02);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "cardinal buoy, east, simplified",
+      "stress_reasons": [
+        "buoy_beacon_marks",
+        "attribute_driven_mark_variant",
+        "cardinal_orientation"
+      ]
+    },
+    {
+      "id": "BOYCAR_BOYCAR03_1024",
+      "asset": "BOYCAR03",
+      "asset_kind": "symbol",
+      "family": "buoy_beacon_marks",
+      "object_class": "BOYCAR",
+      "lookup_id": "1024",
+      "rcid": "31076",
+      "conditions": [
+        "CATCAM3"
+      ],
+      "instruction": "SY(BOYCAR03);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "cardinal buoy, south, simplified",
+      "stress_reasons": [
+        "buoy_beacon_marks",
+        "attribute_driven_mark_variant",
+        "cardinal_orientation"
+      ]
+    },
+    {
+      "id": "BOYCAR_BOYCAR04_1025",
+      "asset": "BOYCAR04",
+      "asset_kind": "symbol",
+      "family": "buoy_beacon_marks",
+      "object_class": "BOYCAR",
+      "lookup_id": "1025",
+      "rcid": "31077",
+      "conditions": [
+        "CATCAM4"
+      ],
+      "instruction": "SY(BOYCAR04);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "cardinal buoy, west, simplified",
+      "stress_reasons": [
+        "buoy_beacon_marks",
+        "attribute_driven_mark_variant",
+        "cardinal_orientation"
+      ]
+    },
+    {
+      "id": "BCNCAR_BCNCAR01_965",
+      "asset": "BCNCAR01",
+      "asset_kind": "symbol",
+      "family": "buoy_beacon_marks",
+      "object_class": "BCNCAR",
+      "lookup_id": "965",
+      "rcid": "31017",
+      "conditions": [
+        "CATCAM1"
+      ],
+      "instruction": "SY(BCNCAR01);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "cardinal beacon, north, simplified",
+      "stress_reasons": [
+        "buoy_beacon_marks",
+        "attribute_driven_mark_variant",
+        "cardinal_orientation"
+      ]
+    },
+    {
+      "id": "BCNCAR_BCNCAR02_966",
+      "asset": "BCNCAR02",
+      "asset_kind": "symbol",
+      "family": "buoy_beacon_marks",
+      "object_class": "BCNCAR",
+      "lookup_id": "966",
+      "rcid": "31018",
+      "conditions": [
+        "CATCAM2"
+      ],
+      "instruction": "SY(BCNCAR02);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "cardinal beacon, east, simplified",
+      "stress_reasons": [
+        "buoy_beacon_marks",
+        "attribute_driven_mark_variant",
+        "cardinal_orientation"
+      ]
+    },
+    {
+      "id": "BCNCAR_BCNCAR03_967",
+      "asset": "BCNCAR03",
+      "asset_kind": "symbol",
+      "family": "buoy_beacon_marks",
+      "object_class": "BCNCAR",
+      "lookup_id": "967",
+      "rcid": "31019",
+      "conditions": [
+        "CATCAM3"
+      ],
+      "instruction": "SY(BCNCAR03);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "cardinal beacon, south, simplified",
+      "stress_reasons": [
+        "buoy_beacon_marks",
+        "attribute_driven_mark_variant",
+        "cardinal_orientation"
+      ]
+    },
+    {
+      "id": "BCNCAR_BCNCAR04_968",
+      "asset": "BCNCAR04",
+      "asset_kind": "symbol",
+      "family": "buoy_beacon_marks",
+      "object_class": "BCNCAR",
+      "lookup_id": "968",
+      "rcid": "31020",
+      "conditions": [
+        "CATCAM4"
+      ],
+      "instruction": "SY(BCNCAR04);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "cardinal beacon, west, simplified",
+      "stress_reasons": [
+        "buoy_beacon_marks",
+        "attribute_driven_mark_variant",
+        "cardinal_orientation"
+      ]
+    },
+    {
+      "id": "BOYLAT_BOYLAT13_1030",
+      "asset": "BOYLAT13",
+      "asset_kind": "symbol",
+      "family": "buoy_beacon_marks",
+      "object_class": "BOYLAT",
+      "lookup_id": "1030",
+      "rcid": "31082",
+      "conditions": [
+        "BOYSHP1",
+        "COLOUR4,3,4"
+      ],
+      "instruction": "SY(BOYLAT13);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "conical lateral buoy, green, simplified",
+      "stress_reasons": [
+        "buoy_beacon_marks",
+        "attribute_driven_mark_variant",
+        "lateral_region_colour_shape"
+      ]
+    },
+    {
+      "id": "BOYLAT_BOYLAT14_1029",
+      "asset": "BOYLAT14",
+      "asset_kind": "symbol",
+      "family": "buoy_beacon_marks",
+      "object_class": "BOYLAT",
+      "lookup_id": "1029",
+      "rcid": "31081",
+      "conditions": [
+        "BOYSHP1",
+        "COLOUR3,4,3"
+      ],
+      "instruction": "SY(BOYLAT14);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "conical lateral buoy, red, simplified",
+      "stress_reasons": [
+        "buoy_beacon_marks",
+        "attribute_driven_mark_variant",
+        "lateral_region_colour_shape"
+      ]
+    },
+    {
+      "id": "BOYLAT_BOYLAT23_1032",
+      "asset": "BOYLAT23",
+      "asset_kind": "symbol",
+      "family": "buoy_beacon_marks",
+      "object_class": "BOYLAT",
+      "lookup_id": "1032",
+      "rcid": "31084",
+      "conditions": [
+        "BOYSHP2",
+        "COLOUR4,3,4"
+      ],
+      "instruction": "SY(BOYLAT23);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "can shape lateral buoy, green, simplified",
+      "stress_reasons": [
+        "buoy_beacon_marks",
+        "attribute_driven_mark_variant",
+        "lateral_region_colour_shape"
+      ]
+    },
+    {
+      "id": "BOYLAT_BOYLAT24_1031",
+      "asset": "BOYLAT24",
+      "asset_kind": "symbol",
+      "family": "buoy_beacon_marks",
+      "object_class": "BOYLAT",
+      "lookup_id": "1031",
+      "rcid": "31083",
+      "conditions": [
+        "BOYSHP2",
+        "COLOUR3,4,3"
+      ],
+      "instruction": "SY(BOYLAT24);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "can shape lateral buoy, red, simplified",
+      "stress_reasons": [
+        "buoy_beacon_marks",
+        "attribute_driven_mark_variant",
+        "lateral_region_colour_shape"
+      ]
+    },
+    {
+      "id": "BOYSAW_BOYSAW12_1046",
+      "asset": "BOYSAW12",
+      "asset_kind": "symbol",
+      "family": "buoy_beacon_marks",
+      "object_class": "BOYSAW",
+      "lookup_id": "1046",
+      "rcid": "31098",
+      "conditions": [],
+      "instruction": "SY(BOYSAW12);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "safe water buoy, simplified",
+      "stress_reasons": [
+        "buoy_beacon_marks"
+      ]
+    },
+    {
+      "id": "$CSYMB_WRECKS04_1692",
+      "asset": "WRECKS04",
+      "asset_kind": "symbol",
+      "family": "wreck_rock_obstruction",
+      "object_class": "$CSYMB",
+      "lookup_id": "1692",
+      "rcid": "31744",
+      "conditions": [
+        "$SCODEWRECKS04"
+      ],
+      "instruction": "SY(WRECKS04)",
+      "description": "non-dangerous wreck, depth unknown",
+      "stress_reasons": [
+        "wreck_rock_obstruction"
+      ]
+    },
+    {
+      "id": "$CSYMB_WRECKS05_1693",
+      "asset": "WRECKS05",
+      "asset_kind": "symbol",
+      "family": "wreck_rock_obstruction",
+      "object_class": "$CSYMB",
+      "lookup_id": "1693",
+      "rcid": "31745",
+      "conditions": [
+        "$SCODEWRECKS05"
+      ],
+      "instruction": "SY(WRECKS05)",
+      "description": "dangerous wreck, depth unknown",
+      "stress_reasons": [
+        "wreck_rock_obstruction"
+      ]
+    },
+    {
+      "id": "$CSYMB_UWTROC03_1680",
+      "asset": "UWTROC03",
+      "asset_kind": "symbol",
+      "family": "wreck_rock_obstruction",
+      "object_class": "$CSYMB",
+      "lookup_id": "1680",
+      "rcid": "31732",
+      "conditions": [
+        "$SCODEUWTROC03"
+      ],
+      "instruction": "SY(UWTROC03)",
+      "description": "dangerous underwater rock of uncertain depth",
+      "stress_reasons": [
+        "wreck_rock_obstruction"
+      ]
+    },
+    {
+      "id": "$CSYMB_OBSTRN11_1645",
+      "asset": "OBSTRN11",
+      "asset_kind": "symbol",
+      "family": "wreck_rock_obstruction",
+      "object_class": "$CSYMB",
+      "lookup_id": "1645",
+      "rcid": "31697",
+      "conditions": [
+        "$SCODEOBSTRN11"
+      ],
+      "instruction": "SY(OBSTRN11)",
+      "description": "obstruction in the water which is always above water level",
+      "stress_reasons": [
+        "wreck_rock_obstruction"
+      ]
+    },
+    {
+      "id": "ISTZNE_RESARE51_422",
+      "asset": "RESARE51",
+      "asset_kind": "line-style",
+      "family": "areas_patterns_lines",
+      "object_class": "ISTZNE",
+      "lookup_id": "422",
+      "rcid": "32457",
+      "conditions": [],
+      "instruction": "SY(ITZARE51);LC(RESARE51);CS(RESTRN01)",
+      "description": "boundary of a restricted area",
+      "stress_reasons": [
+        "areas_patterns_lines",
+        "conditional_symbology"
+      ]
+    },
+    {
+      "id": "ACHARE_ACHARE51_2",
+      "asset": "ACHARE51",
+      "asset_kind": "symbol",
+      "family": "areas_patterns_lines",
+      "object_class": "ACHARE",
+      "lookup_id": "2",
+      "rcid": "32038",
+      "conditions": [],
+      "instruction": "SY(ACHARE51);CS(RESARE02)",
+      "description": "boundary of an anchorage area",
+      "stress_reasons": [
+        "areas_patterns_lines",
+        "conditional_symbology",
+        "area_boundary_pattern"
+      ]
+    },
+    {
+      "id": "TSSLPT_CTNARE51_201",
+      "asset": "CTNARE51",
+      "asset_kind": "symbol",
+      "family": "areas_patterns_lines",
+      "object_class": "TSSLPT",
+      "lookup_id": "201",
+      "rcid": "32236",
+      "conditions": [],
+      "instruction": "SY(CTNARE51);TX(INFORM,1,1,2,'15110',0,-2,CHBLK,24);CS(RESTRN01)",
+      "description": "boundary of area with a specific caution",
+      "stress_reasons": [
+        "areas_patterns_lines",
+        "conditional_symbology"
+      ]
+    },
+    {
+      "id": "BCNLAT_BCNTOW63_1741",
+      "asset": "BCNTOW63",
+      "asset_kind": "symbol",
+      "family": "buoy_beacon_marks",
+      "object_class": "BCNLAT",
+      "lookup_id": "1741",
+      "rcid": "30032",
+      "conditions": [
+        "BCNSHP3",
+        "CATLAM2",
+        "COLPAT1",
+        "COLOUR1,3"
+      ],
+      "instruction": "SY(BCNTOW63);TE('%s','OBJNAM',2,1,2,'15110',-1,-2,CHBLK,21)",
+      "description": "beacon tower, red/white, full-chart",
+      "stress_reasons": [
+        "buoy_beacon_marks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "BCNLAT_BCNTOW64_1742",
+      "asset": "BCNTOW64",
+      "asset_kind": "symbol",
+      "family": "buoy_beacon_marks",
+      "object_class": "BCNLAT",
+      "lookup_id": "1742",
+      "rcid": "30034",
+      "conditions": [
+        "BCNSHP3",
+        "CATLAM2",
+        "COLPAT1",
+        "COLOUR3,1"
+      ],
+      "instruction": "SY(BCNTOW64);TE('%s','OBJNAM',2,1,2,'15110',-1,-2,CHBLK,21)",
+      "description": "beacon tower, red/white, full-chart",
+      "stress_reasons": [
+        "buoy_beacon_marks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "BCNLAT_BCNTOW65_1740",
+      "asset": "BCNTOW65",
+      "asset_kind": "symbol",
+      "family": "buoy_beacon_marks",
+      "object_class": "BCNLAT",
+      "lookup_id": "1740",
+      "rcid": "30035",
+      "conditions": [
+        "BCNSHP3",
+        "CATLAM1",
+        "COLPAT1",
+        "COLOUR4,1"
+      ],
+      "instruction": "SY(BCNTOW65);TE('%s','OBJNAM',2,1,2,'15110',-1,-2,CHBLK,21)",
+      "description": "beacon tower, green/white, full-chart",
+      "stress_reasons": [
+        "buoy_beacon_marks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "BCNLAT_BCNTOW66_1739",
+      "asset": "BCNTOW66",
+      "asset_kind": "symbol",
+      "family": "buoy_beacon_marks",
+      "object_class": "BCNLAT",
+      "lookup_id": "1739",
+      "rcid": "30033",
+      "conditions": [
+        "BCNSHP3",
+        "CATLAM1",
+        "COLPAT1",
+        "COLOUR1,4"
+      ],
+      "instruction": "SY(BCNTOW66);TE('%s','OBJNAM',2,1,2,'15110',-1,-2,CHBLK,21)",
+      "description": "beacon tower, green/white, full-chart",
+      "stress_reasons": [
+        "buoy_beacon_marks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "BCNLAT_BCNTOW74_1738",
+      "asset": "BCNTOW74",
+      "asset_kind": "symbol",
+      "family": "buoy_beacon_marks",
+      "object_class": "BCNLAT",
+      "lookup_id": "1738",
+      "rcid": "93980",
+      "conditions": [
+        "BCNSHP3",
+        "CATLAM4",
+        "COLPAT1",
+        "COLOUR3,4,3"
+      ],
+      "instruction": "SY(BCNTOW74);TE('%s','OBJNAM',2,1,2,'15110',-1,-2,CHBLK,21)",
+      "description": "beacon tower, grg, full-chart",
+      "stress_reasons": [
+        "buoy_beacon_marks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "BCNLAT_BCNSTK60_1744",
+      "asset": "BCNSTK60",
+      "asset_kind": "symbol",
+      "family": "buoy_beacon_marks",
+      "object_class": "BCNLAT",
+      "lookup_id": "1744",
+      "rcid": "30028",
+      "conditions": [
+        "BCNSHP5",
+        "CATLAM2",
+        "COLOUR3"
+      ],
+      "instruction": "SY(BCNSTK60);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "minor, stake or pole beacon, red, full-chart",
+      "stress_reasons": [
+        "buoy_beacon_marks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "BCNLAT_BCNSTK61_1743",
+      "asset": "BCNSTK61",
+      "asset_kind": "symbol",
+      "family": "buoy_beacon_marks",
+      "object_class": "BCNLAT",
+      "lookup_id": "1743",
+      "rcid": "30027",
+      "conditions": [
+        "BCNSHP5",
+        "CATLAM1",
+        "COLOUR4"
+      ],
+      "instruction": "SY(BCNSTK61);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "minor, stake or pole beacon, green, full-chart",
+      "stress_reasons": [
+        "buoy_beacon_marks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "BCNSPP_BCNTOW85_1783",
+      "asset": "BCNTOW85",
+      "asset_kind": "symbol",
+      "family": "buoy_beacon_marks",
+      "object_class": "BCNSPP",
+      "lookup_id": "1783",
+      "rcid": "30070",
+      "conditions": [
+        "BCNSHP3",
+        "COLOUR4,1",
+        "COLPAT2"
+      ],
+      "instruction": "SY(BCNTOW85);TE('%s','OBJNAM',2,1,2,'15110',-1,-2,CHBLK,21)",
+      "description": "beacon tower, green/white, full-chart",
+      "stress_reasons": [
+        "buoy_beacon_marks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "BCNSPP_BCNTOW87_1782",
+      "asset": "BCNTOW87",
+      "asset_kind": "symbol",
+      "family": "buoy_beacon_marks",
+      "object_class": "BCNSPP",
+      "lookup_id": "1782",
+      "rcid": "30069",
+      "conditions": [
+        "BCNSHP3",
+        "COLPAT1",
+        "COLOUR2,1,2"
+      ],
+      "instruction": "SY(BCNTOW87);TE('%s','OBJNAM',2,1,2,'15110',-1,-2,CHBLK,21)",
+      "description": "beacon yb, full-chart",
+      "stress_reasons": [
+        "buoy_beacon_marks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "BOYISD_BOYCON77_1865",
+      "asset": "BOYCON77",
+      "asset_kind": "symbol",
+      "family": "buoy_beacon_marks",
+      "object_class": "BOYISD",
+      "lookup_id": "1865",
+      "rcid": "93803",
+      "conditions": [
+        "BOYSHP1",
+        "COLPAT1",
+        "COLOUR1,11"
+      ],
+      "instruction": "SY(BOYCON77);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "conical buoy,lateral-wo,full-chart",
+      "stress_reasons": [
+        "buoy_beacon_marks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "BOYLAT_BCNSTK78_3028",
+      "asset": "BCNSTK78",
+      "asset_kind": "symbol",
+      "family": "buoy_beacon_marks",
+      "object_class": "BOYLAT",
+      "lookup_id": "3028",
+      "rcid": "3063044",
+      "conditions": [
+        "BOYSHP5",
+        "COLOUR3,1",
+        "COLPAT1"
+      ],
+      "instruction": "SY(BCNSTK78);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "minor, stake or pole beacon, red/white, full-chart",
+      "stress_reasons": [
+        "buoy_beacon_marks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "BOYLAT_BCNSTK81_3029",
+      "asset": "BCNSTK81",
+      "asset_kind": "symbol",
+      "family": "buoy_beacon_marks",
+      "object_class": "BOYLAT",
+      "lookup_id": "3029",
+      "rcid": "3063045",
+      "conditions": [
+        "BOYSHP5",
+        "COLOUR4,1",
+        "COLPAT1"
+      ],
+      "instruction": "SY(BCNSTK81);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "minor, stake or pole beacon, red/white, full-chart",
+      "stress_reasons": [
+        "buoy_beacon_marks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "BOYLAT_BOYCAN73_1883",
+      "asset": "BOYCAN73",
+      "asset_kind": "symbol",
+      "family": "buoy_beacon_marks",
+      "object_class": "BOYLAT",
+      "lookup_id": "1883",
+      "rcid": "30162",
+      "conditions": [
+        "BOYSHP2",
+        "COLOUR4,3,4",
+        "COLPAT1"
+      ],
+      "instruction": "SY(BOYCAN73);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "can buoy,lateral grg,full-chart",
+      "stress_reasons": [
+        "buoy_beacon_marks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "BOYLAT_BOYCAN82_1880",
+      "asset": "BOYCAN82",
+      "asset_kind": "symbol",
+      "family": "buoy_beacon_marks",
+      "object_class": "BOYLAT",
+      "lookup_id": "1880",
+      "rcid": "93823",
+      "conditions": [
+        "BOYSHP2",
+        "CATLAM7",
+        "COLOUR3,1,3,1,3"
+      ],
+      "instruction": "SY(BOYCAN82);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "can buoy,lateral-rw,full-chart",
+      "stress_reasons": [
+        "buoy_beacon_marks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "BOYLAT_BOYCAN83_1881",
+      "asset": "BOYCAN83",
+      "asset_kind": "symbol",
+      "family": "buoy_beacon_marks",
+      "object_class": "BOYLAT",
+      "lookup_id": "1881",
+      "rcid": "93816",
+      "conditions": [
+        "BOYSHP2",
+        "CATLAM7",
+        "COLOUR3,1,3,1"
+      ],
+      "instruction": "SY(BOYCAN83);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "can buoy,lateral-rw,full-chart",
+      "stress_reasons": [
+        "buoy_beacon_marks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "BOYLAT_BOYCON66_1882",
+      "asset": "BOYCON66",
+      "asset_kind": "symbol",
+      "family": "buoy_beacon_marks",
+      "object_class": "BOYLAT",
+      "lookup_id": "1882",
+      "rcid": "30161",
+      "conditions": [
+        "BOYSHP1",
+        "COLOUR3,4,3",
+        "COLPAT1"
+      ],
+      "instruction": "SY(BOYCON66);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "conical buoy,lateral-rgr,full-chart",
+      "stress_reasons": [
+        "buoy_beacon_marks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "BOYLAT_BOYPIL66_1884",
+      "asset": "BOYPIL66",
+      "asset_kind": "symbol",
+      "family": "buoy_beacon_marks",
+      "object_class": "BOYLAT",
+      "lookup_id": "1884",
+      "rcid": "30163",
+      "conditions": [
+        "BOYSHP4",
+        "COLOUR3,4,3",
+        "COLPAT1"
+      ],
+      "instruction": "SY(BOYPIL66);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "pillar buoy,lateral-rgr,full-chart",
+      "stress_reasons": [
+        "buoy_beacon_marks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "BOYLAT_BOYPIL67_1885",
+      "asset": "BOYPIL67",
+      "asset_kind": "symbol",
+      "family": "buoy_beacon_marks",
+      "object_class": "BOYLAT",
+      "lookup_id": "1885",
+      "rcid": "30164",
+      "conditions": [
+        "BOYSHP4",
+        "COLOUR4,3,4",
+        "COLPAT1"
+      ],
+      "instruction": "SY(BOYPIL67);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "pillar buoy,lateral-grg,full-chart",
+      "stress_reasons": [
+        "buoy_beacon_marks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "BOYLAT_BOYPIL74_1889",
+      "asset": "BOYPIL74",
+      "asset_kind": "symbol",
+      "family": "buoy_beacon_marks",
+      "object_class": "BOYLAT",
+      "lookup_id": "1889",
+      "rcid": "30167",
+      "conditions": [
+        "BOYSHP4",
+        "COLOUR4,3",
+        "COLPAT1"
+      ],
+      "instruction": "SY(BOYPIL74);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "pillar buoy,red/green,full-chart",
+      "stress_reasons": [
+        "buoy_beacon_marks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "BOYLAT_BOYSPH62_1890",
+      "asset": "BOYSPH62",
+      "asset_kind": "symbol",
+      "family": "buoy_beacon_marks",
+      "object_class": "BOYLAT",
+      "lookup_id": "1890",
+      "rcid": "93817",
+      "conditions": [
+        "BOYSHP3",
+        "CATLAM23",
+        "COLOUR6"
+      ],
+      "instruction": "SY(BOYSPH62);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "spherical buoy,yellow,full-chart",
+      "stress_reasons": [
+        "buoy_beacon_marks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "BOYLAT_BOYSPH74_1887",
+      "asset": "BOYSPH74",
+      "asset_kind": "symbol",
+      "family": "buoy_beacon_marks",
+      "object_class": "BOYLAT",
+      "lookup_id": "1887",
+      "rcid": "30165",
+      "conditions": [
+        "BOYSHP3",
+        "COLOUR3,4",
+        "COLPAT1"
+      ],
+      "instruction": "SY(BOYSPH74);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "spherical buoy,rg,full-chart",
+      "stress_reasons": [
+        "buoy_beacon_marks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "BOYLAT_BOYSPH75_1888",
+      "asset": "BOYSPH75",
+      "asset_kind": "symbol",
+      "family": "buoy_beacon_marks",
+      "object_class": "BOYLAT",
+      "lookup_id": "1888",
+      "rcid": "30166",
+      "conditions": [
+        "BOYSHP3",
+        "COLOUR4,3",
+        "COLPAT1"
+      ],
+      "instruction": "SY(BOYSPH75);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "spherical buoy,gr,full-chart",
+      "stress_reasons": [
+        "buoy_beacon_marks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "BOYSAW_BOYPIL73_1927",
+      "asset": "BOYPIL73",
+      "asset_kind": "symbol",
+      "family": "buoy_beacon_marks",
+      "object_class": "BOYSAW",
+      "lookup_id": "1927",
+      "rcid": "30204",
+      "conditions": [
+        "BOYSHP4",
+        "COLOUR3,1",
+        "COLPAT2"
+      ],
+      "instruction": "SY(BOYPIL73);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "pillar buoy,safe water-rw,full-chart",
+      "stress_reasons": [
+        "buoy_beacon_marks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "BOYSAW_BOYSPH65_1926",
+      "asset": "BOYSPH65",
+      "asset_kind": "symbol",
+      "family": "buoy_beacon_marks",
+      "object_class": "BOYSAW",
+      "lookup_id": "1926",
+      "rcid": "30203",
+      "conditions": [
+        "BOYSHP3",
+        "COLOUR3,1",
+        "COLPAT2"
+      ],
+      "instruction": "SY(BOYSPH65);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "spherical buoy,red-white,full-chart",
+      "stress_reasons": [
+        "buoy_beacon_marks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "BOYSPP_BOYCAN60_1956",
+      "asset": "BOYCAN60",
+      "asset_kind": "symbol",
+      "family": "buoy_beacon_marks",
+      "object_class": "BOYSPP",
+      "lookup_id": "1956",
+      "rcid": "30227",
+      "conditions": [
+        "CATSPM8",
+        "BOYSHP2",
+        "COLOUR3"
+      ],
+      "instruction": "SY(BOYCAN60);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "can buoy,lateral-r,full-chart",
+      "stress_reasons": [
+        "buoy_beacon_marks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "BOYSPP_BOYCAN75_1950",
+      "asset": "BOYCAN75",
+      "asset_kind": "symbol",
+      "family": "buoy_beacon_marks",
+      "object_class": "BOYSPP",
+      "lookup_id": "1950",
+      "rcid": "93959",
+      "conditions": [
+        "BOYSHP2",
+        "COLOUR3,4",
+        "COLPAT1"
+      ],
+      "instruction": "SY(BOYCAN75);TE('%s','OBJNAM',2,1,2,'15110',-2,-1,CHBLK,21)",
+      "description": "can buoy,lateral rg,full-chart",
+      "stress_reasons": [
+        "buoy_beacon_marks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "BOYSPP_BOYCAN77_1944",
+      "asset": "BOYCAN77",
+      "asset_kind": "symbol",
+      "family": "buoy_beacon_marks",
+      "object_class": "BOYSPP",
+      "lookup_id": "1944",
+      "rcid": "30218",
+      "conditions": [
+        "BOYSHP2",
+        "COLOUR1,11",
+        "COLPAT1"
+      ],
+      "instruction": "SY(BOYCAN77);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "can buoy,lateral white/orange,full-chart",
+      "stress_reasons": [
+        "buoy_beacon_marks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "BOYSPP_BOYCAN78_1942",
+      "asset": "BOYCAN78",
+      "asset_kind": "symbol",
+      "family": "buoy_beacon_marks",
+      "object_class": "BOYSPP",
+      "lookup_id": "1942",
+      "rcid": "30216",
+      "conditions": [
+        "BOYSHP2",
+        "COLOUR1,11,1",
+        "COLPAT1"
+      ],
+      "instruction": "SY(BOYCAN78);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "can buoy,lateral wow,full-chart",
+      "stress_reasons": [
+        "buoy_beacon_marks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "BOYSPP_BOYCAN80_1949",
+      "asset": "BOYCAN80",
+      "asset_kind": "symbol",
+      "family": "buoy_beacon_marks",
+      "object_class": "BOYSPP",
+      "lookup_id": "1949",
+      "rcid": "30223",
+      "conditions": [
+        "BOYSHP2",
+        "COLOUR3,1",
+        "COLPAT1"
+      ],
+      "instruction": "SY(BOYCAN80);TE('%s','OBJNAM',2,1,2,'15110',-2,-1,CHBLK,21)",
+      "description": "can buoy,red-white,full-chart",
+      "stress_reasons": [
+        "buoy_beacon_marks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "BOYSPP_BOYCAN81_1945",
+      "asset": "BOYCAN81",
+      "asset_kind": "symbol",
+      "family": "buoy_beacon_marks",
+      "object_class": "BOYSPP",
+      "lookup_id": "1945",
+      "rcid": "30219",
+      "conditions": [
+        "BOYSHP2",
+        "COLOUR11,1",
+        "COLPAT1"
+      ],
+      "instruction": "SY(BOYCAN81);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "can buoy,lateral white/orange,full-chart",
+      "stress_reasons": [
+        "buoy_beacon_marks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "BOYSPP_BOYCON65_1939",
+      "asset": "BOYCON65",
+      "asset_kind": "symbol",
+      "family": "buoy_beacon_marks",
+      "object_class": "BOYSPP",
+      "lookup_id": "1939",
+      "rcid": "93898",
+      "conditions": [
+        "BOYSHP1",
+        "COLOUR4,1,4,1,4",
+        "COLPAT1"
+      ],
+      "instruction": "SY(BOYCON65);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "conical buoy,green-white,full-chart",
+      "stress_reasons": [
+        "buoy_beacon_marks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "BOYSPP_BOYCON73_1948",
+      "asset": "BOYCON73",
+      "asset_kind": "symbol",
+      "family": "buoy_beacon_marks",
+      "object_class": "BOYSPP",
+      "lookup_id": "1948",
+      "rcid": "30222",
+      "conditions": [
+        "BOYSHP1",
+        "COLOUR4,1",
+        "COLPAT1"
+      ],
+      "instruction": "SY(BOYCON73);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "conical buoy,gw,full-chart",
+      "stress_reasons": [
+        "buoy_beacon_marks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "TOPMAR_TOPMAR01_2382",
+      "asset": "TOPMAR01",
+      "asset_kind": "conditional-procedure",
+      "family": "lights_daymarks_topmarks",
+      "object_class": "TOPMAR",
+      "lookup_id": "2382",
+      "rcid": "93871",
+      "conditions": [
+        "TOPSHP3",
+        "COLPAT1",
+        "COLOUR3,4"
+      ],
+      "instruction": "CS(TOPMAR01)",
+      "description": "",
+      "stress_reasons": [
+        "lights_daymarks_topmarks",
+        "attribute_driven_mark_variant",
+        "conditional_symbology"
+      ]
+    },
+    {
+      "id": "DAYMAR_TOPMA107_2090",
+      "asset": "TOPMA107",
+      "asset_kind": "symbol",
+      "family": "lights_daymarks_topmarks",
+      "object_class": "DAYMAR",
+      "lookup_id": "2090",
+      "rcid": "93800",
+      "conditions": [
+        "TOPSHP19",
+        "COLPAT6",
+        "COLOUR1,3"
+      ],
+      "instruction": "SY(TOPMA107);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "beacon top mark, red boarded square board, vertical",
+      "stress_reasons": [
+        "lights_daymarks_topmarks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "DAYMAR_TOPMA109_2991",
+      "asset": "TOPMA109",
+      "asset_kind": "symbol",
+      "family": "lights_daymarks_topmarks",
+      "object_class": "DAYMAR",
+      "lookup_id": "2991",
+      "rcid": "3063008",
+      "conditions": [
+        "TOPSHP12",
+        "COLOUR1,4",
+        "COLPAT6"
+      ],
+      "instruction": "SY(TOPMA109);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "beacon top mark, green boarded square board, diagonal",
+      "stress_reasons": [
+        "lights_daymarks_topmarks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "DAYMAR_TOPSHP00_2048",
+      "asset": "TOPSHP00",
+      "asset_kind": "symbol",
+      "family": "lights_daymarks_topmarks",
+      "object_class": "DAYMAR",
+      "lookup_id": "2048",
+      "rcid": "93918",
+      "conditions": [
+        "TOPSHP33",
+        "COLPAT6,5",
+        "COLOUR1,1,3"
+      ],
+      "instruction": "SY(TOPSHP00);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "beacon top mark, red boarded square board, vertical",
+      "stress_reasons": [
+        "lights_daymarks_topmarks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "DAYMAR_TOPSHP01_2078",
+      "asset": "TOPSHP01",
+      "asset_kind": "symbol",
+      "family": "lights_daymarks_topmarks",
+      "object_class": "DAYMAR",
+      "lookup_id": "2078",
+      "rcid": "93748",
+      "conditions": [
+        "TOPSHP23",
+        "COLPAT2",
+        "COLOUR1,11"
+      ],
+      "instruction": "SY(TOPSHP01);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "beacon top mark, red boarded square board, vertical",
+      "stress_reasons": [
+        "lights_daymarks_topmarks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "DAYMAR_TOPSHP02_2109",
+      "asset": "TOPSHP02",
+      "asset_kind": "symbol",
+      "family": "lights_daymarks_topmarks",
+      "object_class": "DAYMAR",
+      "lookup_id": "2109",
+      "rcid": "93750",
+      "conditions": [
+        "TOPSHP23",
+        "COLPAT2",
+        "COLOUR3,2"
+      ],
+      "instruction": "SY(TOPSHP02);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "beacon top mark, red boarded square board, vertical",
+      "stress_reasons": [
+        "lights_daymarks_topmarks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "DAYMAR_TOPSHP03_2077",
+      "asset": "TOPSHP03",
+      "asset_kind": "symbol",
+      "family": "lights_daymarks_topmarks",
+      "object_class": "DAYMAR",
+      "lookup_id": "2077",
+      "rcid": "93749",
+      "conditions": [
+        "TOPSHP22",
+        "COLPAT2",
+        "COLOUR1,11"
+      ],
+      "instruction": "SY(TOPSHP03);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "beacon top mark, red boarded square board, vertical",
+      "stress_reasons": [
+        "lights_daymarks_topmarks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "DAYMAR_TOPSHP04_2108",
+      "asset": "TOPSHP04",
+      "asset_kind": "symbol",
+      "family": "lights_daymarks_topmarks",
+      "object_class": "DAYMAR",
+      "lookup_id": "2108",
+      "rcid": "93751",
+      "conditions": [
+        "TOPSHP22",
+        "COLPAT2",
+        "COLOUR3,2"
+      ],
+      "instruction": "SY(TOPSHP04);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "beacon top mark, red boarded square board, vertical",
+      "stress_reasons": [
+        "lights_daymarks_topmarks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "DAYMAR_TOPSHP05_2080",
+      "asset": "TOPSHP05",
+      "asset_kind": "symbol",
+      "family": "lights_daymarks_topmarks",
+      "object_class": "DAYMAR",
+      "lookup_id": "2080",
+      "rcid": "93767",
+      "conditions": [
+        "TOPSHP25",
+        "COLPAT2",
+        "COLOUR11,2"
+      ],
+      "instruction": "SY(TOPSHP05);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "beacon top mark, red boarded square board, vertical",
+      "stress_reasons": [
+        "lights_daymarks_topmarks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "DAYMAR_TOPSHP08_2047",
+      "asset": "TOPSHP08",
+      "asset_kind": "symbol",
+      "family": "lights_daymarks_topmarks",
+      "object_class": "DAYMAR",
+      "lookup_id": "2047",
+      "rcid": "93776",
+      "conditions": [
+        "TOPSHP24",
+        "COLPAT6,1",
+        "COLOUR3,3,6"
+      ],
+      "instruction": "SY(TOPSHP08);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "beacon top mark, red boarded square board, vertical",
+      "stress_reasons": [
+        "lights_daymarks_topmarks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "DAYMAR_TOPSHP16_2110",
+      "asset": "TOPSHP16",
+      "asset_kind": "symbol",
+      "family": "lights_daymarks_topmarks",
+      "object_class": "DAYMAR",
+      "lookup_id": "2110",
+      "rcid": "30334",
+      "conditions": [
+        "TOPSHP24",
+        "COLPAT6",
+        "COLOUR3,1"
+      ],
+      "instruction": "SY(TOPSHP16);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "beacon top mark, red boarded square board, vertical",
+      "stress_reasons": [
+        "lights_daymarks_topmarks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "DAYMAR_TOPSHP17_2045",
+      "asset": "TOPSHP17",
+      "asset_kind": "symbol",
+      "family": "lights_daymarks_topmarks",
+      "object_class": "DAYMAR",
+      "lookup_id": "2045",
+      "rcid": "93768",
+      "conditions": [
+        "TOPSHP24",
+        "COLPAT2",
+        "COLOUR11,2,11"
+      ],
+      "instruction": "SY(TOPSHP17);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "beacon top mark, red boarded square board, vertical",
+      "stress_reasons": [
+        "lights_daymarks_topmarks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "DAYMAR_TOPSHP18_2114",
+      "asset": "TOPSHP18",
+      "asset_kind": "symbol",
+      "family": "lights_daymarks_topmarks",
+      "object_class": "DAYMAR",
+      "lookup_id": "2114",
+      "rcid": "93773",
+      "conditions": [
+        "TOPSHP24",
+        "COLPAT6",
+        "COLOUR6,6"
+      ],
+      "instruction": "SY(TOPSHP18);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "beacon top mark, red boarded square board, vertical",
+      "stress_reasons": [
+        "lights_daymarks_topmarks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "DAYMAR_TOPSHP19_2112",
+      "asset": "TOPSHP19",
+      "asset_kind": "symbol",
+      "family": "lights_daymarks_topmarks",
+      "object_class": "DAYMAR",
+      "lookup_id": "2112",
+      "rcid": "93772",
+      "conditions": [
+        "TOPSHP24",
+        "COLPAT6",
+        "COLOUR3,6"
+      ],
+      "instruction": "SY(TOPSHP19);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "beacon top mark, red boarded square board, vertical",
+      "stress_reasons": [
+        "lights_daymarks_topmarks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "DAYMAR_TOPSHP20_2111",
+      "asset": "TOPSHP20",
+      "asset_kind": "symbol",
+      "family": "lights_daymarks_topmarks",
+      "object_class": "DAYMAR",
+      "lookup_id": "2111",
+      "rcid": "30335",
+      "conditions": [
+        "TOPSHP24",
+        "COLPAT6",
+        "COLOUR3,3"
+      ],
+      "instruction": "SY(TOPSHP20);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "beacon top mark, red boarded square board, vertical",
+      "stress_reasons": [
+        "lights_daymarks_topmarks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "DAYMAR_TOPSHP25_2072",
+      "asset": "TOPSHP25",
+      "asset_kind": "symbol",
+      "family": "lights_daymarks_topmarks",
+      "object_class": "DAYMAR",
+      "lookup_id": "2072",
+      "rcid": "30324",
+      "conditions": [
+        "TOPSHP19",
+        "COLPAT6",
+        "COLOUR1,11"
+      ],
+      "instruction": "SY(TOPSHP25);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "beacon top mark, red boarded square board, vertical",
+      "stress_reasons": [
+        "lights_daymarks_topmarks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "DAYMAR_TOPSHP29_2053",
+      "asset": "TOPSHP29",
+      "asset_kind": "symbol",
+      "family": "lights_daymarks_topmarks",
+      "object_class": "DAYMAR",
+      "lookup_id": "2053",
+      "rcid": "93809",
+      "conditions": [
+        "TOPSHP19",
+        "COLPAT6",
+        "COLOUR3,4,3"
+      ],
+      "instruction": "SY(TOPSHP29);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "beacon top mark, red boarded square board, vertical",
+      "stress_reasons": [
+        "lights_daymarks_topmarks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "DAYMAR_TOPSHP30_2055",
+      "asset": "TOPSHP30",
+      "asset_kind": "symbol",
+      "family": "lights_daymarks_topmarks",
+      "object_class": "DAYMAR",
+      "lookup_id": "2055",
+      "rcid": "30315",
+      "conditions": [
+        "TOPSHP19",
+        "COLPAT6",
+        "COLOUR4,4,6"
+      ],
+      "instruction": "SY(TOPSHP30);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "beacon top mark, red boarded square board, vertical",
+      "stress_reasons": [
+        "lights_daymarks_topmarks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "DAYMAR_TOPSHP31_2073",
+      "asset": "TOPSHP31",
+      "asset_kind": "symbol",
+      "family": "lights_daymarks_topmarks",
+      "object_class": "DAYMAR",
+      "lookup_id": "2073",
+      "rcid": "30325",
+      "conditions": [
+        "TOPSHP19",
+        "COLPAT6",
+        "COLOUR11,1"
+      ],
+      "instruction": "SY(TOPSHP31);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "beacon top mark, red boarded square board, vertical",
+      "stress_reasons": [
+        "lights_daymarks_topmarks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "DAYMAR_TOPSHP32_2088",
+      "asset": "TOPSHP32",
+      "asset_kind": "symbol",
+      "family": "lights_daymarks_topmarks",
+      "object_class": "DAYMAR",
+      "lookup_id": "2088",
+      "rcid": "93754",
+      "conditions": [
+        "TOPSHP19",
+        "COLPAT2",
+        "COLOUR3,1"
+      ],
+      "instruction": "SY(TOPSHP32);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)",
+      "description": "beacon top mark, red boarded square board, vertical",
+      "stress_reasons": [
+        "lights_daymarks_topmarks",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "OBSTRN_FOULAR01_122",
+      "asset": "FOULAR01",
+      "asset_kind": "pattern",
+      "family": "wreck_rock_obstruction",
+      "object_class": "OBSTRN",
+      "lookup_id": "122",
+      "rcid": "32158",
+      "conditions": [
+        "CATOBS6"
+      ],
+      "instruction": "CS(OBSTRN04);AP(FOULAR01);LS(DOTT,2,CHBLK)",
+      "description": "area of depth less than the safety contour",
+      "stress_reasons": [
+        "wreck_rock_obstruction",
+        "conditional_danger_variant",
+        "conditional_symbology"
+      ]
+    },
+    {
+      "id": "DEPARE_PRTSUR01_39",
+      "asset": "PRTSUR01",
+      "asset_kind": "pattern",
+      "family": "wreck_rock_obstruction",
+      "object_class": "DEPARE",
+      "lookup_id": "39",
+      "rcid": "32075",
+      "conditions": [
+        "DRVAL1?",
+        "DRVAL2?"
+      ],
+      "instruction": "AC(NODTA);AP(PRTSUR01);LS(SOLD,2,CHGRD)",
+      "description": "incompletely surveyed area",
+      "stress_reasons": [
+        "wreck_rock_obstruction",
+        "conditional_danger_variant",
+        "area_boundary_pattern"
+      ]
+    },
+    {
+      "id": "OBSTRN_ACHARE02_1193",
+      "asset": "ACHARE02",
+      "asset_kind": "symbol",
+      "family": "wreck_rock_obstruction",
+      "object_class": "OBSTRN",
+      "lookup_id": "1193",
+      "rcid": "31245",
+      "conditions": [
+        "CATOBS9",
+        "VALSOU"
+      ],
+      "instruction": "SY(ACHARE02)",
+      "description": "anchorage area as a point at small scale, or anchor points of mooring trot at large scale",
+      "stress_reasons": [
+        "wreck_rock_obstruction",
+        "conditional_danger_variant"
+      ]
+    },
+    {
+      "id": "OBSTRN_DOTT_122",
+      "asset": "DOTT",
+      "asset_kind": "line-style",
+      "family": "wreck_rock_obstruction",
+      "object_class": "OBSTRN",
+      "lookup_id": "122",
+      "rcid": "32158",
+      "conditions": [
+        "CATOBS6"
+      ],
+      "instruction": "CS(OBSTRN04);AP(FOULAR01);LS(DOTT,2,CHBLK)",
+      "description": "",
+      "stress_reasons": [
+        "wreck_rock_obstruction",
+        "conditional_danger_variant",
+        "conditional_symbology"
+      ]
+    },
+    {
+      "id": "OBSTRN_FOULGND1_120",
+      "asset": "FOULGND1",
+      "asset_kind": "symbol",
+      "family": "wreck_rock_obstruction",
+      "object_class": "OBSTRN",
+      "lookup_id": "120",
+      "rcid": "32156",
+      "conditions": [
+        "CATOBS7",
+        "VALSOU"
+      ],
+      "instruction": "SY(FOULGND1);LS(DASH,1,CHGRD)",
+      "description": "foul area of seabed safe for navigation but not for anchoring",
+      "stress_reasons": [
+        "wreck_rock_obstruction",
+        "conditional_danger_variant"
+      ]
+    },
+    {
+      "id": "OBSTRN_NAVARE51_462",
+      "asset": "NAVARE51",
+      "asset_kind": "line-style",
+      "family": "wreck_rock_obstruction",
+      "object_class": "OBSTRN",
+      "lookup_id": "462",
+      "rcid": "32497",
+      "conditions": [
+        "CATOBS7",
+        "VALSOU"
+      ],
+      "instruction": "SY(FOULGND1);LC(NAVARE51)",
+      "description": "boundary of a navigation feature such as a fairway, magnetic anomaly, etc.",
+      "stress_reasons": [
+        "wreck_rock_obstruction",
+        "conditional_danger_variant"
+      ]
+    },
+    {
+      "id": "OBSTRN_OBSTRN04_122",
+      "asset": "OBSTRN04",
+      "asset_kind": "conditional-procedure",
+      "family": "wreck_rock_obstruction",
+      "object_class": "OBSTRN",
+      "lookup_id": "122",
+      "rcid": "32158",
+      "conditions": [
+        "CATOBS6"
+      ],
+      "instruction": "CS(OBSTRN04);AP(FOULAR01);LS(DOTT,2,CHBLK)",
+      "description": "",
+      "stress_reasons": [
+        "wreck_rock_obstruction",
+        "conditional_danger_variant",
+        "conditional_symbology"
+      ]
+    },
+    {
+      "id": "DEPARE_SOLD_39",
+      "asset": "SOLD",
+      "asset_kind": "line-style",
+      "family": "wreck_rock_obstruction",
+      "object_class": "DEPARE",
+      "lookup_id": "39",
+      "rcid": "32075",
+      "conditions": [
+        "DRVAL1?",
+        "DRVAL2?"
+      ],
+      "instruction": "AC(NODTA);AP(PRTSUR01);LS(SOLD,2,CHGRD)",
+      "description": "",
+      "stress_reasons": [
+        "wreck_rock_obstruction",
+        "conditional_danger_variant",
+        "area_boundary_pattern"
+      ]
+    },
+    {
+      "id": "OBSTRN_DASH_120",
+      "asset": "DASH",
+      "asset_kind": "line-style",
+      "family": "wreck_rock_obstruction",
+      "object_class": "OBSTRN",
+      "lookup_id": "120",
+      "rcid": "32156",
+      "conditions": [
+        "CATOBS7",
+        "VALSOU"
+      ],
+      "instruction": "SY(FOULGND1);LS(DASH,1,CHGRD)",
+      "description": "",
+      "stress_reasons": [
+        "wreck_rock_obstruction",
+        "conditional_danger_variant"
+      ]
+    },
+    {
+      "id": "OBSTRN_FLTHAZ02_1190",
+      "asset": "FLTHAZ02",
+      "asset_kind": "symbol",
+      "family": "wreck_rock_obstruction",
+      "object_class": "OBSTRN",
+      "lookup_id": "1190",
+      "rcid": "31242",
+      "conditions": [
+        "CATOBS10",
+        "VALSOU"
+      ],
+      "instruction": "SY(FLTHAZ02)",
+      "description": "",
+      "stress_reasons": [
+        "wreck_rock_obstruction",
+        "conditional_danger_variant"
+      ]
+    },
+    {
+      "id": "M_QUAL_DQUALA11_108",
+      "asset": "DQUALA11",
+      "asset_kind": "pattern",
+      "family": "wreck_rock_obstruction",
+      "object_class": "M_QUAL",
+      "lookup_id": "108",
+      "rcid": "32144",
+      "conditions": [
+        "CATZOC1"
+      ],
+      "instruction": "AP(DQUALA11);LS(DASH,2,CHGRD)",
+      "description": "pattern of symbols for a chart of 5m accuracy with full seafloor coverage",
+      "stress_reasons": [
+        "wreck_rock_obstruction",
+        "conditional_danger_variant"
+      ]
+    },
+    {
+      "id": "M_QUAL_DQUALA21_109",
+      "asset": "DQUALA21",
+      "asset_kind": "pattern",
+      "family": "wreck_rock_obstruction",
+      "object_class": "M_QUAL",
+      "lookup_id": "109",
+      "rcid": "32145",
+      "conditions": [
+        "CATZOC2"
+      ],
+      "instruction": "AP(DQUALA21);LS(DASH,2,CHGRD)",
+      "description": "pattern of symbols for a chart with 20m accuracy with full seafloor coverage",
+      "stress_reasons": [
+        "wreck_rock_obstruction",
+        "conditional_danger_variant"
+      ]
+    },
+    {
+      "id": "M_QUAL_DQUALB01_110",
+      "asset": "DQUALB01",
+      "asset_kind": "pattern",
+      "family": "wreck_rock_obstruction",
+      "object_class": "M_QUAL",
+      "lookup_id": "110",
+      "rcid": "32146",
+      "conditions": [
+        "CATZOC3"
+      ],
+      "instruction": "AP(DQUALB01);LS(DASH,2,CHGRD)",
+      "description": "pattern of symbols for a chart with 50m accuracy from standard survey based on lines of continuous soundings",
+      "stress_reasons": [
+        "wreck_rock_obstruction",
+        "conditional_danger_variant"
+      ]
+    },
+    {
+      "id": "M_QUAL_DQUALC01_111",
+      "asset": "DQUALC01",
+      "asset_kind": "pattern",
+      "family": "wreck_rock_obstruction",
+      "object_class": "M_QUAL",
+      "lookup_id": "111",
+      "rcid": "32147",
+      "conditions": [
+        "CATZOC4"
+      ],
+      "instruction": "AP(DQUALC01);LS(DASH,2,CHGRD)",
+      "description": "pattern of symbols for a low accuracy or incomplete chart",
+      "stress_reasons": [
+        "wreck_rock_obstruction",
+        "conditional_danger_variant"
+      ]
+    },
+    {
+      "id": "M_QUAL_DQUALD01_112",
+      "asset": "DQUALD01",
+      "asset_kind": "pattern",
+      "family": "wreck_rock_obstruction",
+      "object_class": "M_QUAL",
+      "lookup_id": "112",
+      "rcid": "32148",
+      "conditions": [
+        "CATZOC5"
+      ],
+      "instruction": "AP(DQUALD01);LS(DASH,2,CHGRD)",
+      "description": "pattern of symbols for an unreliable chart",
+      "stress_reasons": [
+        "wreck_rock_obstruction",
+        "conditional_danger_variant"
+      ]
+    },
+    {
+      "id": "M_QUAL_DQUALU01_113",
+      "asset": "DQUALU01",
+      "asset_kind": "pattern",
+      "family": "wreck_rock_obstruction",
+      "object_class": "M_QUAL",
+      "lookup_id": "113",
+      "rcid": "32149",
+      "conditions": [
+        "CATZOC6"
+      ],
+      "instruction": "AP(DQUALU01);LS(DASH,2,CHGRD)",
+      "description": "pattern of symbols for a chart with quality not assessed",
+      "stress_reasons": [
+        "wreck_rock_obstruction",
+        "conditional_danger_variant"
+      ]
+    },
+    {
+      "id": "$CSYMB_OBSTRN01_1642",
+      "asset": "OBSTRN01",
+      "asset_kind": "symbol",
+      "family": "wreck_rock_obstruction",
+      "object_class": "$CSYMB",
+      "lookup_id": "1642",
+      "rcid": "31694",
+      "conditions": [
+        "$SCODEOBSTRN01"
+      ],
+      "instruction": "SY(OBSTRN01)",
+      "description": "obstruction, depth not stated",
+      "stress_reasons": [
+        "wreck_rock_obstruction"
+      ]
+    },
+    {
+      "id": "$CSYMB_OBSTRN02_1643",
+      "asset": "OBSTRN02",
+      "asset_kind": "symbol",
+      "family": "wreck_rock_obstruction",
+      "object_class": "$CSYMB",
+      "lookup_id": "1643",
+      "rcid": "31695",
+      "conditions": [
+        "$SCODEOBSTRN02"
+      ],
+      "instruction": "SY(OBSTRN02)",
+      "description": "obstruction in the intertidal area",
+      "stress_reasons": [
+        "wreck_rock_obstruction"
+      ]
+    },
+    {
+      "id": "$CSYMB_OBSTRN03_1644",
+      "asset": "OBSTRN03",
+      "asset_kind": "symbol",
+      "family": "wreck_rock_obstruction",
+      "object_class": "$CSYMB",
+      "lookup_id": "1644",
+      "rcid": "31696",
+      "conditions": [
+        "$SCODEOBSTRN03"
+      ],
+      "instruction": "SY(OBSTRN03)",
+      "description": "obstruction which covers and uncovers",
+      "stress_reasons": [
+        "wreck_rock_obstruction"
+      ]
+    },
+    {
+      "id": "$CSYMB_UWTROC04_1681",
+      "asset": "UWTROC04",
+      "asset_kind": "symbol",
+      "family": "wreck_rock_obstruction",
+      "object_class": "$CSYMB",
+      "lookup_id": "1681",
+      "rcid": "31733",
+      "conditions": [
+        "$SCODEUWTROC04"
+      ],
+      "instruction": "SY(UWTROC04)",
+      "description": "rock which covers and uncovers or is awash at low water",
+      "stress_reasons": [
+        "wreck_rock_obstruction"
+      ]
+    },
+    {
+      "id": "$CSYMB_WRECKS01_1691",
+      "asset": "WRECKS01",
+      "asset_kind": "symbol",
+      "family": "wreck_rock_obstruction",
+      "object_class": "$CSYMB",
+      "lookup_id": "1691",
+      "rcid": "31743",
+      "conditions": [
+        "$SCODEWRECKS01"
+      ],
+      "instruction": "SY(WRECKS01)",
+      "description": "wreck showing any portion of hull or superstructure at level of chart datum",
+      "stress_reasons": [
+        "wreck_rock_obstruction"
+      ]
+    },
+    {
+      "id": "DWRTPT_DWRUTE51_387",
+      "asset": "DWRUTE51",
+      "asset_kind": "line-style",
+      "family": "areas_patterns_lines",
+      "object_class": "DWRTPT",
+      "lookup_id": "387",
+      "rcid": "32422",
+      "conditions": [
+        "ORIENT ",
+        "TRAFIC1"
+      ],
+      "instruction": "SY(TSSLPT51,ORIENT);SY(DWRTPT51);LC(DWRUTE51);CS(RESTRN01)",
+      "description": "boundary of a deep water route",
+      "stress_reasons": [
+        "areas_patterns_lines",
+        "conditional_symbology"
+      ]
+    },
+    {
+      "id": "SBDARE_RCKLDG01_172",
+      "asset": "RCKLDG01",
+      "asset_kind": "pattern",
+      "family": "areas_patterns_lines",
+      "object_class": "SBDARE",
+      "lookup_id": "172",
+      "rcid": "32207",
+      "conditions": [
+        "WATLEV4",
+        "NATSUR11"
+      ],
+      "instruction": "AP(RCKLDG01);LS(DASH,1,CHGRD)",
+      "description": "rock or coral drying ledges",
+      "stress_reasons": [
+        "areas_patterns_lines",
+        "conditional_danger_variant",
+        "area_boundary_pattern"
+      ]
+    },
+    {
+      "id": "PIPARE_INFARE51_131",
+      "asset": "INFARE51",
+      "asset_kind": "symbol",
+      "family": "areas_patterns_lines",
+      "object_class": "PIPARE",
+      "lookup_id": "131",
+      "rcid": "32167",
+      "conditions": [
+        "CATPIP2"
+      ],
+      "instruction": "SY(INFARE51);LS(DASH,2,CHGRD);CS(RESTRN01)",
+      "description": "area with minor restrictions or information notices",
+      "stress_reasons": [
+        "areas_patterns_lines",
+        "conditional_symbology",
+        "area_boundary_pattern"
+      ]
+    },
+    {
+      "id": "PIPARE_PIPARE61_473",
+      "asset": "PIPARE61",
+      "asset_kind": "line-style",
+      "family": "areas_patterns_lines",
+      "object_class": "PIPARE",
+      "lookup_id": "473",
+      "rcid": "32508",
+      "conditions": [
+        "CATPIP2"
+      ],
+      "instruction": "SY(INFARE51);LC(PIPARE61);CS(RESTRN01)",
+      "description": "boundary of a submarine pipeline area with generally non-dangerous contents",
+      "stress_reasons": [
+        "areas_patterns_lines",
+        "conditional_symbology",
+        "area_boundary_pattern"
+      ]
+    },
+    {
+      "id": "TSSLPT_TSSLPT51_199",
+      "asset": "TSSLPT51",
+      "asset_kind": "symbol",
+      "family": "areas_patterns_lines",
+      "object_class": "TSSLPT",
+      "lookup_id": "199",
+      "rcid": "32234",
+      "conditions": [
+        "ORIENT "
+      ],
+      "instruction": "SY(TSSLPT51,ORIENT);CS(RESTRN01)",
+      "description": "traffic direction in a one way lane of a traffic separation scheme",
+      "stress_reasons": [
+        "areas_patterns_lines",
+        "conditional_symbology"
+      ]
+    },
+    {
+      "id": "ACHARE_RESTRN01_1",
+      "asset": "RESTRN01",
+      "asset_kind": "conditional-procedure",
+      "family": "areas_patterns_lines",
+      "object_class": "ACHARE",
+      "lookup_id": "1",
+      "rcid": "32037",
+      "conditions": [
+        "CATACH8"
+      ],
+      "instruction": "SY(ACHARE02);LS(DASH,2,CHMGF);CS(RESTRN01)",
+      "description": "",
+      "stress_reasons": [
+        "areas_patterns_lines",
+        "conditional_symbology",
+        "area_boundary_pattern"
+      ]
+    },
+    {
+      "id": "DWRTCL_DWRTCL05_737",
+      "asset": "DWRTCL05",
+      "asset_kind": "line-style",
+      "family": "areas_patterns_lines",
+      "object_class": "DWRTCL",
+      "lookup_id": "737",
+      "rcid": "31813",
+      "conditions": [
+        "CATTRK2",
+        "TRAFIC4"
+      ],
+      "instruction": "LC(DWRTCL05);TE('%03.0lf deg','ORIENT',3,1,2,'15110',1,-1,CHBLK,11)",
+      "description": "two-way deep water route centreline, not based on fixed marks",
+      "stress_reasons": [
+        "areas_patterns_lines"
+      ]
+    },
+    {
+      "id": "DWRTCL_DWRTCL06_733",
+      "asset": "DWRTCL06",
+      "asset_kind": "line-style",
+      "family": "areas_patterns_lines",
+      "object_class": "DWRTCL",
+      "lookup_id": "733",
+      "rcid": "31809",
+      "conditions": [
+        "CATTRK1",
+        "TRAFIC4"
+      ],
+      "instruction": "LC(DWRTCL06);TE('%03.0lf deg','ORIENT',3,1,2,'15110',1,-1,CHBLK,11)",
+      "description": "two-way deep water route centreline, based on fixed marks",
+      "stress_reasons": [
+        "areas_patterns_lines"
+      ]
+    },
+    {
+      "id": "DWRTCL_DWRTCL07_734",
+      "asset": "DWRTCL07",
+      "asset_kind": "line-style",
+      "family": "areas_patterns_lines",
+      "object_class": "DWRTCL",
+      "lookup_id": "734",
+      "rcid": "31810",
+      "conditions": [
+        "CATTRK2",
+        "TRAFIC1"
+      ],
+      "instruction": "LC(DWRTCL07);TE('%03.0lf deg','ORIENT',3,1,2,'15110',1,-1,CHBLK,11)",
+      "description": "one-way deep water route centreline, not based on fixed marks",
+      "stress_reasons": [
+        "areas_patterns_lines"
+      ]
+    },
+    {
+      "id": "DWRTCL_DWRTCL08_730",
+      "asset": "DWRTCL08",
+      "asset_kind": "line-style",
+      "family": "areas_patterns_lines",
+      "object_class": "DWRTCL",
+      "lookup_id": "730",
+      "rcid": "31806",
+      "conditions": [
+        "CATTRK1",
+        "TRAFIC1"
+      ],
+      "instruction": "LC(DWRTCL08);TE('%03.0lf deg','ORIENT',3,1,2,'15110',1,-1,CHBLK,11)",
+      "description": "one-way deep water route centreline, based on fixed-marks",
+      "stress_reasons": [
+        "areas_patterns_lines"
+      ]
+    },
+    {
+      "id": "PRDARE_FLASTK11_1206",
+      "asset": "FLASTK11",
+      "asset_kind": "symbol",
+      "family": "areas_patterns_lines",
+      "object_class": "PRDARE",
+      "lookup_id": "1206",
+      "rcid": "31258",
+      "conditions": [
+        "CATPRA5",
+        "CONVIS1"
+      ],
+      "instruction": "SY(FLASTK11)",
+      "description": "conspicuous flare stack",
+      "stress_reasons": [
+        "areas_patterns_lines",
+        "area_boundary_pattern"
+      ]
+    },
+    {
+      "id": "PRDARE_RFNERY11_137",
+      "asset": "RFNERY11",
+      "asset_kind": "symbol",
+      "family": "areas_patterns_lines",
+      "object_class": "PRDARE",
+      "lookup_id": "137",
+      "rcid": "32173",
+      "conditions": [
+        "CATPRA5",
+        "CONVIS1"
+      ],
+      "instruction": "SY(RFNERY11);LS(DASH,1,CHBLK)",
+      "description": "conspicuous refinery",
+      "stress_reasons": [
+        "areas_patterns_lines",
+        "area_boundary_pattern"
+      ]
+    },
+    {
+      "id": "PRDARE_TNKCON12_1207",
+      "asset": "TNKCON12",
+      "asset_kind": "symbol",
+      "family": "areas_patterns_lines",
+      "object_class": "PRDARE",
+      "lookup_id": "1207",
+      "rcid": "31259",
+      "conditions": [
+        "CATPRA8",
+        "CONVIS1"
+      ],
+      "instruction": "SY(TNKCON12)",
+      "description": "conspicuous tank",
+      "stress_reasons": [
+        "areas_patterns_lines",
+        "area_boundary_pattern"
+      ]
+    },
+    {
+      "id": "PRDARE_TNKFRM11_138",
+      "asset": "TNKFRM11",
+      "asset_kind": "symbol",
+      "family": "areas_patterns_lines",
+      "object_class": "PRDARE",
+      "lookup_id": "138",
+      "rcid": "32174",
+      "conditions": [
+        "CATPRA8",
+        "CONVIS1"
+      ],
+      "instruction": "SY(TNKFRM11);LS(DASH,1,CHBLK)",
+      "description": "conspicuous tank farm",
+      "stress_reasons": [
+        "areas_patterns_lines",
+        "area_boundary_pattern"
+      ]
+    },
+    {
+      "id": "PRDARE_WIMCON11_1208",
+      "asset": "WIMCON11",
+      "asset_kind": "symbol",
+      "family": "areas_patterns_lines",
+      "object_class": "PRDARE",
+      "lookup_id": "1208",
+      "rcid": "31260",
+      "conditions": [
+        "CATPRA9",
+        "CONVIS1"
+      ],
+      "instruction": "SY(WIMCON11)",
+      "description": "conspicuous windmotor",
+      "stress_reasons": [
+        "areas_patterns_lines",
+        "area_boundary_pattern"
+      ]
+    },
+    {
+      "id": "PRDARE_WNDFRM61_139",
+      "asset": "WNDFRM61",
+      "asset_kind": "symbol",
+      "family": "areas_patterns_lines",
+      "object_class": "PRDARE",
+      "lookup_id": "139",
+      "rcid": "32175",
+      "conditions": [
+        "CATPRA9",
+        "CONVIS1"
+      ],
+      "instruction": "SY(WNDFRM61);LS(DASH,1,CHBLK)",
+      "description": "conspicuous wind generator farm",
+      "stress_reasons": [
+        "areas_patterns_lines",
+        "area_boundary_pattern"
+      ]
+    },
+    {
+      "id": "RCRTCL_RCRTCL11_802",
+      "asset": "RCRTCL11",
+      "asset_kind": "line-style",
+      "family": "areas_patterns_lines",
+      "object_class": "RCRTCL",
+      "lookup_id": "802",
+      "rcid": "31878",
+      "conditions": [
+        "CATTRK2",
+        "TRAFIC4"
+      ],
+      "instruction": "LC(RCRTCL11);TE('%03.0lf deg','ORIENT',3,1,2,'15110',1,-1,CHBLK,11)",
+      "description": "regulated two-way recommended route centreline, not based on fixed marks",
+      "stress_reasons": [
+        "areas_patterns_lines"
+      ]
+    },
+    {
+      "id": "RCRTCL_RCRTCL12_799",
+      "asset": "RCRTCL12",
+      "asset_kind": "line-style",
+      "family": "areas_patterns_lines",
+      "object_class": "RCRTCL",
+      "lookup_id": "799",
+      "rcid": "31875",
+      "conditions": [
+        "CATTRK2",
+        "TRAFIC1"
+      ],
+      "instruction": "LC(RCRTCL12);TE('%03.0lf deg','ORIENT',3,1,2,'15110',1,-1,CHBLK,11)",
+      "description": "regulated one-way recommended route centreline, not based on fixed marks",
+      "stress_reasons": [
+        "areas_patterns_lines"
+      ]
+    },
+    {
+      "id": "RCRTCL_RCRTCL13_798",
+      "asset": "RCRTCL13",
+      "asset_kind": "line-style",
+      "family": "areas_patterns_lines",
+      "object_class": "RCRTCL",
+      "lookup_id": "798",
+      "rcid": "31874",
+      "conditions": [
+        "CATTRK1",
+        "TRAFIC4"
+      ],
+      "instruction": "LC(RCRTCL13);TE('%03.0lf deg','ORIENT',3,1,2,'15110',1,-1,CHBLK,11)",
+      "description": "regulated two-way recommended route centreline, based on fixed marks",
+      "stress_reasons": [
+        "areas_patterns_lines"
+      ]
+    },
+    {
+      "id": "RCRTCL_RCRTCL14_795",
+      "asset": "RCRTCL14",
+      "asset_kind": "line-style",
+      "family": "areas_patterns_lines",
+      "object_class": "RCRTCL",
+      "lookup_id": "795",
+      "rcid": "31871",
+      "conditions": [
+        "CATTRK1",
+        "TRAFIC1"
+      ],
+      "instruction": "LC(RCRTCL14);TE('%03.0lf deg','ORIENT',3,1,2,'15110',1,-1,CHBLK,11)",
+      "description": "regulated one-way recommended route centreline, based on fixed marks",
+      "stress_reasons": [
+        "areas_patterns_lines"
+      ]
+    },
+    {
+      "id": "RECTRC_RECTRC09_820",
+      "asset": "RECTRC09",
+      "asset_kind": "line-style",
+      "family": "areas_patterns_lines",
+      "object_class": "RECTRC",
+      "lookup_id": "820",
+      "rcid": "31896",
+      "conditions": [
+        "CATTRK2",
+        "TRAFIC4"
+      ],
+      "instruction": "LC(RECTRC09);TE('%03.0lf deg','ORIENT',3,1,2,'15110',1,-1,CHBLK,11)",
+      "description": "non-regulated recommended two-way track, not based on fixed marks",
+      "stress_reasons": [
+        "areas_patterns_lines"
+      ]
+    },
+    {
+      "id": "RECTRC_RECTRC10_816",
+      "asset": "RECTRC10",
+      "asset_kind": "line-style",
+      "family": "areas_patterns_lines",
+      "object_class": "RECTRC",
+      "lookup_id": "816",
+      "rcid": "31892",
+      "conditions": [
+        "CATTRK1",
+        "TRAFIC4"
+      ],
+      "instruction": "LC(RECTRC10);TE('%03.0lf deg','ORIENT',3,1,2,'15110',1,-1,CHBLK,11)",
+      "description": "non-regulated recommended two-way track, based on fixed-marks",
+      "stress_reasons": [
+        "areas_patterns_lines"
+      ]
+    },
+    {
+      "id": "LNDMRK_TOWERS48_2217",
+      "asset": "TOWERS48",
+      "asset_kind": "symbol",
+      "family": "ugly_attribute_edges",
+      "object_class": "LNDMRK",
+      "lookup_id": "2217",
+      "rcid": "94010",
+      "conditions": [
+        "CATLMK17",
+        "COLPAT1",
+        "FUNCTN33",
+        "COLOUR1,4"
+      ],
+      "instruction": "SY(TOWERS48)",
+      "description": "tower, red/white, full-chart and simplified",
+      "stress_reasons": [
+        "ugly_attribute_edges",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "LNDMRK_TOWERS51_2211",
+      "asset": "TOWERS51",
+      "asset_kind": "symbol",
+      "family": "ugly_attribute_edges",
+      "object_class": "LNDMRK",
+      "lookup_id": "2211",
+      "rcid": "94002",
+      "conditions": [
+        "CATLMK17",
+        "COLPAT1",
+        "FUNCTN33",
+        "COLOUR1,2,1"
+      ],
+      "instruction": "SY(TOWERS51)",
+      "description": "tower, black/yellow/black, full-chart and simplified",
+      "stress_reasons": [
+        "ugly_attribute_edges",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "LNDMRK_TOWERS72_2212",
+      "asset": "TOWERS72",
+      "asset_kind": "symbol",
+      "family": "ugly_attribute_edges",
+      "object_class": "LNDMRK",
+      "lookup_id": "2212",
+      "rcid": "93988",
+      "conditions": [
+        "CATLMK17",
+        "COLPAT1",
+        "FUNCTN33",
+        "COLOUR1,3,1"
+      ],
+      "instruction": "SY(TOWERS72)",
+      "description": "tower, black/yellow/black, full-chart and simplified",
+      "stress_reasons": [
+        "ugly_attribute_edges",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "LNDMRK_TOWERS73_2215",
+      "asset": "TOWERS73",
+      "asset_kind": "symbol",
+      "family": "ugly_attribute_edges",
+      "object_class": "LNDMRK",
+      "lookup_id": "2215",
+      "rcid": "93989",
+      "conditions": [
+        "CATLMK17",
+        "COLPAT1",
+        "FUNCTN33",
+        "COLOUR2,3,2"
+      ],
+      "instruction": "SY(TOWERS73)",
+      "description": "tower, black/yellow/black, full-chart and simplified",
+      "stress_reasons": [
+        "ugly_attribute_edges",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "LNDMRK_TOWERS79_2216",
+      "asset": "TOWERS79",
+      "asset_kind": "symbol",
+      "family": "ugly_attribute_edges",
+      "object_class": "LNDMRK",
+      "lookup_id": "2216",
+      "rcid": "30393",
+      "conditions": [
+        "CATLMK17",
+        "COLPAT1",
+        "FUNCTN33",
+        "COLOUR1,2"
+      ],
+      "instruction": "SY(TOWERS79)",
+      "description": "tower, white/black, full-chart and simplified",
+      "stress_reasons": [
+        "ugly_attribute_edges",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "LNDMRK_TOWERS83_2218",
+      "asset": "TOWERS83",
+      "asset_kind": "symbol",
+      "family": "ugly_attribute_edges",
+      "object_class": "LNDMRK",
+      "lookup_id": "2218",
+      "rcid": "30394",
+      "conditions": [
+        "CATLMK17",
+        "COLPAT1",
+        "FUNCTN33",
+        "COLOUR2,1"
+      ],
+      "instruction": "SY(TOWERS83)",
+      "description": "tower, black/white, full-chart and simplified",
+      "stress_reasons": [
+        "ugly_attribute_edges",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "LNDMRK_TOWERS92_2213",
+      "asset": "TOWERS92",
+      "asset_kind": "symbol",
+      "family": "ugly_attribute_edges",
+      "object_class": "LNDMRK",
+      "lookup_id": "2213",
+      "rcid": "30391",
+      "conditions": [
+        "CATLMK17",
+        "COLPAT1",
+        "FUNCTN33",
+        "COLOUR2,1,2"
+      ],
+      "instruction": "SY(TOWERS92)",
+      "description": "tower, black/yellow/black, full-chart and simplified",
+      "stress_reasons": [
+        "ugly_attribute_edges",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "LNDMRK_TOWERS93_2214",
+      "asset": "TOWERS93",
+      "asset_kind": "symbol",
+      "family": "ugly_attribute_edges",
+      "object_class": "LNDMRK",
+      "lookup_id": "2214",
+      "rcid": "30392",
+      "conditions": [
+        "CATLMK17",
+        "COLPAT1",
+        "FUNCTN33",
+        "COLOUR2,1,7"
+      ],
+      "instruction": "SY(TOWERS93)",
+      "description": "tower, black/yellow/black, full-chart and simplified",
+      "stress_reasons": [
+        "ugly_attribute_edges",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "LNDMRK_TOWERS94_2219",
+      "asset": "TOWERS94",
+      "asset_kind": "symbol",
+      "family": "ugly_attribute_edges",
+      "object_class": "LNDMRK",
+      "lookup_id": "2219",
+      "rcid": "30395",
+      "conditions": [
+        "CATLMK17",
+        "COLPAT3",
+        "FUNCTN33",
+        "COLOUR2,1"
+      ],
+      "instruction": "SY(TOWERS94)",
+      "description": "tower, black/yellow/black, full-chart and simplified",
+      "stress_reasons": [
+        "ugly_attribute_edges",
+        "attribute_driven_mark_variant"
+      ]
+    },
+    {
+      "id": "LNDMRK_TOWERS98_2220",
+      "asset": "TOWERS98",
+      "asset_kind": "symbol",
+      "family": "ugly_attribute_edges",
+      "object_class": "LNDMRK",
+      "lookup_id": "2220",
+      "rcid": "94005",
+      "conditions": [
+        "CATLMK17",
+        "COLPAT4",
+        "FUNCTN33",
+        "COLOUR3,1"
+      ],
+      "instruction": "SY(TOWERS98)",
+      "description": "tower, red/white, full-chart and simplified",
+      "stress_reasons": [
+        "ugly_attribute_edges",
+        "attribute_driven_mark_variant"
+      ]
+    }
+  ]
+}

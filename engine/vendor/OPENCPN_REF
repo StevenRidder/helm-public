@@ -1,0 +1,5 @@
+# Pinned OpenCPN upstream that the Helm headless chart-render patches apply against.
+# The build is reproduced by engine/bootstrap.sh — do NOT hand-edit a live clone.
+OPENCPN_REMOTE=https://github.com/OpenCPN/OpenCPN.git
+OPENCPN_SHA=28e13adc0c4ee6ce82e32fb7f1f00636fd29cb7b
+# (OpenCPN master as of the pin; wxWidgets 3.2 required — 3.3 removed wxNode.)

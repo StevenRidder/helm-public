@@ -1,0 +1,90 @@
+{
+  "id": "BOYCAR_north",
+  "s52_token": "BOYCAR",
+  "name": "North cardinal buoy",
+  "category": "buoy",
+  "meaning": "Pass to the north of this mark; safe water lies to the north.",
+  "invariants": {
+    "colors": [
+      "black",
+      "yellow"
+    ],
+    "topmark": "two_cones_point_up",
+    "light_flare": false,
+    "shape_class": "buoy",
+    "distinguishing": "black above yellow; two black cone topmarks both point up; safe-water side is north of the mark",
+    "anchor": [
+      0.5,
+      0.84
+    ]
+  },
+  "reference": "references/us-chart-1/q-cardinal-marks/BOYCAR_north.png",
+  "siblings": [
+    "BOYCAR_south",
+    "BOYCAR_east",
+    "BOYCAR_west"
+  ],
+  "source_refs": {
+    "s52_metadata": {
+      "path": "~/.helm/runtime/s57data/chartsymbols.xml",
+      "lookup": {
+        "object_class": "BOYCAR",
+        "lookup_id": "1022",
+        "rcid": "31074",
+        "condition": "CATCAM1",
+        "instruction": "SY(BOYCAR01);TE('%s','OBJNAM',2,1,2,'15110',-1,-1,CHBLK,21)"
+      },
+      "symbol": {
+        "name": "BOYCAR01",
+        "rcid": "1270",
+        "description": "cardinal buoy, north, simplified",
+        "color_ref": "HCHYLWmOUTLW",
+        "pivot": {
+          "x": 750,
+          "y": 750
+        },
+        "origin": {
+          "x": 484,
+          "y": 437
+        },
+        "vector_size": {
+          "width": 416,
+          "height": 616
+        }
+      }
+    },
+    "chart_no_1_reference": {
+      "publisher": "NOAA",
+      "publication": "U.S. Chart No. 1",
+      "source_url": "https://nauticalcharts.noaa.gov/publications/us-chart-1.html",
+      "crop_status": "required_before_scaling",
+      "expected_crop": "references/us-chart-1/q-cardinal-marks/BOYCAR_north.png"
+    }
+  },
+  "geometry": {
+    "basis": "Generate fresh owned SVG from the Chart No.1 crop and style primitives. Use chartsymbols.xml only for object-class lookup, CATCAM identity, pivot/origin sanity checks, palette-token expectations, and sibling discrimination; do not copy OpenCPN raster artwork into the owned pack.",
+    "primitive_plan": [
+      {
+        "name": "cardinal_buoy_body",
+        "semantic_role": "floating mark body",
+        "style_axis": "outline/stroke/fill treatment may vary"
+      },
+      {
+        "name": "cardinal_band_north",
+        "semantic_role": "black above yellow cardinal colour pattern",
+        "style_axis": "none for colour order"
+      },
+      {
+        "name": "cone_topmark_pair_up",
+        "semantic_role": "two black cones both points up",
+        "style_axis": "stroke weight/corner treatment only; orientation must not vary"
+      }
+    ],
+    "acceptance_checks": [
+      "SVG references CSS variables for black and yellow, with no literal hex colours.",
+      "Verifier sees two cone topmarks both pointing up.",
+      "Sibling forced-choice returns BOYCAR_north, not BOYCAR_south, BOYCAR_east, or BOYCAR_west.",
+      "Atlas manifest entry remains keyed by name/kind/palette plus style axis."
+    ]
+  }
+}

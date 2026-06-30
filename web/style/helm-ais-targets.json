@@ -1,0 +1,117 @@
+{
+  "_epic": "AIS",
+  "_note": "AIS vessel triangle + label (AIS-1). Owned by AIS. The `ais` source is driven live from the engine by updateAisFromEngine in index.html; legacy ids ais-vessels/ais-label are referenced by the tap-card popup + the Layers checkbox. New AIS layers should be namespaced helm-ais-*.",
+  "sources": {
+    "ais": {
+      "type": "geojson",
+      "data": "data/ais-sample.geojson",
+      "promoteId": "mmsi"
+    }
+  },
+  "layers": [
+    {
+      "id": "ais-vessels",
+      "type": "symbol",
+      "source": "ais",
+      "layout": {
+        "visibility": "visible",
+        "text-field": "▲",
+        "text-font": [
+          "Noto Sans Regular"
+        ],
+        "text-size": 15,
+        "text-rotate": [
+          "get",
+          "cog"
+        ],
+        "text-rotation-alignment": "map",
+        "text-allow-overlap": true,
+        "text-ignore-placement": true
+      },
+      "paint": {
+        "text-color": [
+          "case",
+          [
+            "<",
+            [
+              "coalesce",
+              [
+                "get",
+                "cpa"
+              ],
+              99
+            ],
+            0.2
+          ],
+          "#e4564f",
+          [
+            "<",
+            [
+              "coalesce",
+              [
+                "get",
+                "cpa"
+              ],
+              99
+            ],
+            0.5
+          ],
+          "#f2b441",
+          "#5bc0ff"
+        ],
+        "text-halo-color": "rgba(13,19,27,0.9)",
+        "text-halo-width": 1.3
+      }
+    },
+    {
+      "id": "ais-label",
+      "type": "symbol",
+      "source": "ais",
+      "minzoom": 12,
+      "layout": {
+        "visibility": "visible",
+        "text-field": [
+          "format",
+          [
+            "get",
+            "name"
+          ],
+          {
+            "font-scale": 1.0
+          },
+          "\n",
+          {},
+          [
+            "concat",
+            [
+              "to-string",
+              [
+                "get",
+                "sog"
+              ]
+            ],
+            " kn"
+          ],
+          {
+            "font-scale": 0.85
+          }
+        ],
+        "text-font": [
+          "Noto Sans Regular"
+        ],
+        "text-size": 11,
+        "text-anchor": "left",
+        "text-offset": [
+          0.9,
+          0
+        ],
+        "text-optional": true
+      },
+      "paint": {
+        "text-color": "#cdd6e0",
+        "text-halo-color": "rgba(13,19,27,0.92)",
+        "text-halo-width": 1.3
+      }
+    }
+  ]
+}

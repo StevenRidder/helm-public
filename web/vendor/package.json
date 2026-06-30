@@ -1,0 +1,28 @@
+{
+  "name": "helm-web-vendor",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Vendored, offline-first MapLibre + plugin bundles for the Helm web client — no CDN at runtime (Helm must work on a boat with no internet). build.mjs (esbuild) reproduces every bundle in this directory from the pinned deps below; the import map in web/index.html points each bare specifier at the emitted file. Versions here are the single source of truth (the README table is descriptive only).",
+  "scripts": {
+    "build": "node build.mjs",
+    "audit": "npm audit"
+  },
+  "devDependencies": {
+    "esbuild": "0.24.2"
+  },
+  "dependencies": {
+    "maplibre-gl": "5.24.0",
+    "pmtiles": "4.4.1",
+    "@geomatico/maplibre-cog-protocol": "0.9.0",
+    "maplibre-contour": "0.1.0",
+    "terra-draw": "1.31.2",
+    "terra-draw-maplibre-gl-adapter": "1.4.1",
+    "maplibre-gl-measures": "0.0.20",
+    "maplibre-gl-temporal-control": "1.2.0",
+    "@deck.gl/core": "9.3.4",
+    "@deck.gl/mapbox": "9.3.4",
+    "@deck.gl/layers": "9.3.4",
+    "@deck.gl/aggregation-layers": "9.3.4"
+  }
+}

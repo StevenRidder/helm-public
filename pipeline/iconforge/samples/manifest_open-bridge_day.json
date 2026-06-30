@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "generator": "iconforge-forge-poc",
+  "style": "open-bridge",
+  "palette": "day",
+  "atlas": {
+    "image": "s52_symbols_open-bridge_day.png",
+    "format": "png",
+    "width": 480,
+    "height": 96,
+    "cell": 96
+  },
+  "entries": [
+    {
+      "name": "BOYCAR_north",
+      "kind": "symbol",
+      "palette": "day",
+      "style": "open-bridge",
+      "pixel_rect": {
+        "x": 0,
+        "y": 0,
+        "width": 96,
+        "height": 96
+      },
+      "uv": {
+        "u0": 0.0,
+        "v0": 0.0,
+        "u1": 0.2,
+        "v1": 1.0
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.84
+      }
+    },
+    {
+      "name": "BCNCAR_south",
+      "kind": "symbol",
+      "palette": "day",
+      "style": "open-bridge",
+      "pixel_rect": {
+        "x": 96,
+        "y": 0,
+        "width": 96,
+        "height": 96
+      },
+      "uv": {
+        "u0": 0.2,
+        "v0": 0.0,
+        "u1": 0.4,
+        "v1": 1.0
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    {
+      "name": "BOYSAW",
+      "kind": "symbol",
+      "palette": "day",
+      "style": "open-bridge",
+      "pixel_rect": {
+        "x": 192,
+        "y": 0,
+        "width": 96,
+        "height": 96
+      },
+      "uv": {
+        "u0": 0.4,
+        "v0": 0.0,
+        "u1": 0.6,
+        "v1": 1.0
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.84
+      }
+    },
+    {
+      "name": "RESARE_pattern",
+      "kind": "pattern",
+      "palette": "day",
+      "style": "open-bridge",
+      "pixel_rect": {
+        "x": 288,
+        "y": 0,
+        "width": 96,
+        "height": 96
+      },
+      "uv": {
+        "u0": 0.6,
+        "v0": 0.0,
+        "u1": 0.8,
+        "v1": 1.0
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "name": "WRECKS_dangerous",
+      "kind": "symbol",
+      "palette": "day",
+      "style": "open-bridge",
+      "pixel_rect": {
+        "x": 384,
+        "y": 0,
+        "width": 96,
+        "height": 96
+      },
+      "uv": {
+        "u0": 0.8,
+        "v0": 0.0,
+        "u1": 1.0,
+        "v1": 1.0
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.55
+      }
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "version": 6,
+  "configurePresets": [
+    {
+      "name": "macos-debug",
+      "displayName": "macOS Debug",
+      "generator": "Unix Makefiles",
+      "binaryDir": "${sourceDir}/build/macos-debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "macos-release",
+      "displayName": "macOS Release",
+      "generator": "Unix Makefiles",
+      "binaryDir": "${sourceDir}/build/macos-release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "ios-simulator-release",
+      "displayName": "iOS Simulator Release (static library only)",
+      "generator": "Unix Makefiles",
+      "binaryDir": "${sourceDir}/build/ios-simulator-release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_SYSTEM_NAME": "iOS",
+        "CMAKE_OSX_SYSROOT": "iphonesimulator",
+        "CMAKE_OSX_ARCHITECTURES": "arm64",
+        "HELM_NATIVE_BUILD_TESTS": "OFF"
+      }
+    },
+    {
+      "name": "iphoneos-release",
+      "displayName": "iPhoneOS Release (static library only)",
+      "generator": "Unix Makefiles",
+      "binaryDir": "${sourceDir}/build/iphoneos-release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_SYSTEM_NAME": "iOS",
+        "CMAKE_OSX_SYSROOT": "iphoneos",
+        "CMAKE_OSX_ARCHITECTURES": "arm64",
+        "HELM_NATIVE_BUILD_TESTS": "OFF"
+      }
+    }
+  ],
+  "buildPresets": [
+    { "name": "macos-debug", "configurePreset": "macos-debug" },
+    { "name": "macos-release", "configurePreset": "macos-release" },
+    { "name": "ios-simulator-release", "configurePreset": "ios-simulator-release" },
+    { "name": "iphoneos-release", "configurePreset": "iphoneos-release" }
+  ],
+  "testPresets": [
+    {
+      "name": "macos-debug",
+      "configurePreset": "macos-debug",
+      "output": { "outputOnFailure": true }
+    }
+  ]
+}

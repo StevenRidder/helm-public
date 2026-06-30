@@ -1,0 +1,22 @@
+{
+  "criteria": [
+    {
+      "name": "colours_correct",
+      "passed": true,
+      "reason": "black present; no wrong lateral colour"
+    },
+    {
+      "name": "light_flare",
+      "passed": true,
+      "reason": "flare present == False"
+    },
+    {
+      "name": "distinguishing_feature",
+      "passed": true,
+      "reason": "hull-and-masts inside a DOTTED danger oval (dangerous variant)"
+    }
+  ],
+  "overall_pass": true,
+  "confidence": 0.95,
+  "sibling_pick": "WRECKS_dangerous"
+}

@@ -1,0 +1,25 @@
+# Web-client test suite (CLIENT epic · CLIENT-17).
+# Runs `node web/test/run.mjs` — the dependency-free aggregator over every web/ JS test
+# (persist, alarms, true-wind, wx-value-codec, ais-risk, ais-guard). No build step, no engine.
+name: web-tests
+
+on:
+  push:
+    paths:
+      - 'web/**'
+      - '.github/workflows/web-tests.yml'
+  pull_request:
+    paths:
+      - 'web/**'
+      - '.github/workflows/web-tests.yml'
+
+jobs:
+  web-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Run web test suite
+        run: node web/test/run.mjs

@@ -1,0 +1,22 @@
+{
+  "criteria": [
+    {
+      "name": "colours_correct",
+      "passed": true,
+      "reason": "magenta present; no wrong lateral colour"
+    },
+    {
+      "name": "light_flare",
+      "passed": true,
+      "reason": "flare present == False"
+    },
+    {
+      "name": "distinguishing_feature",
+      "passed": true,
+      "reason": "tileable magenta diagonal hatch"
+    }
+  ],
+  "overall_pass": true,
+  "confidence": 0.95,
+  "sibling_pick": "RESARE_pattern"
+}

@@ -1,0 +1,1 @@
+{ "type": "FeatureCollection", "_comment": "Where-to-go highlight layer; backend /whereto fills this at runtime.", "features": [] }

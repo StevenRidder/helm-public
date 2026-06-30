@@ -1,0 +1,27 @@
+{
+  "id": "BOYCAR_north",
+  "s52_token": "BOYCAR",
+  "name": "North cardinal buoy",
+  "category": "buoy",
+  "meaning": "Pass to the north of this mark; safe water lies to the north.",
+  "invariants": {
+    "colors": [
+      "black",
+      "yellow"
+    ],
+    "topmark": "two_cones_point_up",
+    "light_flare": false,
+    "shape_class": "buoy",
+    "distinguishing": "black above yellow; topmark two cones BOTH points up",
+    "anchor": [
+      0.5,
+      0.84
+    ]
+  },
+  "reference": null,
+  "siblings": [
+    "BOYCAR_south",
+    "BOYCAR_east",
+    "BOYCAR_west"
+  ]
+}

@@ -1,0 +1,138 @@
+{
+  "schema": "helm.env.bundle.v1",
+  "bundleId": "fixture/fiji-south-pacific/open-meteo/2026-06-29T00Z",
+  "title": "Synthetic Fiji / South Pacific environmental bundle fixture",
+  "productFamily": "met-ocean",
+  "encoding": "helm-wxv1",
+  "generatedAt": "2026-06-29T00:00:00Z",
+  "source": {
+    "provider": "fixture",
+    "basedOn": "open-meteo-shape",
+    "advisoryOnly": true,
+    "notForNavigation": true
+  },
+  "run": {
+    "mode": "model-run",
+    "model": "open-meteo-gfs-seamless",
+    "marineModel": "open-meteo-marine",
+    "runTime": "2026-06-29T00:00:00Z",
+    "validTimes": [
+      "2026-06-29T00:00:00Z",
+      "2026-06-29T03:00:00Z",
+      "2026-06-29T06:00:00Z",
+      "2026-06-29T09:00:00Z",
+      "2026-06-29T12:00:00Z"
+    ],
+    "frames": 5
+  },
+  "coverage": {
+    "crs": "OGC:CRS84",
+    "bbox": {
+      "west": 160.0,
+      "south": -35.0,
+      "east": -150.0,
+      "north": 5.0,
+      "crossesAntimeridian": true
+    },
+    "homeWaters": "Fiji / Tonga / Samoa / South Pacific passage region",
+    "wrap": "antimeridian"
+  },
+  "lod": {
+    "tileMatrixSet": "WebMercatorQuad",
+    "tileSize": 256,
+    "levels": {
+      "overview": {"minzoom": 0, "maxzoom": 2},
+      "basin": {"minzoom": 3, "maxzoom": 5},
+      "regional": {"minzoom": 6, "maxzoom": 8}
+    },
+    "parentFallback": true,
+    "overzoom": "renderer may overzoom prepared parent/native field tiles; never fetch upstream during gestures"
+  },
+  "cachePolicy": {
+    "targetInvariant": "pan, zoom, scrub, and layer toggles read prepared local/cache data only",
+    "upstreamFetchesAllowedDuringGesture": false,
+    "refreshCadenceSeconds": 10800,
+    "staleServing": true
+  },
+  "renderPolicy": {
+    "renderer": "client-webgpu-or-webgl-field-scene",
+    "scalarColour": "colourise from numeric field tiles using fixed per-layer ramps",
+    "particles": "animate vector layers from uv-grid fields using the same bundle/time/coverage",
+    "displayTiles": "optional"
+  },
+  "sampleContract": {
+    "schema": "helm.layer.sample.v1",
+    "requiredFields": ["value", "unit", "sourceRef", "freshness", "confidence", "coverage", "advisory"]
+  },
+  "layers": {
+    "wind": {
+      "kind": "vector",
+      "unit": "kn",
+      "s100": {"productIdentifier": "S-413", "officialProduct": false},
+      "fieldTiles": {"urlTemplate": "wind/{validTime}/{z}/{x}/{y}.png"},
+      "vectorField": {"urlTemplate": "wind/{validTime}/uv/{z}/{x}/{y}.bin"}
+    },
+    "gust": {
+      "kind": "scalar",
+      "unit": "kn",
+      "s100": {"productIdentifier": "S-412", "officialProduct": false},
+      "fieldTiles": {"urlTemplate": "gust/{validTime}/{z}/{x}/{y}.png"}
+    },
+    "rain": {
+      "kind": "scalar",
+      "unit": "mm",
+      "s100": {"productIdentifier": "S-412", "officialProduct": false},
+      "fieldTiles": {"urlTemplate": "rain/{validTime}/{z}/{x}/{y}.png"}
+    },
+    "temp": {
+      "kind": "scalar",
+      "unit": "°C",
+      "s100": {"productIdentifier": "S-413", "officialProduct": false},
+      "fieldTiles": {"urlTemplate": "temp/{validTime}/{z}/{x}/{y}.png"}
+    },
+    "pressure": {
+      "kind": "scalar",
+      "unit": "hPa",
+      "s100": {"productIdentifier": "S-413", "officialProduct": false},
+      "fieldTiles": {"urlTemplate": "pressure/{validTime}/{z}/{x}/{y}.png"}
+    },
+    "clouds": {
+      "kind": "scalar",
+      "unit": "%",
+      "s100": {"productIdentifier": "S-413", "officialProduct": false},
+      "fieldTiles": {"urlTemplate": "clouds/{validTime}/{z}/{x}/{y}.png"}
+    },
+    "cape": {
+      "kind": "scalar",
+      "unit": "J/kg",
+      "s100": {"productIdentifier": "S-412", "officialProduct": false},
+      "fieldTiles": {"urlTemplate": "cape/{validTime}/{z}/{x}/{y}.png"}
+    },
+    "waves": {
+      "kind": "scalar",
+      "unit": "m",
+      "s100": {"productIdentifier": "S-413", "officialProduct": false},
+      "fieldTiles": {"urlTemplate": "waves/{validTime}/{z}/{x}/{y}.png"}
+    },
+    "swell": {
+      "kind": "scalar",
+      "unit": "m",
+      "s100": {"productIdentifier": "S-413", "officialProduct": false},
+      "fieldTiles": {"urlTemplate": "swell/{validTime}/{z}/{x}/{y}.png"}
+    },
+    "current": {
+      "kind": "vector",
+      "unit": "kn",
+      "s100": {"productIdentifier": "S-111", "officialProduct": false},
+      "fieldTiles": {"urlTemplate": "current/{validTime}/{z}/{x}/{y}.png"},
+      "vectorField": {"urlTemplate": "current/{validTime}/uv/{z}/{x}/{y}.bin"}
+    },
+    "sst": {
+      "kind": "scalar",
+      "unit": "°C",
+      "s100": {"productIdentifier": "S-413", "officialProduct": false},
+      "fieldTiles": {"urlTemplate": "sst/{validTime}/{z}/{x}/{y}.png"}
+    }
+  },
+  "disclaimer": "Synthetic contract fixture. Forecast/advisory shape only. NOT FOR NAVIGATION."
+}

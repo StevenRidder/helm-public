@@ -1,0 +1,85 @@
+{
+  "id": "forge-scale-decision-2026-06-30",
+  "status": "go",
+  "decision": "Proceed from the 20-symbol stress pilot to a 100-150 presentation-asset batch.",
+  "basis": {
+    "stress20_valid_accepts": 40,
+    "stress20_valid_total": 40,
+    "stress20_broken_rejects": 80,
+    "stress20_broken_total": 80,
+    "hard_pile_entries": 80,
+    "notable_finding": "Semantic QA caught a real generator bug: west cardinal lost the repeated yellow band when colors were deduped. The bug was fixed and covered."
+  },
+  "local_s52_inventory": {
+    "source": "~/.helm/runtime/s57data/chartsymbols.xml",
+    "symbol_definitions": 1093,
+    "unique_symbol_names": 1018,
+    "patterns": 30,
+    "line_styles": 57,
+    "lookup_rules": 3057,
+    "presentation_asset_definitions": 1180,
+    "unique_presentation_assets": 1105
+  },
+  "coverage_targets": {
+    "symbol_definition_99_percent": 1082,
+    "presentation_asset_definition_99_percent": 1168,
+    "unique_presentation_asset_99_percent": 1093
+  },
+  "next_batch": {
+    "size": {
+      "minimum_assets": 100,
+      "target_assets": 125,
+      "maximum_assets": 150
+    },
+    "style_count": 2,
+    "palette_count": 3,
+    "expected_svg_outputs": {
+      "minimum": 200,
+      "target": 250,
+      "maximum": 300
+    },
+    "expected_png_outputs": {
+      "minimum": 600,
+      "target": 750,
+      "maximum": 900
+    },
+    "selection_rules": [
+      "Prefer whole symbol families over isolated symbols.",
+      "Include every sibling needed for forced-choice discrimination.",
+      "Include conditional pairs for wrecks, obstructions, lights, and restricted/caution/anchorage areas.",
+      "Include at least 20 area patterns and line styles, not only point symbols.",
+      "Include symbols whose S-52 lookup depends on attributes such as CATCAM, COLOUR, COLPAT, BOYSHP, BCNSHP, CATWRK, CATOBS, WATLEV, LIGHTS, and VALSOU.",
+      "Every item must have an S-52 lookup/instruction, Chart No.1 reference target, invariants, sibling set, deliberate broken cases, and hard-pile reason codes."
+    ]
+  },
+  "go_no_go_thresholds": {
+    "valid_accept_rate_minimum": 0.98,
+    "deliberate_broken_reject_rate_minimum": 1.0,
+    "silent_safety_misses_allowed": 0,
+    "unexplained_hard_pile_entries_allowed": 0,
+    "max_hard_pile_rate_for_generated_valids": 0.15,
+    "required_outputs": [
+      "semantic_report.json",
+      "hard_pile.json",
+      "contact_sheet.png",
+      "per-symbol provenance",
+      "atlas manifest compatibility evidence"
+    ]
+  },
+  "risks_before_99_percent": [
+    "Chart No.1 crop acquisition and naming must be automated or the catalog becomes manual bottleneck.",
+    "Current semantic QA is rule-based and must be extended per family before full S-52 coverage.",
+    "Line styles and area patterns need first-class generation and tiling checks.",
+    "The clean-IP counsel gate remains required before treating the generated pack as relicensable production artwork.",
+    "A human hard-pile review workflow is still needed for ambiguous or rare symbols."
+  ],
+  "definition_of_done_for_next_batch": [
+    "100-150 selected assets are cataloged with provenance and sibling sets.",
+    "All selected assets generate across two styles with CSS-var colors and valid anchors.",
+    "All selected assets render across day/dusk/night palettes.",
+    "Valid generated cases meet or exceed 98% acceptance, with all failures in hard-pile.",
+    "Every deliberate broken case rejects for an expected reason code.",
+    "No silent safety miss is observed.",
+    "A scale report recommends either bulk expansion, another corrective batch, or stop."
+  ]
+}

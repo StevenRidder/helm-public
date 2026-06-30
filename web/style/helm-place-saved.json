@@ -1,0 +1,74 @@
+{
+  "_epic": "PLACES",
+  "_note": "Owned/saved community pins — halo + glyph + label (PLACES-2). Owned by PLACES. Legacy ids saved-halo/saved-icon/saved-label are referenced by the Layers checkbox + the saved-icon click popup. New PLACES layers should be namespaced helm-place-*.",
+  "sources": {
+    "saved": {
+      "type": "geojson",
+      "data": "data/saved-sample.geojson",
+      "attribution": "Helm community (owned)"
+    }
+  },
+  "layers": [
+    {
+      "id": "saved-halo",
+      "type": "circle",
+      "source": "saved",
+      "layout": { "visibility": "visible" },
+      "paint": {
+        "circle-radius": 10,
+        "circle-color": "rgba(13,19,27,0.74)",
+        "circle-stroke-width": 1.4,
+        "circle-stroke-color": "#f5c451",
+        "circle-pitch-alignment": "map"
+      }
+    },
+    {
+      "id": "saved-icon",
+      "type": "symbol",
+      "source": "saved",
+      "layout": {
+        "visibility": "visible",
+        "text-field": [
+          "match", ["get", "kind"],
+          "anchorage", "⚓",
+          "snorkel", "S",
+          "fuel", "F",
+          "provisioning", "P",
+          "hazard", "!",
+          "must-see", "★",
+          "•"
+        ],
+        "text-font": ["Noto Sans Regular"],
+        "text-size": 12,
+        "text-allow-overlap": true,
+        "text-ignore-placement": true
+      },
+      "paint": {
+        "text-color": "#f5c451",
+        "text-halo-color": "rgba(13,19,27,0.9)",
+        "text-halo-width": 1.0
+      }
+    },
+    {
+      "id": "saved-label",
+      "type": "symbol",
+      "source": "saved",
+      "minzoom": 11,
+      "layout": {
+        "visibility": "visible",
+        "text-field": ["get", "name"],
+        "text-font": ["Noto Sans Regular"],
+        "text-size": 11,
+        "text-anchor": "top",
+        "text-offset": [0, 1.0],
+        "text-optional": true,
+        "text-max-width": 9
+      },
+      "paint": {
+        "text-color": "#f3dca0",
+        "text-halo-color": "rgba(13,19,27,0.92)",
+        "text-halo-width": 1.4
+      }
+    }
+  ]
+}

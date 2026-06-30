@@ -1,0 +1,40 @@
+Helm Notice
+
+Copyright 2026 Steve Ridder.
+
+Helm is pre-alpha marine navigation software. It is not a certified navigation
+system, not type-approved ECDIS, and not a substitute for official charts,
+notices, instruments, watchkeeping, or seamanship. Satellite imagery,
+weather-derived layers, AI summaries, pass advisors, and community data are
+supplemental aids only. See SAFETY.md before running, demonstrating, or
+distributing Helm.
+
+Primary project attribution:
+
+- OpenCPN: Helm's current engine work reuses OpenCPN's GPLv2-or-later model/
+  navigation core and S-52/S-57 chart-rendering code in a standalone engine
+  process. OpenCPN-derived work remains under GPLv2-or-later.
+- wxWidgets: used by the OpenCPN-derived engine path under its applicable
+  wxWindows/wxWidgets license terms.
+- MapLibre GL JS, PMTiles, deck.gl, Terra Draw, maplibre-contour,
+  maplibre-cog-protocol, maplibre-gl-measures, maplibre-gl-temporal-control,
+  and transitive browser bundles: see web/vendor/README.md and
+  docs/CLIENT-LICENSE-REGISTER.md.
+- Noto Sans font glyph atlases: derived from Noto Sans under the SIL Open Font
+  License 1.1.
+
+Data and layer attribution rules:
+
+- NOAA ENC / NCDS: US public-domain source; courtesy attribution recommended.
+- Copernicus Sentinel data: keep permanent attribution in public builds, for
+  example "Contains modified Copernicus Sentinel data [Year]".
+- OpenStreetMap / OpenSeaMap: attribution and ODbL obligations apply. Seamarks
+  are supplemental overlay data, not primary charts.
+- Windy, PredictWind, Google, Bing, Esri/ArcGIS, Navionics, and other commercial
+  sources are not generally redistributable by Helm unless a written commercial
+  agreement permits it. See docs/LEGAL.md before enabling these in any public,
+  hosted, or sold build.
+
+Before a public alpha or paid distribution, refresh the attribution table,
+dependency register, and legal review notes in docs/LEGAL.md and
+docs/CLIENT-LICENSE-REGISTER.md.

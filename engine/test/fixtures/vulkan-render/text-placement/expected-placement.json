@@ -1,0 +1,15 @@
+{
+  "schema_version": "vulkan.text_placement_contract.v0",
+  "placements": [
+    {"command_id":"cmd.text.harbor","label_kind":"text","text":"Harbor label","object_class":"OBJNAM","font_ref":"font.chart-label","resource_key":"glyphs:font.chart-label","anchor":{"x":5,"y":2},"priority":50,"rotation_deg":0,"order_key":[1,1,5,4,10],"collision_policy":"declutter-box","safety_class":"","reservation":{"glyphs":12,"vertices":4,"indices":6}},
+    {"command_id":"cmd.sounding.shoal","label_kind":"sounding","text":"7.4","object_class":"SOUNDG","font_ref":"font.chart-label","resource_key":"glyphs:font.chart-label","anchor":{"x":3,"y":6},"priority":60,"rotation_deg":0,"order_key":[1,1,6,4,20],"collision_policy":"sounding-grid","safety_class":"shoal","reservation":{"glyphs":3,"vertices":4,"indices":6}},
+    {"command_id":"cmd.light.label","label_kind":"light_label","text":"Fl(2) 10s","object_class":"LIGHTS","font_ref":"font.chart-label","resource_key":"glyphs:font.chart-label","anchor":{"x":8,"y":3},"priority":70,"rotation_deg":0,"order_key":[1,1,7,4,30],"collision_policy":"light-description","safety_class":"","reservation":{"glyphs":9,"vertices":4,"indices":6}}
+  ],
+  "resource_needs": [
+    {"resource_key":"glyphs:font.chart-label","font_ref":"font.chart-label","owner":"frame-owned","label_count":3,"glyph_count":24,"vertices":12,"indices":18}
+  ],
+  "diagnostics": [
+    {"severity":"info","code":"placement.culled","command_id":"cmd.text.scamin-hidden","message":"text command culled by semantic visibility gate: scamin"},
+    {"severity":"warning","code":"placement.deferred.shaping","command_id":"cmd.text.complex-script","message":"text command deferred; shaping/ligature placement is outside SYM-4: complex_shaping"}
+  ]
+}

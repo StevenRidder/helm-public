@@ -1,0 +1,25 @@
+diff --git a/gui/src/tcmgr.cpp b/gui/src/tcmgr.cpp
+index 234f731..f4e63c8 100644
+--- a/gui/src/tcmgr.cpp
++++ b/gui/src/tcmgr.cpp
+@@ -34,9 +34,18 @@
+ #include "model/georef.h"
+ #include "model/logger.h"
+-
++
++#ifdef OCPN_HEADLESS
++int OCPNMessageBox(wxWindow *parent, const wxString &message,
++                   const wxString &caption = "Message", int style = wxOK,
++                   int timeout_sec = -1, int x = -1, int y = -1);
++wxDateTime toUsrDateTime(const wxDateTime ts, const int format,
++                         const double lon);
++#else
+ #include "gui_lib.h"
+ #include "dychart.h"
+ #include "navutil.h"
++#endif
++
+ #include "tcmgr.h"
+-
++
+ TCMgr *ptcmgr;  ///< Global instance

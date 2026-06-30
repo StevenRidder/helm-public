@@ -1,0 +1,44 @@
+{
+  "_epic": "PLACES",
+  "_note": "Where-to-go AI recommendation rings/ranks (PLACES + AI). Owned by PLACES. `whereto` source is repopulated by community.js. New PLACES layers should be namespaced helm-place-*.",
+  "sources": {
+    "whereto": {
+      "type": "geojson",
+      "data": "data/whereto-empty.geojson"
+    }
+  },
+  "layers": [
+    {
+      "id": "whereto-ring",
+      "type": "circle",
+      "source": "whereto",
+      "layout": { "visibility": "visible" },
+      "paint": {
+        "circle-radius": 22,
+        "circle-color": "rgba(245,196,81,0.10)",
+        "circle-stroke-width": 2,
+        "circle-stroke-color": "#f5c451",
+        "circle-stroke-opacity": 0.9,
+        "circle-pitch-alignment": "map"
+      }
+    },
+    {
+      "id": "whereto-rank",
+      "type": "symbol",
+      "source": "whereto",
+      "layout": {
+        "visibility": "visible",
+        "text-field": ["concat", "#", ["to-string", ["get", "rank"]]],
+        "text-font": ["Noto Sans Regular"],
+        "text-size": 11,
+        "text-offset": [0, -2.0],
+        "text-allow-overlap": true
+      },
+      "paint": {
+        "text-color": "#f5c451",
+        "text-halo-color": "rgba(13,19,27,0.92)",
+        "text-halo-width": 1.2
+      }
+    }
+  ]
+}

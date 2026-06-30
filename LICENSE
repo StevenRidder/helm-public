@@ -1,0 +1,30 @@
+Helm License Notice
+
+Copyright 2026 Steve Ridder
+
+This repository is multi-licensed. Unless a file, directory, vendored
+dependency, generated artifact, or upstream component says otherwise:
+
+1. Helm-authored source code, web client code, backend services, pipeline code,
+   documentation, and project materials are licensed under the Business Source
+   License 1.1 in LICENSE.BSL.
+
+2. On the Change Date stated in LICENSE.BSL, the Helm-authored Licensed Work
+   changes to the Apache License, Version 2.0.
+
+3. OpenCPN-derived engine code, OpenCPN patch series, and any source copied or
+   adapted from OpenCPN remain under OpenCPN's GPLv2-or-later terms. Helm's
+   architecture keeps this GPL engine in a separate process behind an
+   HTTP/WebSocket protocol boundary; this notice does not relicense OpenCPN.
+
+4. Third-party dependencies keep their own licenses. The client-side dependency
+   register is docs/CLIENT-LICENSE-REGISTER.md; vendored web bundles are
+   described in web/vendor/README.md.
+
+5. Chart, imagery, weather, place, font, and demo data may carry separate terms
+   and attribution duties. See SAFETY.md, docs/LEGAL.md, and NOTICE before
+   distributing any public build.
+
+Helm is pre-alpha navigation software. It is not type-approved ECDIS, not a
+primary navigation system, and is provided without warranty. Cross-check
+official charts, notices, instruments, and prudent seamanship. See SAFETY.md.

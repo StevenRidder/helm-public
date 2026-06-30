@@ -1,0 +1,763 @@
+[
+  {
+    "id": "BOYCAR_north",
+    "style": "open-bridge",
+    "kind": "symbol",
+    "anchor": [
+      0.5,
+      0.84
+    ],
+    "structural_pass": true,
+    "vision_pass": true,
+    "overall_pass": true,
+    "identity": "BOYCAR_north",
+    "render_day": "/home/user/Helm/pipeline/iconforge/out/renders/BOYCAR_north_open-bridge_day.png",
+    "provenance": {
+      "source": "fixture:claude-opus-4-8",
+      "prompt_version": "forge-compose-v1",
+      "input_hash": "3a79c362de0f840d"
+    },
+    "criteria": [
+      {
+        "name": "xml_wellformed",
+        "passed": true,
+        "reason": "parses as XML"
+      },
+      {
+        "name": "palette_tokens_defined",
+        "passed": true,
+        "reason": "all colour tokens defined"
+      },
+      {
+        "name": "invariant_colours_used",
+        "passed": true,
+        "reason": "all invariant colours referenced"
+      },
+      {
+        "name": "no_literal_hex",
+        "passed": true,
+        "reason": "colours are CSS variables"
+      },
+      {
+        "name": "anchor_in_bounds",
+        "passed": true,
+        "reason": "anchor=(0.5,0.84)"
+      },
+      {
+        "name": "renders",
+        "passed": true,
+        "reason": "1054 bytes"
+      },
+      {
+        "name": "colours_correct",
+        "passed": true,
+        "reason": "black, yellow present; no wrong lateral colour"
+      },
+      {
+        "name": "topmark_correct",
+        "passed": true,
+        "reason": "topmark is two_cones_point_up"
+      },
+      {
+        "name": "light_flare",
+        "passed": true,
+        "reason": "flare present == False"
+      },
+      {
+        "name": "distinguishing_feature",
+        "passed": true,
+        "reason": "black above yellow; topmark two cones BOTH points up"
+      }
+    ]
+  },
+  {
+    "id": "BCNCAR_south",
+    "style": "open-bridge",
+    "kind": "symbol",
+    "anchor": [
+      0.5,
+      0.88
+    ],
+    "structural_pass": true,
+    "vision_pass": true,
+    "overall_pass": true,
+    "identity": "BCNCAR_south",
+    "render_day": "/home/user/Helm/pipeline/iconforge/out/renders/BCNCAR_south_open-bridge_day.png",
+    "provenance": {
+      "source": "fixture:claude-opus-4-8",
+      "prompt_version": "forge-compose-v1",
+      "input_hash": "473d3c99a3257ccd"
+    },
+    "criteria": [
+      {
+        "name": "xml_wellformed",
+        "passed": true,
+        "reason": "parses as XML"
+      },
+      {
+        "name": "palette_tokens_defined",
+        "passed": true,
+        "reason": "all colour tokens defined"
+      },
+      {
+        "name": "invariant_colours_used",
+        "passed": true,
+        "reason": "all invariant colours referenced"
+      },
+      {
+        "name": "no_literal_hex",
+        "passed": true,
+        "reason": "colours are CSS variables"
+      },
+      {
+        "name": "anchor_in_bounds",
+        "passed": true,
+        "reason": "anchor=(0.5,0.88)"
+      },
+      {
+        "name": "renders",
+        "passed": true,
+        "reason": "842 bytes"
+      },
+      {
+        "name": "colours_correct",
+        "passed": true,
+        "reason": "yellow, black present; no wrong lateral colour"
+      },
+      {
+        "name": "topmark_correct",
+        "passed": true,
+        "reason": "topmark is two_cones_point_down"
+      },
+      {
+        "name": "light_flare",
+        "passed": true,
+        "reason": "flare present == False"
+      },
+      {
+        "name": "distinguishing_feature",
+        "passed": true,
+        "reason": "yellow above black; topmark two cones BOTH points down; fixed beacon on a base"
+      }
+    ]
+  },
+  {
+    "id": "BOYSAW",
+    "style": "open-bridge",
+    "kind": "symbol",
+    "anchor": [
+      0.5,
+      0.84
+    ],
+    "structural_pass": true,
+    "vision_pass": true,
+    "overall_pass": true,
+    "identity": "BOYSAW",
+    "render_day": "/home/user/Helm/pipeline/iconforge/out/renders/BOYSAW_open-bridge_day.png",
+    "provenance": {
+      "source": "fixture:claude-opus-4-8",
+      "prompt_version": "forge-compose-v1",
+      "input_hash": "53a0fe9e763ad1a1"
+    },
+    "criteria": [
+      {
+        "name": "xml_wellformed",
+        "passed": true,
+        "reason": "parses as XML"
+      },
+      {
+        "name": "palette_tokens_defined",
+        "passed": true,
+        "reason": "all colour tokens defined"
+      },
+      {
+        "name": "invariant_colours_used",
+        "passed": true,
+        "reason": "all invariant colours referenced"
+      },
+      {
+        "name": "no_literal_hex",
+        "passed": true,
+        "reason": "colours are CSS variables"
+      },
+      {
+        "name": "anchor_in_bounds",
+        "passed": true,
+        "reason": "anchor=(0.5,0.84)"
+      },
+      {
+        "name": "renders",
+        "passed": true,
+        "reason": "1249 bytes"
+      },
+      {
+        "name": "colours_correct",
+        "passed": true,
+        "reason": "red, white present; no wrong lateral colour"
+      },
+      {
+        "name": "topmark_correct",
+        "passed": true,
+        "reason": "topmark is single_sphere"
+      },
+      {
+        "name": "light_flare",
+        "passed": true,
+        "reason": "flare present == False"
+      },
+      {
+        "name": "distinguishing_feature",
+        "passed": true,
+        "reason": "red and white VERTICAL stripes; single red sphere topmark"
+      }
+    ]
+  },
+  {
+    "id": "RESARE_pattern",
+    "style": "open-bridge",
+    "kind": "pattern",
+    "anchor": [
+      0.5,
+      0.5
+    ],
+    "structural_pass": true,
+    "vision_pass": true,
+    "overall_pass": true,
+    "identity": "RESARE_pattern",
+    "render_day": "/home/user/Helm/pipeline/iconforge/out/renders/RESARE_pattern_open-bridge_day.png",
+    "provenance": {
+      "source": "fixture:claude-opus-4-8",
+      "prompt_version": "forge-compose-v1",
+      "input_hash": "48d81cc524f2b9f9"
+    },
+    "criteria": [
+      {
+        "name": "xml_wellformed",
+        "passed": true,
+        "reason": "parses as XML"
+      },
+      {
+        "name": "palette_tokens_defined",
+        "passed": true,
+        "reason": "all colour tokens defined"
+      },
+      {
+        "name": "invariant_colours_used",
+        "passed": true,
+        "reason": "all invariant colours referenced"
+      },
+      {
+        "name": "no_literal_hex",
+        "passed": true,
+        "reason": "colours are CSS variables"
+      },
+      {
+        "name": "anchor_in_bounds",
+        "passed": true,
+        "reason": "anchor=(0.5,0.5)"
+      },
+      {
+        "name": "renders",
+        "passed": true,
+        "reason": "590 bytes"
+      },
+      {
+        "name": "colours_correct",
+        "passed": true,
+        "reason": "magenta present; no wrong lateral colour"
+      },
+      {
+        "name": "light_flare",
+        "passed": true,
+        "reason": "flare present == False"
+      },
+      {
+        "name": "distinguishing_feature",
+        "passed": true,
+        "reason": "tileable magenta diagonal hatch"
+      }
+    ]
+  },
+  {
+    "id": "WRECKS_dangerous",
+    "style": "open-bridge",
+    "kind": "symbol",
+    "anchor": [
+      0.5,
+      0.55
+    ],
+    "structural_pass": true,
+    "vision_pass": true,
+    "overall_pass": true,
+    "identity": "WRECKS_dangerous",
+    "render_day": "/home/user/Helm/pipeline/iconforge/out/renders/WRECKS_dangerous_open-bridge_day.png",
+    "provenance": {
+      "source": "fixture:claude-opus-4-8",
+      "prompt_version": "forge-compose-v1",
+      "input_hash": "bc5fd782b6d59ecd"
+    },
+    "criteria": [
+      {
+        "name": "xml_wellformed",
+        "passed": true,
+        "reason": "parses as XML"
+      },
+      {
+        "name": "palette_tokens_defined",
+        "passed": true,
+        "reason": "all colour tokens defined"
+      },
+      {
+        "name": "invariant_colours_used",
+        "passed": true,
+        "reason": "all invariant colours referenced"
+      },
+      {
+        "name": "no_literal_hex",
+        "passed": true,
+        "reason": "colours are CSS variables"
+      },
+      {
+        "name": "anchor_in_bounds",
+        "passed": true,
+        "reason": "anchor=(0.5,0.55)"
+      },
+      {
+        "name": "renders",
+        "passed": true,
+        "reason": "1932 bytes"
+      },
+      {
+        "name": "colours_correct",
+        "passed": true,
+        "reason": "black present; no wrong lateral colour"
+      },
+      {
+        "name": "light_flare",
+        "passed": true,
+        "reason": "flare present == False"
+      },
+      {
+        "name": "distinguishing_feature",
+        "passed": true,
+        "reason": "hull-and-masts inside a DOTTED danger oval (dangerous variant)"
+      }
+    ]
+  },
+  {
+    "id": "BOYCAR_north",
+    "style": "us-paper",
+    "kind": "symbol",
+    "anchor": [
+      0.5,
+      0.84
+    ],
+    "structural_pass": true,
+    "vision_pass": true,
+    "overall_pass": true,
+    "identity": "BOYCAR_north",
+    "render_day": "/home/user/Helm/pipeline/iconforge/out/renders/BOYCAR_north_us-paper_day.png",
+    "provenance": {
+      "source": "fixture:claude-opus-4-8",
+      "prompt_version": "forge-compose-v1",
+      "input_hash": "6172f8dc2209ff95"
+    },
+    "criteria": [
+      {
+        "name": "xml_wellformed",
+        "passed": true,
+        "reason": "parses as XML"
+      },
+      {
+        "name": "palette_tokens_defined",
+        "passed": true,
+        "reason": "all colour tokens defined"
+      },
+      {
+        "name": "invariant_colours_used",
+        "passed": true,
+        "reason": "all invariant colours referenced"
+      },
+      {
+        "name": "no_literal_hex",
+        "passed": true,
+        "reason": "colours are CSS variables"
+      },
+      {
+        "name": "anchor_in_bounds",
+        "passed": true,
+        "reason": "anchor=(0.5,0.84)"
+      },
+      {
+        "name": "renders",
+        "passed": true,
+        "reason": "913 bytes"
+      },
+      {
+        "name": "colours_correct",
+        "passed": true,
+        "reason": "black, yellow present; no wrong lateral colour"
+      },
+      {
+        "name": "topmark_correct",
+        "passed": true,
+        "reason": "topmark is two_cones_point_up"
+      },
+      {
+        "name": "light_flare",
+        "passed": true,
+        "reason": "flare present == False"
+      },
+      {
+        "name": "distinguishing_feature",
+        "passed": true,
+        "reason": "black above yellow; topmark two cones BOTH points up"
+      }
+    ]
+  },
+  {
+    "id": "BCNCAR_south",
+    "style": "us-paper",
+    "kind": "symbol",
+    "anchor": [
+      0.5,
+      0.88
+    ],
+    "structural_pass": true,
+    "vision_pass": true,
+    "overall_pass": true,
+    "identity": "BCNCAR_south",
+    "render_day": "/home/user/Helm/pipeline/iconforge/out/renders/BCNCAR_south_us-paper_day.png",
+    "provenance": {
+      "source": "fixture:claude-opus-4-8",
+      "prompt_version": "forge-compose-v1",
+      "input_hash": "8c48903f6a41698a"
+    },
+    "criteria": [
+      {
+        "name": "xml_wellformed",
+        "passed": true,
+        "reason": "parses as XML"
+      },
+      {
+        "name": "palette_tokens_defined",
+        "passed": true,
+        "reason": "all colour tokens defined"
+      },
+      {
+        "name": "invariant_colours_used",
+        "passed": true,
+        "reason": "all invariant colours referenced"
+      },
+      {
+        "name": "no_literal_hex",
+        "passed": true,
+        "reason": "colours are CSS variables"
+      },
+      {
+        "name": "anchor_in_bounds",
+        "passed": true,
+        "reason": "anchor=(0.5,0.88)"
+      },
+      {
+        "name": "renders",
+        "passed": true,
+        "reason": "700 bytes"
+      },
+      {
+        "name": "colours_correct",
+        "passed": true,
+        "reason": "yellow, black present; no wrong lateral colour"
+      },
+      {
+        "name": "topmark_correct",
+        "passed": true,
+        "reason": "topmark is two_cones_point_down"
+      },
+      {
+        "name": "light_flare",
+        "passed": true,
+        "reason": "flare present == False"
+      },
+      {
+        "name": "distinguishing_feature",
+        "passed": true,
+        "reason": "yellow above black; topmark two cones BOTH points down; fixed beacon on a base"
+      }
+    ]
+  },
+  {
+    "id": "BOYSAW",
+    "style": "us-paper",
+    "kind": "symbol",
+    "anchor": [
+      0.5,
+      0.84
+    ],
+    "structural_pass": true,
+    "vision_pass": true,
+    "overall_pass": true,
+    "identity": "BOYSAW",
+    "render_day": "/home/user/Helm/pipeline/iconforge/out/renders/BOYSAW_us-paper_day.png",
+    "provenance": {
+      "source": "fixture:claude-opus-4-8",
+      "prompt_version": "forge-compose-v1",
+      "input_hash": "7499e31e5cb41ade"
+    },
+    "criteria": [
+      {
+        "name": "xml_wellformed",
+        "passed": true,
+        "reason": "parses as XML"
+      },
+      {
+        "name": "palette_tokens_defined",
+        "passed": true,
+        "reason": "all colour tokens defined"
+      },
+      {
+        "name": "invariant_colours_used",
+        "passed": true,
+        "reason": "all invariant colours referenced"
+      },
+      {
+        "name": "no_literal_hex",
+        "passed": true,
+        "reason": "colours are CSS variables"
+      },
+      {
+        "name": "anchor_in_bounds",
+        "passed": true,
+        "reason": "anchor=(0.5,0.84)"
+      },
+      {
+        "name": "renders",
+        "passed": true,
+        "reason": "1047 bytes"
+      },
+      {
+        "name": "colours_correct",
+        "passed": true,
+        "reason": "red, white present; no wrong lateral colour"
+      },
+      {
+        "name": "topmark_correct",
+        "passed": true,
+        "reason": "topmark is single_sphere"
+      },
+      {
+        "name": "light_flare",
+        "passed": true,
+        "reason": "flare present == False"
+      },
+      {
+        "name": "distinguishing_feature",
+        "passed": true,
+        "reason": "red and white VERTICAL stripes; single red sphere topmark"
+      }
+    ]
+  },
+  {
+    "id": "RESARE_pattern",
+    "style": "us-paper",
+    "kind": "pattern",
+    "anchor": [
+      0.5,
+      0.5
+    ],
+    "structural_pass": true,
+    "vision_pass": true,
+    "overall_pass": true,
+    "identity": "RESARE_pattern",
+    "render_day": "/home/user/Helm/pipeline/iconforge/out/renders/RESARE_pattern_us-paper_day.png",
+    "provenance": {
+      "source": "fixture:claude-opus-4-8",
+      "prompt_version": "forge-compose-v1",
+      "input_hash": "645d62a1cdafb49b"
+    },
+    "criteria": [
+      {
+        "name": "xml_wellformed",
+        "passed": true,
+        "reason": "parses as XML"
+      },
+      {
+        "name": "palette_tokens_defined",
+        "passed": true,
+        "reason": "all colour tokens defined"
+      },
+      {
+        "name": "invariant_colours_used",
+        "passed": true,
+        "reason": "all invariant colours referenced"
+      },
+      {
+        "name": "no_literal_hex",
+        "passed": true,
+        "reason": "colours are CSS variables"
+      },
+      {
+        "name": "anchor_in_bounds",
+        "passed": true,
+        "reason": "anchor=(0.5,0.5)"
+      },
+      {
+        "name": "renders",
+        "passed": true,
+        "reason": "587 bytes"
+      },
+      {
+        "name": "colours_correct",
+        "passed": true,
+        "reason": "magenta present; no wrong lateral colour"
+      },
+      {
+        "name": "light_flare",
+        "passed": true,
+        "reason": "flare present == False"
+      },
+      {
+        "name": "distinguishing_feature",
+        "passed": true,
+        "reason": "tileable magenta diagonal hatch"
+      }
+    ]
+  },
+  {
+    "id": "WRECKS_dangerous",
+    "style": "us-paper",
+    "kind": "symbol",
+    "anchor": [
+      0.5,
+      0.55
+    ],
+    "structural_pass": true,
+    "vision_pass": true,
+    "overall_pass": true,
+    "identity": "WRECKS_dangerous",
+    "render_day": "/home/user/Helm/pipeline/iconforge/out/renders/WRECKS_dangerous_us-paper_day.png",
+    "provenance": {
+      "source": "fixture:claude-opus-4-8",
+      "prompt_version": "forge-compose-v1",
+      "input_hash": "b5346fbdde06cd82"
+    },
+    "criteria": [
+      {
+        "name": "xml_wellformed",
+        "passed": true,
+        "reason": "parses as XML"
+      },
+      {
+        "name": "palette_tokens_defined",
+        "passed": true,
+        "reason": "all colour tokens defined"
+      },
+      {
+        "name": "invariant_colours_used",
+        "passed": true,
+        "reason": "all invariant colours referenced"
+      },
+      {
+        "name": "no_literal_hex",
+        "passed": true,
+        "reason": "colours are CSS variables"
+      },
+      {
+        "name": "anchor_in_bounds",
+        "passed": true,
+        "reason": "anchor=(0.5,0.55)"
+      },
+      {
+        "name": "renders",
+        "passed": true,
+        "reason": "1390 bytes"
+      },
+      {
+        "name": "colours_correct",
+        "passed": true,
+        "reason": "black present; no wrong lateral colour"
+      },
+      {
+        "name": "light_flare",
+        "passed": true,
+        "reason": "flare present == False"
+      },
+      {
+        "name": "distinguishing_feature",
+        "passed": true,
+        "reason": "hull-and-masts inside a DOTTED danger oval (dangerous variant)"
+      }
+    ]
+  },
+  {
+    "id": "BOYCAR_north__BROKEN",
+    "style": "us-paper",
+    "kind": "symbol",
+    "anchor": [
+      0.5,
+      0.84
+    ],
+    "structural_pass": true,
+    "vision_pass": false,
+    "overall_pass": false,
+    "identity": "BOYCAR_south",
+    "render_day": "/home/user/Helm/pipeline/iconforge/out/renders/BOYCAR_north__BROKEN_us-paper_day.png",
+    "provenance": {
+      "source": "fixture:claude-opus-4-8",
+      "prompt_version": "forge-compose-v1",
+      "input_hash": "6172f8dc2209ff95"
+    },
+    "criteria": [
+      {
+        "name": "xml_wellformed",
+        "passed": true,
+        "reason": "parses as XML"
+      },
+      {
+        "name": "palette_tokens_defined",
+        "passed": true,
+        "reason": "all colour tokens defined"
+      },
+      {
+        "name": "invariant_colours_used",
+        "passed": true,
+        "reason": "all invariant colours referenced"
+      },
+      {
+        "name": "no_literal_hex",
+        "passed": true,
+        "reason": "colours are CSS variables"
+      },
+      {
+        "name": "anchor_in_bounds",
+        "passed": true,
+        "reason": "anchor=(0.5,0.84)"
+      },
+      {
+        "name": "renders",
+        "passed": true,
+        "reason": "900 bytes"
+      },
+      {
+        "name": "colours_correct",
+        "passed": true,
+        "reason": "black above yellow \u2014 colours fine"
+      },
+      {
+        "name": "topmark_correct",
+        "passed": false,
+        "reason": "topmark cones point DOWN, not up \u2014 this reads as a SOUTH cardinal. Wrong cardinal quadrant is a grounding hazard."
+      },
+      {
+        "name": "light_flare",
+        "passed": true,
+        "reason": "no flare, correct"
+      },
+      {
+        "name": "distinguishing_feature",
+        "passed": false,
+        "reason": "black-over-yellow with down-cones is contradictory"
+      }
+    ]
+  }
+]

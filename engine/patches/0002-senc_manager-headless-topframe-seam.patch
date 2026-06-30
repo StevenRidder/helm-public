@@ -1,0 +1,45 @@
+diff --git a/gui/src/senc_manager.cpp b/gui/src/senc_manager.cpp
+index e8d2a1c..568d4ab 100644
+--- a/gui/src/senc_manager.cpp
++++ b/gui/src/senc_manager.cpp
+@@ -154,9 +154,11 @@ void SENCThreadManager::StartTopJob() {
+   if (nRunning) {
+     wxString count;
+     count.Printf("  %ld", static_cast<long>(ticket_list.size()));
++#ifndef OCPN_HEADLESS  // headless: no GUI status bar (top_frame absent) — Step 6 seam
+     if (auto tfPtr = top_frame::Get()) {
+       tfPtr->SetAlertString(_("Preparing vector chart ") + count);
+     }
++#endif
+   }
+ }
+ 
+@@ -186,13 +188,17 @@ void SENCThreadManager::FinishJob(SENCJobTicket *ticket) {
+   if (nRunning) {
+     wxString count;
+     count.Printf("  %ld", static_cast<long>(ticket_list.size()));
++#ifndef OCPN_HEADLESS  // headless: no GUI status bar — Step 6 seam
+     if (auto tfPtr = top_frame::Get()) {
+       tfPtr->SetAlertString(_("Preparing vector chart ") + count);
+     }
++#endif
+   } else {
++#ifndef OCPN_HEADLESS
+     if (auto tfPtr = top_frame::Get()) {
+       tfPtr->SetAlertString("");
+     }
++#endif
+   }
+ #endif
+ }
+@@ -248,8 +254,10 @@ void SENCThreadManager::OnEvtThread(OCPN_BUILDSENC_ThreadEvent &event) {
+     default:
+       break;
+   }
++#ifndef OCPN_HEADLESS  // headless: no frame event loop to re-inject into — Step 6 seam
+   if (top_frame::Get())
+     top_frame::Get()->GetEventHandler()->AddPendingEvent(Sevent);
++#endif
+ }
+ 
+ //----------------------------------------------------------------------------------

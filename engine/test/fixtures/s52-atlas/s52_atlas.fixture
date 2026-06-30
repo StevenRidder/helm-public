@@ -1,0 +1,4 @@
+# kind name width height anchor_x anchor_y repeat_x repeat_y dash day dusk night
+symbol BOYSPP 12 12 6 6 0 0 - #f5d76e #b38b2e #8a5a22
+pattern DEPARE01 8 8 0 0 8 8 - #b9d7e8 #5f7a88 #1b3c4b
+line DEPCNT02 16 4 0 2 0 0 3,2 #4a6f8a #304a5a #7eb6d6

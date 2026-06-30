@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Helm Tides</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #071014;
+    --panel: rgba(17, 27, 32, .86);
+    --panel2: rgba(255, 255, 255, .055);
+    --line: rgba(255, 255, 255, .12);
+    --text: #eef6f3;
+    --muted: #95aaa5;
+    --faint: #687c78;
+    --blue: #6bb7ff;
+    --cyan: #61dcc8;
+    --green: #69d58c;
+    --amber: #ffc261;
+    --red: #ff7a75;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background:
+      linear-gradient(rgba(7, 16, 20, .74), rgba(7, 16, 20, .9)),
+      url("/chart/12/1120/1756.png") center / cover fixed,
+      var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+  }
+  main {
+    width: min(1180px, calc(100vw - 32px));
+    margin: 0 auto;
+    padding: 22px 0 28px;
+  }
+  header {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 18px;
+    align-items: end;
+    min-height: 88px;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 18px;
+  }
+  h1 {
+    margin: 0;
+    font-size: clamp(30px, 5vw, 62px);
+    line-height: .94;
+    letter-spacing: 0;
+    font-weight: 650;
+  }
+  .sub {
+    margin-top: 10px;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .seg {
+    display: flex;
+    gap: 6px;
+    padding: 5px;
+    border: 1px solid var(--line);
+    background: rgba(0, 0, 0, .25);
+    border-radius: 8px;
+  }
+  button {
+    appearance: none;
+    border: 0;
+    border-radius: 6px;
+    padding: 9px 13px;
+    color: var(--muted);
+    background: transparent;
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  button.on {
+    color: #061012;
+    background: var(--cyan);
+    font-weight: 650;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.55fr) minmax(320px, .85fr);
+    gap: 16px;
+    margin-top: 18px;
+  }
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, .35);
+  }
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 230px;
+    gap: 20px;
+    padding: 22px;
+  }
+  .label {
+    color: var(--faint);
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    font-size: 10px;
+    font-weight: 700;
+  }
+  .height {
+    margin-top: 8px;
+    font-size: clamp(58px, 12vw, 122px);
+    line-height: .86;
+    font-weight: 620;
+    letter-spacing: 0;
+  }
+  .height span { font-size: .23em; color: var(--muted); font-weight: 500; }
+  .station {
+    margin-top: 14px;
+    font-size: 18px;
+    color: var(--text);
+  }
+  .meta {
+    margin-top: 7px;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.45;
+  }
+  .badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+  }
+  .badge {
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 6px 9px;
+    color: var(--muted);
+    background: rgba(255, 255, 255, .04);
+    font-size: 12px;
+  }
+  .badge.ok { color: var(--green); border-color: rgba(105, 213, 140, .34); }
+  .badge.warn { color: var(--amber); border-color: rgba(255, 194, 97, .36); }
+  .badge.blue { color: var(--blue); border-color: rgba(107, 183, 255, .34); }
+  .event {
+    align-self: stretch;
+    padding: 16px;
+    border-left: 1px solid var(--line);
+  }
+  .event .kind {
+    margin-top: 8px;
+    font-size: 28px;
+    line-height: 1.02;
+    font-weight: 620;
+  }
+  .event .time {
+    margin-top: 10px;
+    font-size: 15px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .curve {
+    padding: 16px 18px 20px;
+    border-top: 1px solid var(--line);
+  }
+  svg {
+    width: 100%;
+    height: 240px;
+    display: block;
+  }
+  .axis { stroke: rgba(255, 255, 255, .16); stroke-width: 1; }
+  .line { fill: none; stroke: var(--cyan); stroke-width: 3; }
+  .area { fill: rgba(97, 220, 200, .16); }
+  .dot { fill: var(--cyan); stroke: #061012; stroke-width: 2; }
+  .side {
+    padding: 18px;
+  }
+  .side h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 650;
+  }
+  .kv {
+    display: grid;
+    grid-template-columns: 118px 1fr;
+    gap: 10px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 13px;
+  }
+  .kv div:first-child { color: var(--faint); }
+  .kv div:last-child { color: var(--text); overflow-wrap: anywhere; }
+  .sources {
+    margin-top: 16px;
+    display: grid;
+    gap: 8px;
+  }
+  .source {
+    padding: 11px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--panel2);
+  }
+  .source b {
+    display: block;
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+  .source span {
+    display: block;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.35;
+  }
+  .source.cleared { border-color: rgba(105, 213, 140, .32); }
+  .source.gated { border-color: rgba(255, 194, 97, .34); }
+  .status {
+    min-height: 18px;
+    margin-top: 12px;
+    color: var(--muted);
+    font-size: 12px;
+  }
+  .error { color: var(--red); }
+  @media (max-width: 820px) {
+    header { grid-template-columns: 1fr; }
+    .grid { grid-template-columns: 1fr; }
+    .hero { grid-template-columns: 1fr; }
+    .event { border-left: 0; border-top: 1px solid var(--line); }
+  }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div>
+      <h1>Tide Engine</h1>
+      <div class="sub">OpenCPN TCMgr, source-tagged, running on this private Helm origin.</div>
+    </div>
+    <div class="seg" role="tablist" aria-label="Tide scenario">
+      <button class="on" data-scenario="fiji">Fiji/Suva</button>
+      <button data-scenario="free">Licensed default</button>
+    </div>
+  </header>
+
+  <section class="grid">
+    <div class="panel">
+      <div class="hero">
+        <div>
+          <div class="label">Predicted water level</div>
+          <div class="height" id="height">--<span> m</span></div>
+          <div class="station" id="station">Loading</div>
+          <div class="meta" id="meta"></div>
+          <div class="badges" id="badges"></div>
+        </div>
+        <div class="event">
+          <div class="label">Next event</div>
+          <div class="kind" id="event-kind">--</div>
+          <div class="time" id="event-time"></div>
+          <div class="meta" id="event-height"></div>
+        </div>
+      </div>
+      <div class="curve">
+        <div class="label">24 hour curve</div>
+        <svg viewBox="0 0 760 240" aria-label="Tide curve">
+          <path class="area" id="area"></path>
+          <path class="line" id="line"></path>
+          <g id="dots"></g>
+          <line class="axis" x1="36" y1="204" x2="734" y2="204"></line>
+          <line class="axis" x1="36" y1="28" x2="36" y2="204"></line>
+        </svg>
+      </div>
+    </div>
+
+    <aside class="panel side">
+      <h2>Source & Policy</h2>
+      <div class="kv"><div>Policy</div><div id="policy">--</div></div>
+      <div class="kv"><div>Station</div><div id="station2">--</div></div>
+      <div class="kv"><div>Distance</div><div id="distance">--</div></div>
+      <div class="kv"><div>Confidence</div><div id="confidence">--</div></div>
+      <div class="kv"><div>Official</div><div id="official">--</div></div>
+      <div class="kv"><div>Datum</div><div id="datum">--</div></div>
+      <div class="kv"><div>Direction</div><div id="direction">--</div></div>
+      <div class="sources" id="sources"></div>
+      <div class="status" id="status"></div>
+    </aside>
+  </section>
+</main>
+
+<script>
+const scenarios = {
+  fiji: {
+    label: 'Fiji/Suva',
+    lat: -18.1248,
+    lon: 178.4501,
+    all: true,
+    start: '2026-06-26T00:00:00Z'
+  },
+  free: {
+    label: 'Licensed default',
+    lat: 21.3069,
+    lon: -157.8583,
+    all: false,
+    start: '2026-06-26T00:00:00Z'
+  }
+};
+
+const el = id => document.getElementById(id);
+let active = 'fiji';
+
+function fmtTime(iso) {
+  if (!iso) return '--';
+  return new Intl.DateTimeFormat(undefined, {
+    month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
+    timeZoneName: 'short'
+  }).format(new Date(iso));
+}
+
+function endpoint(s, time) {
+  const q = new URLSearchParams({
+    lat: s.lat,
+    lon: s.lon,
+    time: time || s.start
+  });
+  if (s.all) q.set('all', '1');
+  return `/tides/summary?${q.toString()}`;
+}
+
+async function fetchSummary(s, time) {
+  const res = await fetch(endpoint(s, time), { cache: 'no-store' });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const data = await res.json();
+  if (!data.ok) throw new Error(data.error || 'tide query failed');
+  return data;
+}
+
+function sourceClass(source) {
+  return source.redistribution_cleared ? 'cleared' : 'gated';
+}
+
+function badge(text, cls = '') {
+  return `<span class="badge ${cls}">${text}</span>`;
+}
+
+function renderSummary(data) {
+  const st = data.station || {};
+  const ev = data.next_event || {};
+  el('height').innerHTML = `${Number(data.value_m).toFixed(2)}<span> m</span>`;
+  el('station').textContent = st.name || '--';
+  el('meta').textContent = `${fmtTime(data.time_utc)} at ${data.lat.toFixed(4)}, ${data.lon.toFixed(4)}`;
+  el('event-kind').textContent = ev.ok ? ev.kind.replace('_', ' ') : 'Unavailable';
+  el('event-time').textContent = ev.ok ? fmtTime(ev.event_utc) : '';
+  el('event-height').textContent = ev.ok ? `${Number(ev.value_m).toFixed(2)} m` : (ev.error || '');
+  el('policy').textContent = data.source_policy;
+  el('station2').textContent = st.name || '--';
+  el('distance').textContent = Number.isFinite(st.distance_nm) ? `${st.distance_nm.toFixed(1)} nm` : '--';
+  const confidence = data.confidence || {};
+  const official = confidence.official_reference || {};
+  el('confidence').textContent = confidence.tier ? `${confidence.tier} (${Number(confidence.score).toFixed(2)})` : '--';
+  el('official').textContent = official.station_name ? `${official.station_name} · ${official.datum_name || 'datum unknown'}` : 'none';
+  el('datum').textContent = st.has_datum ? `${Number(st.datum_m).toFixed(2)} m (${st.unit || 'unit'})` : 'none';
+  el('direction').textContent = data.has_direction ? `${Number(data.direction_deg).toFixed(0)} deg` : 'not applicable';
+
+  const cleared = st.source_redistribution_cleared;
+  el('badges').innerHTML = [
+    badge(data.engine, 'blue'),
+    badge(data.source_policy, data.source_policy === 'redistributable-only' ? 'ok' : 'warn'),
+    badge(confidence.tier ? `${confidence.tier} confidence` : 'confidence unknown', confidence.tier === 'high' ? 'ok' : 'warn'),
+    badge(cleared ? 'redistribution cleared' : 'commercial review', cleared ? 'ok' : 'warn'),
+    badge(st.source_enabled_by_default ? 'default source' : 'explicit opt-in', st.source_enabled_by_default ? 'ok' : 'warn')
+  ].join('');
+
+  el('sources').innerHTML = (data.loaded_sources || []).map(src => `
+    <div class="source ${sourceClass(src)}">
+      <b>${src.basename}</b>
+      <span>${src.license}</span>
+      <span>${src.redistribution_status}</span>
+    </div>
+  `).join('');
+}
+
+function renderCurve(samples) {
+  const values = samples.map(d => d.value_m);
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const pad = Math.max(.05, (max - min) * .18);
+  const lo = min - pad;
+  const hi = max + pad;
+  const x0 = 36, y0 = 28, w = 698, h = 176;
+  const pts = samples.map((d, i) => {
+    const x = x0 + (w * i / (samples.length - 1));
+    const y = y0 + h - ((d.value_m - lo) / (hi - lo || 1)) * h;
+    return [x, y];
+  });
+  const line = pts.map((p, i) => `${i ? 'L' : 'M'}${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join(' ');
+  const area = `${line} L${x0 + w} ${y0 + h} L${x0} ${y0 + h} Z`;
+  el('line').setAttribute('d', line);
+  el('area').setAttribute('d', area);
+  el('dots').innerHTML = pts.map((p, i) => `<circle class="dot" cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="${i % 2 ? 3 : 4}"></circle>`).join('');
+}
+
+async function loadScenario(id) {
+  active = id;
+  document.querySelectorAll('button[data-scenario]').forEach(b => b.classList.toggle('on', b.dataset.scenario === id));
+  const s = scenarios[id];
+  el('status').textContent = 'Loading tide engine output...';
+  try {
+    const base = new Date(s.start);
+    const times = Array.from({ length: 9 }, (_, i) => new Date(base.getTime() + i * 3 * 3600 * 1000).toISOString().replace('.000Z', 'Z'));
+    const summary = await fetchSummary(s, s.start);
+    const series = [];
+    for (const t of times) series.push(await fetchSummary(s, t));
+    renderSummary(summary);
+    renderCurve(series);
+    el('status').textContent = `Updated from ${location.origin}/tides/summary`;
+  } catch (err) {
+    el('status').innerHTML = `<span class="error">${err.message}</span>`;
+  }
+}
+
+document.querySelectorAll('button[data-scenario]').forEach(btn => {
+  btn.addEventListener('click', () => loadScenario(btn.dataset.scenario));
+});
+
+loadScenario(active);
+</script>
+</body>
+</html>

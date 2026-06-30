@@ -1,0 +1,148 @@
+{
+  "fixture_id": "s52-semantics",
+  "schema_version": "vulkan.provenance.v0",
+  "provenance_table": [
+    {
+      "provenance_id": "prov.depare-shoal",
+      "source_chart_id": "SYNTH-S52-RULES",
+      "source_chart_edition": "1",
+      "source_update": "0",
+      "source_object_id": "DEPARE-SHOAL",
+      "source_object_class": "DEPARE",
+      "source_geometry_hash": "synthetic-depare-shoal-square",
+      "conversion_stage": "s52-semantic-area-fill",
+      "transform_chain": [
+        "wgs84",
+        "web-mercator",
+        "target-pixels"
+      ],
+      "quilt_decision_id": "quilt.synthetic.primary",
+      "target_bounds": [
+        1,
+        1,
+        7,
+        7
+      ],
+      "warnings": []
+    },
+    {
+      "provenance_id": "prov.depcnt-safety",
+      "source_chart_id": "SYNTH-S52-RULES",
+      "source_chart_edition": "1",
+      "source_update": "0",
+      "source_object_id": "DEPCNT-SAFETY",
+      "source_object_class": "DEPCNT",
+      "source_geometry_hash": "synthetic-depcnt-safety-polyline",
+      "conversion_stage": "s52-semantic-depth-contour",
+      "transform_chain": [
+        "wgs84",
+        "web-mercator",
+        "target-pixels"
+      ],
+      "quilt_decision_id": "quilt.synthetic.primary",
+      "target_bounds": [
+        1,
+        4,
+        7,
+        5
+      ],
+      "warnings": []
+    },
+    {
+      "provenance_id": "prov.boyspp-standard",
+      "source_chart_id": "SYNTH-S52-RULES",
+      "source_chart_edition": "1",
+      "source_update": "0",
+      "source_object_id": "BOYSPP-STANDARD",
+      "source_object_class": "BOYSPP",
+      "source_geometry_hash": "synthetic-buoy-standard-point",
+      "conversion_stage": "s52-semantic-symbol-command",
+      "transform_chain": [
+        "wgs84",
+        "web-mercator",
+        "target-pixels"
+      ],
+      "quilt_decision_id": "quilt.synthetic.primary",
+      "target_bounds": [
+        5,
+        3,
+        5,
+        3
+      ],
+      "warnings": []
+    },
+    {
+      "provenance_id": "prov.soundg-shoal",
+      "source_chart_id": "SYNTH-S52-RULES",
+      "source_chart_edition": "1",
+      "source_update": "0",
+      "source_object_id": "SOUNDG-SHOAL",
+      "source_object_class": "SOUNDG",
+      "source_geometry_hash": "synthetic-sounding-shoal-point",
+      "conversion_stage": "s52-semantic-sounding-command",
+      "transform_chain": [
+        "wgs84",
+        "web-mercator",
+        "target-pixels"
+      ],
+      "quilt_decision_id": "quilt.synthetic.primary",
+      "target_bounds": [
+        3,
+        6,
+        3,
+        6
+      ],
+      "warnings": []
+    },
+    {
+      "provenance_id": "prov.lights-other-hidden",
+      "source_chart_id": "SYNTH-S52-RULES",
+      "source_chart_edition": "1",
+      "source_update": "0",
+      "source_object_id": "LIGHTS-OTHER-HIDDEN",
+      "source_object_class": "LIGHTS",
+      "source_geometry_hash": "synthetic-light-hidden-point",
+      "conversion_stage": "s52-semantic-cull",
+      "transform_chain": [
+        "wgs84",
+        "web-mercator",
+        "target-pixels"
+      ],
+      "quilt_decision_id": "quilt.synthetic.primary",
+      "target_bounds": [
+        6,
+        2,
+        6,
+        2
+      ],
+      "warnings": [
+        "culled by display category in this fixture"
+      ]
+    },
+    {
+      "provenance_id": "prov.obstrn-scamin-hidden",
+      "source_chart_id": "SYNTH-S52-RULES",
+      "source_chart_edition": "1",
+      "source_update": "0",
+      "source_object_id": "OBSTRN-SCAMIN-HIDDEN",
+      "source_object_class": "OBSTRN",
+      "source_geometry_hash": "synthetic-obstruction-hidden-point",
+      "conversion_stage": "s52-semantic-cull",
+      "transform_chain": [
+        "wgs84",
+        "web-mercator",
+        "target-pixels"
+      ],
+      "quilt_decision_id": "quilt.synthetic.primary",
+      "target_bounds": [
+        2,
+        3,
+        2,
+        3
+      ],
+      "warnings": [
+        "culled by SCAMIN at scale 24000 in this fixture"
+      ]
+    }
+  ]
+}

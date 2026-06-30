@@ -1,0 +1,25 @@
+{
+  "id": "RESARE_pattern",
+  "s52_token": "RESARE",
+  "name": "Restricted area pattern",
+  "category": "area",
+  "meaning": "Entry/activity restricted; magenta-tagged area fill.",
+  "invariants": {
+    "colors": [
+      "magenta"
+    ],
+    "topmark": null,
+    "light_flare": false,
+    "shape_class": "area_pattern",
+    "distinguishing": "tileable magenta diagonal hatch",
+    "anchor": [
+      0.5,
+      0.5
+    ]
+  },
+  "reference": null,
+  "siblings": [
+    "ACHARE_pattern",
+    "CTNARE_pattern"
+  ]
+}

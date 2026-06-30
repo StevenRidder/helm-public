@@ -1,0 +1,27 @@
+{
+  "id": "BOYSAW",
+  "s52_token": "BOYSAW",
+  "name": "Safe water mark buoy",
+  "category": "buoy",
+  "meaning": "Navigable water all around; mid-channel or landfall mark.",
+  "invariants": {
+    "colors": [
+      "red",
+      "white"
+    ],
+    "topmark": "single_sphere",
+    "light_flare": false,
+    "shape_class": "buoy",
+    "distinguishing": "red and white VERTICAL stripes; single red sphere topmark",
+    "anchor": [
+      0.5,
+      0.84
+    ]
+  },
+  "reference": null,
+  "siblings": [
+    "BOYISD",
+    "BOYSPP",
+    "BOYLAT_port"
+  ]
+}

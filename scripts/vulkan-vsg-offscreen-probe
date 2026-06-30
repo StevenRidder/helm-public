@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SRC="$ROOT/engine/vulkan/vsg_offscreen_probe.cpp"
+BIN="${HELM_VSG_OFFSCREEN_PROBE_BIN:-${TMPDIR:-/tmp}/helm-vsg-offscreen-probe}"
+CXX_BIN="${CXX:-c++}"
+VSG_PREFIX="${HELM_VSG_PREFIX:-/private/tmp/vsg-install}"
+BREW_PREFIX="${HOMEBREW_PREFIX:-$(brew --prefix 2>/dev/null || printf /opt/homebrew)}"
+
+if [ ! -d "$VSG_PREFIX/include/vsg" ] || [ ! -f "$VSG_PREFIX/lib/libvsg.dylib" ]; then
+  printf 'missing VSG install at %s; set HELM_VSG_PREFIX to a VulkanSceneGraph install\n' "$VSG_PREFIX" >&2
+  exit 2
+fi
+
+if [ ! -x "$BIN" ] || [ "$SRC" -nt "$BIN" ]; then
+  mkdir -p "$(dirname "$BIN")"
+  "$CXX_BIN" -std=c++17 -O2 -Wall -Wextra -pedantic \
+    -isystem "$VSG_PREFIX/include" \
+    -isystem "$BREW_PREFIX/opt/vulkan-headers/include" \
+    "$SRC" \
+    -L"$VSG_PREFIX/lib" -Wl,-rpath,"$VSG_PREFIX/lib" \
+    -L"$BREW_PREFIX/lib" -Wl,-rpath,"$BREW_PREFIX/lib" \
+    -lvsg -lvulkan \
+    -o "$BIN"
+fi
+
+export DYLD_LIBRARY_PATH="$VSG_PREFIX/lib:$BREW_PREFIX/lib:${DYLD_LIBRARY_PATH:-}"
+exec "$BIN" "$@"

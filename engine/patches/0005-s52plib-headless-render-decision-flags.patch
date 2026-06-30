@@ -1,0 +1,22 @@
+diff --git a/libs/s52plib/src/s52plib.cpp b/libs/s52plib/src/s52plib.cpp
+index 39207d2..3d855c0 100644
+--- a/libs/s52plib/src/s52plib.cpp
++++ b/libs/s52plib/src/s52plib.cpp
+@@ -337,6 +337,17 @@ s52plib::s52plib(const wxString &PLib, bool b_forceLegacy) {
+   m_bShowLdisText = true;
+   m_bExtendLightSectors = true;
+
++  // These render-DECISION flags are set ONLY from the GUI options dialog
++  // (gui/src/options.cpp) / config; a headless consumer never sets them, so they
++  // were read UNINITIALIZED in ObjectRenderCheck() -> per-process garbage decided
++  // which objects render. m_bUseSUPER_SCAMIN is the dangerous one: when garbage-on
++  // it culls DEPCNT/DEPARE/SOUNDG (the safety contour + dangerous soundings).
++  // Initialise to OpenCPN's factory defaults; SUPER_SCAMIN OFF is the safe choice.
++  m_bUseSCAMIN = true;
++  m_bUseSUPER_SCAMIN = false;
++  m_bShowMeta = false;
++  m_chart_zoom_modifier_vector = 0;
++
+   // Set a few initial states
+   AddObjNoshow("M_QUAL");
+   m_lightsOff = false;

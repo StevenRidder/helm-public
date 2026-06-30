@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SRC="$ROOT/engine/vulkan/text_placement.cpp"
+MAIN="$ROOT/engine/vulkan/text_placement_smoke.cpp"
+HDR="$ROOT/engine/vulkan/text_placement.h"
+BIN="${HELM_VULKAN_TEXT_PLACEMENT_BIN:-${TMPDIR:-/tmp}/helm-vulkan-text-placement}"
+CXX_BIN="${CXX:-c++}"
+
+if [ ! -x "$BIN" ] || [ "$SRC" -nt "$BIN" ] || [ "$MAIN" -nt "$BIN" ] || [ "$HDR" -nt "$BIN" ]; then
+  mkdir -p "$(dirname "$BIN")"
+  "$CXX_BIN" -std=c++17 -O2 -Wall -Wextra -pedantic -I "$ROOT/engine/vulkan" "$SRC" "$MAIN" -o "$BIN"
+fi
+
+exec "$BIN" "$@"

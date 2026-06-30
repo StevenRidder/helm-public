@@ -1,0 +1,20 @@
+{
+  "_epic": "SHELL",
+  "_note": "Base style: top-level keys + ocean background. Per-domain layers live in helm-*-*.json fragments listed in manifest.json and merged by HelmShell.buildStyle() at load. The merged result is byte-equivalent to the legacy web/style.json. NEW layers added by an epic MUST be namespaced helm-<epic>-* (see web/SHELL.md); the legacy un-prefixed ids below are grandfathered because index.html + feature modules reference them by name.",
+  "version": 8,
+  "name": "Helm — tracer bullet",
+  "glyphs": "fonts/{fontstack}/{range}.pbf",
+  "sources": {},
+  "layers": [
+    {
+      "id": "ocean",
+      "type": "background",
+      "paint": { "background-color": "#0a1622" }
+    }
+  ],
+  "center": [
+    -81.77,
+    24.52
+  ],
+  "zoom": 11
+}

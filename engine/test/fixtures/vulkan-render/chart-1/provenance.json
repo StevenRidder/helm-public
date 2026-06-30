@@ -1,0 +1,122 @@
+{
+  "fixture_id": "chart-1",
+  "schema_version": "vulkan.provenance.v0",
+  "provenance_table": [
+    {
+      "provenance_id": "prov.raster.debug-collar",
+      "source_chart_id": "SYNTH-CHART-1",
+      "source_chart_edition": "1",
+      "source_update": "0",
+      "source_object_id": "RASTER-DEBUG-1",
+      "source_object_class": "RASTER",
+      "source_geometry_hash": "synthetic-raster-full-tile",
+      "conversion_stage": "synthetic-raster-sheet",
+      "transform_chain": [
+        "fixture-raster-pixels",
+        "target-pixels"
+      ],
+      "quilt_decision_id": "quilt.synthetic.full-tile",
+      "target_bounds": [
+        0,
+        0,
+        8,
+        8
+      ],
+      "warnings": [
+        "debug raster is a placeholder, not a chart image"
+      ]
+    },
+    {
+      "provenance_id": "prov.depare-1",
+      "source_chart_id": "SYNTH-CHART-1",
+      "source_chart_edition": "1",
+      "source_update": "0",
+      "source_object_id": "DEPARE-1",
+      "source_object_class": "DEPARE",
+      "source_geometry_hash": "synthetic-depare-square",
+      "conversion_stage": "area-fill-command",
+      "transform_chain": [
+        "wgs84",
+        "web-mercator",
+        "target-pixels"
+      ],
+      "quilt_decision_id": "quilt.synthetic.primary",
+      "target_bounds": [
+        1,
+        1,
+        7,
+        7
+      ],
+      "warnings": []
+    },
+    {
+      "provenance_id": "prov.depcnt-10",
+      "source_chart_id": "SYNTH-CHART-1",
+      "source_chart_edition": "1",
+      "source_update": "0",
+      "source_object_id": "DEPCNT-10",
+      "source_object_class": "DEPCNT",
+      "source_geometry_hash": "synthetic-depcnt-polyline",
+      "conversion_stage": "stroke-line-command",
+      "transform_chain": [
+        "wgs84",
+        "web-mercator",
+        "target-pixels"
+      ],
+      "quilt_decision_id": "quilt.synthetic.primary",
+      "target_bounds": [
+        1,
+        4,
+        7,
+        5
+      ],
+      "warnings": []
+    },
+    {
+      "provenance_id": "prov.boyspp-1",
+      "source_chart_id": "SYNTH-CHART-1",
+      "source_chart_edition": "1",
+      "source_update": "0",
+      "source_object_id": "BOYSPP-1",
+      "source_object_class": "BOYSPP",
+      "source_geometry_hash": "synthetic-buoy-point",
+      "conversion_stage": "symbol-and-label-commands",
+      "transform_chain": [
+        "wgs84",
+        "web-mercator",
+        "target-pixels"
+      ],
+      "quilt_decision_id": "quilt.synthetic.primary",
+      "target_bounds": [
+        5,
+        2,
+        5,
+        3
+      ],
+      "warnings": []
+    },
+    {
+      "provenance_id": "prov.soundg-1",
+      "source_chart_id": "SYNTH-CHART-1",
+      "source_chart_edition": "1",
+      "source_update": "0",
+      "source_object_id": "SOUNDG-1",
+      "source_object_class": "SOUNDG",
+      "source_geometry_hash": "synthetic-sounding-point",
+      "conversion_stage": "sounding-command",
+      "transform_chain": [
+        "wgs84",
+        "web-mercator",
+        "target-pixels"
+      ],
+      "quilt_decision_id": "quilt.synthetic.primary",
+      "target_bounds": [
+        3,
+        6,
+        3,
+        6
+      ],
+      "warnings": []
+    }
+  ]
+}

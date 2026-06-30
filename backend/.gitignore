@@ -1,0 +1,8 @@
+.env
+__pycache__/
+*.pyc
+.venv/
+venv/
+# runtime-written owned data (seed lives in store.py)
+data/owned.json
+data/queue.json

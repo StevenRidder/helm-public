@@ -1,0 +1,48 @@
+{
+  "fixture_id": "chart-1",
+  "source_epoch": "synthetic-chart-1@2026-06-28",
+  "source_type": "synthetic",
+  "charts": [
+    {
+      "source_chart_id": "SYNTH-CHART-1",
+      "source_chart_edition": "1",
+      "source_update": "0",
+      "native_scale": 12000,
+      "bounds": {
+        "west": -81.805,
+        "south": 24.495,
+        "east": -81.795,
+        "north": 24.505
+      },
+      "objects": [
+        {
+          "source_object_id": "DEPARE-1",
+          "source_object_class": "DEPARE",
+          "geometry_type": "polygon",
+          "depth_range_m": [
+            0,
+            10
+          ]
+        },
+        {
+          "source_object_id": "DEPCNT-10",
+          "source_object_class": "DEPCNT",
+          "geometry_type": "line",
+          "depth_m": 10
+        },
+        {
+          "source_object_id": "BOYSPP-1",
+          "source_object_class": "BOYSPP",
+          "geometry_type": "point",
+          "symbol": "BOYSPP"
+        },
+        {
+          "source_object_id": "SOUNDG-1",
+          "source_object_class": "SOUNDG",
+          "geometry_type": "point",
+          "depth_m": 7.4
+        }
+      ]
+    }
+  ]
+}

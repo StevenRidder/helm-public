@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SRC="$ROOT/engine/vulkan/resource_plan.cpp"
+MAIN="$ROOT/engine/vulkan/resource_plan_smoke.cpp"
+HDR="$ROOT/engine/vulkan/resource_plan.h"
+BIN="${HELM_VULKAN_RESOURCE_PLAN_BIN:-${TMPDIR:-/tmp}/helm-vulkan-resource-plan}"
+CXX_BIN="${CXX:-c++}"
+
+if [ ! -x "$BIN" ] || [ "$SRC" -nt "$BIN" ] || [ "$MAIN" -nt "$BIN" ] || [ "$HDR" -nt "$BIN" ]; then
+  mkdir -p "$(dirname "$BIN")"
+  "$CXX_BIN" -std=c++17 -O2 -Wall -Wextra -pedantic -I "$ROOT/engine/vulkan" "$SRC" "$MAIN" -o "$BIN"
+fi
+
+exec "$BIN" "$@"

@@ -1,0 +1,28 @@
+{
+  "type": "FeatureCollection",
+  "attribution": "Helm community (owned)",
+  "_comment": "Committed sample for the Saved-places layer. The backend (/saved) overrides this at runtime; this keeps the layer alive offline / with no backend.",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-81.6960, 24.5772] },
+      "properties": { "id": "saved-1", "source": "owned", "kind": "anchorage",
+        "name": "Boca Chica Basin", "note": "Quiet in an easterly, good sand holding — watch the shoal on entry.",
+        "sourceUrl": "https://www.sailingtotem.com", "status": "to-check" }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-81.7378, 24.5705] },
+      "properties": { "id": "saved-2", "source": "owned", "kind": "must-see",
+        "name": "Stock Island provisioning", "note": "Best all-round shelter + full services. Saturday market.",
+        "status": "to-check" }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-81.8772, 24.4548] },
+      "properties": { "id": "saved-3", "source": "owned", "kind": "snorkel",
+        "name": "Sand Key reef", "note": "Snorkel the reef in good light, slack tide only.",
+        "status": "to-check" }
+    }
+  ]
+}

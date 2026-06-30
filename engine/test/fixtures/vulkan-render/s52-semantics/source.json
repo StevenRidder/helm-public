@@ -1,0 +1,99 @@
+{
+  "fixture_id": "s52-semantics",
+  "source_epoch": "synthetic-s52-semantics@2026-06-29",
+  "source_type": "synthetic",
+  "charts": [
+    {
+      "source_chart_id": "SYNTH-S52-RULES",
+      "source_chart_edition": "1",
+      "source_update": "0",
+      "native_scale": 12000,
+      "chart_priority": 1,
+      "quilt_rank": 1,
+      "bounds": {
+        "west": -81.805,
+        "south": 24.495,
+        "east": -81.795,
+        "north": 24.505
+      },
+      "objects": [
+        {
+          "source_object_id": "DEPARE-SHOAL",
+          "source_object_class": "DEPARE",
+          "geometry_type": "polygon",
+          "display_category": "displaybase",
+          "display_priority": 1,
+          "lup_type": "plain_boundaries",
+          "render_pass": "area_fill",
+          "source_sequence": 10,
+          "depth_range_m": [
+            0,
+            8
+          ],
+          "expected_command_id": "cmd.area.depare-shoal"
+        },
+        {
+          "source_object_id": "DEPCNT-SAFETY",
+          "source_object_class": "DEPCNT",
+          "geometry_type": "line",
+          "display_category": "displaybase",
+          "display_priority": 3,
+          "lup_type": "lines",
+          "render_pass": "line",
+          "source_sequence": 20,
+          "depth_m": 10,
+          "expected_command_id": "cmd.line.depcnt-safety"
+        },
+        {
+          "source_object_id": "BOYSPP-STANDARD",
+          "source_object_class": "BOYSPP",
+          "geometry_type": "point",
+          "display_category": "standard",
+          "display_priority": 7,
+          "lup_type": "paper_chart",
+          "render_pass": "symbol",
+          "source_sequence": 30,
+          "scamin_max_scale": 50000,
+          "symbol": "BOYSPP",
+          "expected_command_id": "cmd.symbol.boyspp-standard"
+        },
+        {
+          "source_object_id": "SOUNDG-SHOAL",
+          "source_object_class": "SOUNDG",
+          "geometry_type": "point",
+          "display_category": "standard",
+          "display_priority": 8,
+          "lup_type": "paper_chart",
+          "render_pass": "sounding",
+          "source_sequence": 40,
+          "depth_m": 7.4,
+          "expected_command_id": "cmd.sounding.soundg-shoal"
+        },
+        {
+          "source_object_id": "LIGHTS-OTHER-HIDDEN",
+          "source_object_class": "LIGHTS",
+          "geometry_type": "point",
+          "display_category": "other",
+          "display_priority": 7,
+          "lup_type": "paper_chart",
+          "render_pass": "symbol",
+          "source_sequence": 50,
+          "scamin_max_scale": 50000,
+          "symbol": "LIGHTS"
+        },
+        {
+          "source_object_id": "OBSTRN-SCAMIN-HIDDEN",
+          "source_object_class": "OBSTRN",
+          "geometry_type": "point",
+          "display_category": "standard",
+          "display_priority": 7,
+          "lup_type": "paper_chart",
+          "render_pass": "symbol",
+          "source_sequence": 60,
+          "scamin_max_scale": 12000,
+          "symbol": "OBSTRN"
+        }
+      ]
+    }
+  ]
+}

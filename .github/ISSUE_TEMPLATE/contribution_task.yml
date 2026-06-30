@@ -1,0 +1,51 @@
+name: Contribution task
+description: Propose a small, reviewable improvement.
+title: "[Task]: "
+labels: ["contribution", "needs-triage"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What should be improved?
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - web cockpit
+        - engine/server
+        - charts/data
+        - services
+        - pipeline
+        - tests
+        - docs
+        - packaging
+        - not sure
+    validations:
+      required: true
+  - type: textarea
+    id: proposed
+    attributes:
+      label: Proposed change
+      description: Keep it small enough to review.
+    validations:
+      required: true
+  - type: textarea
+    id: verification
+    attributes:
+      label: How would we verify it?
+      placeholder: Unit test, Playwright test, engine smoke, manual command, screenshot, docs link check...
+    validations:
+      required: true
+  - type: checkboxes
+    id: boundaries
+    attributes:
+      label: Boundaries
+      options:
+        - label: This does not require committing private chart data, private basemaps, or credentials.
+          required: true
+        - label: This does not describe Helm as primary navigation or certified navigation software.
+          required: true

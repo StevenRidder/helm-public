@@ -1,0 +1,39 @@
+name: Engine fresh-clone smoke
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/engine-fresh-clone-smoke.yml"
+      - "engine/**"
+      - "scripts/install-sample-enc.sh"
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/engine-fresh-clone-smoke.yml"
+      - "engine/**"
+      - "scripts/install-sample-enc.sh"
+  workflow_dispatch:
+
+jobs:
+  fresh-clone:
+    name: Fresh clone, empty home, ENC tile
+    runs-on: macos-14
+    timeout-minutes: 120
+
+    steps:
+      - name: Check out Helm
+        uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: brew install cmake gpatch lame libarchive libsndfile libusb mpg123 openssl@3 wxwidgets@3.2
+
+      - name: Configure wxWidgets
+        run: |
+          echo "WX_CONFIG=$(brew --prefix wxwidgets@3.2)/bin/wx-config-3.2" >> "$GITHUB_ENV"
+          echo "OPENSSL_ROOT_DIR=$(brew --prefix openssl@3)" >> "$GITHUB_ENV"
+
+      - name: Run fresh-clone smoke
+        env:
+          HELM_FRESH_JOBS: "3"
+        run: ./engine/test-fresh-clone-install.sh

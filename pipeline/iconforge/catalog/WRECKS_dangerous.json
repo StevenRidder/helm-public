@@ -1,0 +1,26 @@
+{
+  "id": "WRECKS_dangerous",
+  "s52_token": "WRECKS",
+  "name": "Dangerous wreck",
+  "category": "danger",
+  "meaning": "Wreck with < safety-clearance depth; dangerous to navigation.",
+  "invariants": {
+    "colors": [
+      "black"
+    ],
+    "topmark": null,
+    "light_flare": false,
+    "shape_class": "wreck",
+    "distinguishing": "hull-and-masts inside a DOTTED danger oval (dangerous variant)",
+    "anchor": [
+      0.5,
+      0.55
+    ]
+  },
+  "reference": null,
+  "siblings": [
+    "WRECKS_nondangerous",
+    "OBSTRN",
+    "UWTROC"
+  ]
+}

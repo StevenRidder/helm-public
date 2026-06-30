@@ -1,0 +1,177 @@
+diff --git a/model/include/model/routeman.h b/model/include/model/routeman.h
+index fa5bfeb..734104b 100644
+--- a/model/include/model/routeman.h
++++ b/model/include/model/routeman.h
+@@ -228,6 +228,14 @@ public:
+   double GetCurrentSegmentCourse() { return CurrentSegmentCourse; }
+   int GetXTEDir() { return XTEDir; }
+ 
++  /// Per-fix active-route progress: recompute bearing/range/XTE/segment-course to
++  /// the active waypoint from own-ship gLat/gLon and run arrival detection +
++  /// waypoint auto-advance. Relocated headless from RoutemanGui::UpdateProgress so
++  /// the safety-critical leg math lives in the model and is callable with no GUI
++  /// (the gui-only DirectShipToActive canvas-pixel block is intentionally dropped).
++  /// Returns true while a route is active. (ENGINE-10)
++  bool UpdateProgress();
++
+   void SetColorScheme(ColorScheme cs, double displayDPmm);
+   wxPen *GetRoutePen(void) { return m_pRoutePen; }
+   wxPen *GetTrackPen(void) { return m_pTrackPen; }
+diff --git a/model/src/routeman.cpp b/model/src/routeman.cpp
+index 38fd586..12fd1cf 100644
+--- a/model/src/routeman.cpp
++++ b/model/src/routeman.cpp
+@@ -40,6 +40,7 @@
+ #include "model/comm_n0183_output.h"
+ #include "model/config_vars.h"
+ #include "model/georef.h"
++#include "model/gui_vars.h"
+ #include "model/nav_object_database.h"
+ #include "model/navutil_base.h"
+ #include "model/navobj_db.h"
+@@ -409,6 +410,145 @@ bool Routeman::ActivateNextPoint(Route *pr, bool skipped) {
+   return result;
+ }
+ 
++// ENGINE-10: per-fix active-route geometry + arrival/auto-advance, relocated
++// headless from RoutemanGui::UpdateProgress (gui/src/routeman_gui.cpp). Byte-
++// faithful to the upstream math (Mercator-sailing bearing, great-circle range,
++// vector-normal cross-track, perpendicular arrival-line crossing + 2 s moving-away
++// hysteresis). Two GUI-only pieces are intentionally NOT carried over because they
++// have no headless meaning and would pull gui/ symbols:
++//   * the `if (g_bShowShipToActive)` block — top_frame::Get() canvas-pixel XTE that
++//     only sets the g_bAllowShipToActive *display* flag; and
++//   * the pRouteManagerDialog->UpdateRouteListCtrl() tail of RoutemanGui::DoAdvance
++//     (the advance itself is inlined below as a lambda over the model-side calls).
++bool Routeman::UpdateProgress() {
++  bool bret_val = false;
++
++  // Inlined headless equivalent of RoutemanGui::DoAdvance(): advance to the next
++  // waypoint; at end-of-route deactivate (this is an arrival) and honour
++  // delete-on-arrival. The GUI route-list refresh is intentionally omitted.
++  auto DoAdvance = [&]() {
++    if (!ActivateNextPoint(pActiveRoute, false)) {  // at the end?
++      Route *pthis_route = pActiveRoute;
++      DeactivateRoute(true);  // this is an arrival
++      if (pthis_route->m_bDeleteOnArrival && !pthis_route->m_bIsBeingEdited)
++        DeleteRoute(pthis_route);
++    }
++  };
++
++  if (pActiveRoute) {
++    //      Update bearing, range, and crosstrack error
++    //  Bearing is calculated as Mercator Sailing, i.e. a cartographic "bearing"
++    double north, east;
++    toSM(pActivePoint->m_lat, pActivePoint->m_lon, gLat, gLon, &east, &north);
++    double a = atan(north / east);
++    if (fabs(pActivePoint->m_lon - gLon) < 180.) {
++      if (pActivePoint->m_lon >= gLon)
++        CurrentBrgToActivePoint = 90. - (a * 180 / PI);
++      else
++        CurrentBrgToActivePoint = 270. - (a * 180 / PI);
++    } else {
++      if (pActivePoint->m_lon >= gLon)
++        CurrentBrgToActivePoint = 270. - (a * 180 / PI);
++      else
++        CurrentBrgToActivePoint = 90. - (a * 180 / PI);
++    }
++
++    //      Calculate range using Great Circle Formula
++    double d5 = DistGreatCircle(gLat, gLon, pActivePoint->m_lat,
++                                pActivePoint->m_lon);
++    CurrentRngToActivePoint = d5;
++
++    //      Get the XTE vector, normal to current segment
++    vector2D va, vb, vn;
++    double brg1, dist1, brg2, dist2;
++    DistanceBearingMercator(pActivePoint->m_lat, pActivePoint->m_lon,
++                            pActiveRouteSegmentBeginPoint->m_lat,
++                            pActiveRouteSegmentBeginPoint->m_lon, &brg1, &dist1);
++    vb.x = dist1 * sin(brg1 * PI / 180.);
++    vb.y = dist1 * cos(brg1 * PI / 180.);
++
++    DistanceBearingMercator(pActivePoint->m_lat, pActivePoint->m_lon, gLat, gLon,
++                            &brg2, &dist2);
++    va.x = dist2 * sin(brg2 * PI / 180.);
++    va.y = dist2 * cos(brg2 * PI / 180.);
++
++    double sdelta = vGetLengthOfNormal(&va, &vb, &vn);  // NM
++    CurrentXTEToActivePoint = sdelta;
++
++    //    Distance to the arrival line, perpendicular to the current route segment,
++    //    taking advantage of the normal vn computed above.
++    vector2D vToArriveNormal;
++    vSubtractVectors(&va, &vn, &vToArriveNormal);
++    CurrentRangeToActiveNormalCrossing = vVectorMagnitude(&vToArriveNormal);
++
++    //          Compute current segment course (simple Mercator projection)
++    double x1, y1, x2, y2;
++    toSM(pActiveRouteSegmentBeginPoint->m_lat,
++         pActiveRouteSegmentBeginPoint->m_lon,
++         pActiveRouteSegmentBeginPoint->m_lat,
++         pActiveRouteSegmentBeginPoint->m_lon, &x1, &y1);
++    toSM(pActivePoint->m_lat, pActivePoint->m_lon,
++         pActiveRouteSegmentBeginPoint->m_lat,
++         pActiveRouteSegmentBeginPoint->m_lon, &x2, &y2);
++    double e1 = atan2((x2 - x1), (y2 - y1));
++    CurrentSegmentCourse = e1 * 180 / PI;
++    if (CurrentSegmentCourse < 0) CurrentSegmentCourse += 360;
++
++    //      Compute XTE direction
++    double h = atan(vn.y / vn.x);
++    if (vn.x > 0)
++      CourseToRouteSegment = 90. - (h * 180 / PI);
++    else
++      CourseToRouteSegment = 270. - (h * 180 / PI);
++
++    h = CurrentBrgToActivePoint - CourseToRouteSegment;
++    if (h < 0) h = h + 360;
++
++    if (h > 180)
++      XTEDir = 1;
++    else
++      XTEDir = -1;
++
++    //      Determine Arrival
++    bool bDidArrival = false;
++
++    // Duplicate points can result in NaN for normal crossing range.
++    if (std::isnan(CurrentRangeToActiveNormalCrossing))
++      CurrentRangeToActiveNormalCrossing = CurrentRngToActivePoint;
++
++    // Special signal: if ArrivalRadius < 0, NEVER arrive (MOB auto-created routes).
++    if (pActivePoint->GetWaypointArrivalRadius() > 0) {
++      if (CurrentRangeToActiveNormalCrossing <=
++          pActivePoint->GetWaypointArrivalRadius()) {
++        m_bArrival = true;
++        UpdateAutopilot();
++        bDidArrival = true;
++        DoAdvance();
++      } else {
++        //      Moving away from the arrival point for ~2 s -> declare "Arrival".
++        if ((CurrentRangeToActiveNormalCrossing - m_arrival_min) >
++            pActivePoint->GetWaypointArrivalRadius()) {
++          if (++m_arrival_test > 2 && !g_bAdvanceRouteWaypointOnArrivalOnly) {
++            m_bArrival = true;
++            UpdateAutopilot();
++            bDidArrival = true;
++            DoAdvance();
++          }
++        } else
++          m_arrival_test = 0;
++      }
++    }
++    if (!bDidArrival)
++      m_arrival_min =
++          wxMin(m_arrival_min, CurrentRangeToActiveNormalCrossing);
++    // Only once on arrival
++    if (!bDidArrival) UpdateAutopilot();
++    bret_val = true;  // a route is active
++  }
++  m_bDataValid = true;
++  return bret_val;
++}
++
+ bool Routeman::DeactivateRoute(bool b_arrival) {
+   if (pActivePoint) {
+     pActivePoint->m_bBlink = false;

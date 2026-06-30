@@ -1,0 +1,227 @@
+{
+  "schema_version": "vulkan.render_scene.v0",
+  "scene_id": "vsg-resource-plan",
+  "source_epoch": "synthetic-vsg-resource-plan@2026-06-29",
+  "render_view": {
+    "projection": "web_mercator_tile",
+    "scale_denom": 12000,
+    "pixel_size": [
+      16,
+      16
+    ],
+    "device_pixel_ratio": 1,
+    "overzoom": false,
+    "overscan_px": 1
+  },
+  "display_state": {
+    "palette": "day",
+    "display_category": "standard",
+    "safety_depth_m": 10,
+    "show_text": true,
+    "show_soundings": true
+  },
+  "resource_table": {
+    "symbols": [
+      {
+        "resource_id": "sym.boyspp",
+        "logical_size": [
+          12,
+          12
+        ],
+        "anchor": [
+          6,
+          6
+        ]
+      }
+    ],
+    "line_styles": [
+      {
+        "resource_id": "line.depth-contour",
+        "dash": [
+          3,
+          2
+        ]
+      }
+    ],
+    "area_patterns": [
+      {
+        "resource_id": "pattern.depth-shoal",
+        "repeat": [
+          8,
+          8
+        ]
+      }
+    ],
+    "fonts": [
+      {
+        "resource_id": "font.chart-label",
+        "family": "fixture-sans",
+        "size_px": 10
+      }
+    ],
+    "raster_textures": [],
+    "geometry_buffers": [],
+    "palettes": [
+      {
+        "resource_id": "palette.day",
+        "name": "day"
+      }
+    ]
+  },
+  "command_groups": [
+    {
+      "group_id": "s52-vsg-resource-plan",
+      "chart_priority": 1,
+      "s52_layer": "semantic",
+      "quilt_rank": 1,
+      "commands": [
+        {
+          "type": "fill_area",
+          "command_id": "cmd.area.solid",
+          "rings": [
+            [
+              [
+                1,
+                1
+              ],
+              [
+                7,
+                1
+              ],
+              [
+                7,
+                7
+              ],
+              [
+                1,
+                7
+              ]
+            ]
+          ],
+          "pattern_ref": null,
+          "opacity": 1,
+          "provenance_refs": []
+        },
+        {
+          "type": "fill_area",
+          "command_id": "cmd.area.pattern",
+          "rings": [
+            [
+              [
+                2,
+                2
+              ],
+              [
+                6,
+                2
+              ],
+              [
+                6,
+                6
+              ],
+              [
+                2,
+                6
+              ]
+            ]
+          ],
+          "pattern_ref": "pattern.depth-shoal",
+          "opacity": 1,
+          "provenance_refs": []
+        },
+        {
+          "type": "stroke_line",
+          "command_id": "cmd.line.safety",
+          "polyline": [
+            [
+              1,
+              5
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              7,
+              5
+            ]
+          ],
+          "line_style_ref": "line.depth-contour",
+          "width_px": 1,
+          "provenance_refs": []
+        },
+        {
+          "type": "place_symbol",
+          "command_id": "cmd.symbol.boyspp-1",
+          "symbol_ref": "sym.boyspp",
+          "position": [
+            5,
+            3
+          ],
+          "priority": 70,
+          "provenance_refs": []
+        },
+        {
+          "type": "place_symbol",
+          "command_id": "cmd.symbol.boyspp-2",
+          "symbol_ref": "sym.boyspp",
+          "position": [
+            6,
+            4
+          ],
+          "priority": 70,
+          "provenance_refs": []
+        },
+        {
+          "type": "draw_text",
+          "command_id": "cmd.text.label",
+          "text": "Synthetic label",
+          "font_ref": "font.chart-label",
+          "position": [
+            5,
+            2
+          ],
+          "priority": 50,
+          "provenance_refs": []
+        },
+        {
+          "type": "draw_sounding",
+          "command_id": "cmd.sounding.7",
+          "depth_m": 7.4,
+          "formatted_text": "7.4",
+          "font_ref": "font.chart-label",
+          "position": [
+            3,
+            6
+          ],
+          "priority": 60,
+          "provenance_refs": []
+        },
+        {
+          "type": "place_symbol",
+          "command_id": "cmd.symbol.boyspp-late",
+          "symbol_ref": "sym.boyspp",
+          "position": [
+            9,
+            4
+          ],
+          "priority": 70,
+          "provenance_refs": []
+        },
+        {
+          "type": "place_symbol",
+          "command_id": "cmd.symbol.missing",
+          "symbol_ref": "sym.missing",
+          "position": [
+            4,
+            4
+          ],
+          "priority": 70,
+          "provenance_refs": []
+        }
+      ]
+    }
+  ],
+  "provenance_table": [],
+  "diagnostics": []
+}

@@ -1,0 +1,157 @@
+{
+  "_comment": [
+    "Helm 'Places' + 'AIS' overlay -- splice into web/style.json.",
+    "Glyphs are basic letters/geometry present in the demotiles 'Noto Sans Regular'",
+    "fontstack (no emoji, no custom sprite) so it renders identically in MapLibre",
+    "GL JS and MapLibre Native. Kind is carried by COLOR + a one-char glyph.",
+    "See integration_notes for splice + checkbox wiring."
+  ],
+  "sources": {
+    "places": {
+      "type": "geojson",
+      "data": "data/places.geojson",
+      "attribution": "(c) OpenStreetMap contributors, ODbL"
+    },
+    "ais": {
+      "type": "geojson",
+      "data": "data/ais-sample.geojson"
+    }
+  },
+  "layers": [
+    {
+      "id": "places-halo",
+      "type": "circle",
+      "source": "places",
+      "layout": { "visibility": "visible" },
+      "paint": {
+        "circle-radius": 11,
+        "circle-color": "rgba(13,19,27,0.74)",
+        "circle-stroke-width": 1.2,
+        "circle-stroke-color": [
+          "match", ["get", "kind"],
+          "marina", "#5bc0ff",
+          "anchorage", "#8fd3ff",
+          "fuel", "#f2b441",
+          "dinghy", "#5bc0ff",
+          "water", "#7fd1e0",
+          "chandlery", "#cdd6e0",
+          "rgba(255,255,255,0.13)"
+        ],
+        "circle-pitch-alignment": "map"
+      }
+    },
+    {
+      "id": "places-icon",
+      "type": "symbol",
+      "source": "places",
+      "layout": {
+        "visibility": "visible",
+        "symbol-sort-key": [
+          "match", ["get", "kind"],
+          "marina", 0, "fuel", 1, "anchorage", 2,
+          "dinghy", 3, "chandlery", 4, "water", 5, 9
+        ],
+        "text-field": [
+          "match", ["get", "kind"],
+          "marina", "M",
+          "anchorage", "⚓",
+          "fuel", "F",
+          "dinghy", "D",
+          "water", "W",
+          "chandlery", "C",
+          "•"
+        ],
+        "text-font": ["Noto Sans Regular"],
+        "text-size": 13,
+        "text-allow-overlap": true,
+        "text-ignore-placement": true,
+        "text-anchor": "center"
+      },
+      "paint": {
+        "text-color": [
+          "match", ["get", "kind"],
+          "marina", "#5bc0ff",
+          "anchorage", "#8fd3ff",
+          "fuel", "#f2b441",
+          "dinghy", "#5bc0ff",
+          "water", "#7fd1e0",
+          "chandlery", "#cdd6e0",
+          "#5bc0ff"
+        ],
+        "text-halo-color": "rgba(13,19,27,0.9)",
+        "text-halo-width": 1.0
+      }
+    },
+    {
+      "id": "places-label",
+      "type": "symbol",
+      "source": "places",
+      "minzoom": 12,
+      "layout": {
+        "visibility": "visible",
+        "text-field": ["get", "name"],
+        "text-font": ["Noto Sans Regular"],
+        "text-size": 11,
+        "text-anchor": "top",
+        "text-offset": [0, 1.0],
+        "text-optional": true,
+        "text-max-width": 9
+      },
+      "paint": {
+        "text-color": "#e8eef5",
+        "text-halo-color": "rgba(13,19,27,0.92)",
+        "text-halo-width": 1.4
+      }
+    },
+    {
+      "id": "ais-vessels",
+      "type": "symbol",
+      "source": "ais",
+      "layout": {
+        "visibility": "visible",
+        "text-field": "▲",
+        "text-font": ["Noto Sans Regular"],
+        "text-size": 15,
+        "text-rotate": ["get", "cog"],
+        "text-rotation-alignment": "map",
+        "text-allow-overlap": true,
+        "text-ignore-placement": true
+      },
+      "paint": {
+        "text-color": [
+          "case",
+          ["<", ["coalesce", ["get", "cpa"], 99], 0.2], "#e4564f",
+          ["<", ["coalesce", ["get", "cpa"], 99], 0.5], "#f2b441",
+          "#5bc0ff"
+        ],
+        "text-halo-color": "rgba(13,19,27,0.9)",
+        "text-halo-width": 1.3
+      }
+    },
+    {
+      "id": "ais-label",
+      "type": "symbol",
+      "source": "ais",
+      "minzoom": 12,
+      "layout": {
+        "visibility": "visible",
+        "text-field": [
+          "format",
+          ["get", "name"], { "font-scale": 1.0 },
+          "\n", {},
+          ["concat", ["to-string", ["get", "sog"]], " kn"], { "font-scale": 0.85 }
+        ],
+        "text-font": ["Noto Sans Regular"],
+        "text-size": 11,
+        "text-anchor": "left",
+        "text-offset": [0.9, 0],
+        "text-optional": true
+      },
+      "paint": {
+        "text-color": "#cdd6e0",
+        "text-halo-color": "rgba(13,19,27,0.92)",
+        "text-halo-width": 1.3
+      }
+    }
+  ]
+}

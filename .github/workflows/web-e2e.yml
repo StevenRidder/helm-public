@@ -1,0 +1,32 @@
+# Web-client E2E (CLIENT epic) — Playwright drives the real app in headless Chromium (SIM mode, no
+# engine) and asserts the Tier-1 behaviours hold. Heavier than the dependency-free unit job
+# (web-tests.yml), so it's a separate workflow that installs a browser.
+name: web-e2e
+
+on:
+  push:
+    paths:
+      - 'web/**'
+      - '.github/workflows/web-e2e.yml'
+  pull_request:
+    paths:
+      - 'web/**'
+      - '.github/workflows/web-e2e.yml'
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web/test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install test deps
+        run: npm ci
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Run E2E (serves web/ via serve.py in SIM mode)
+        run: npx playwright test

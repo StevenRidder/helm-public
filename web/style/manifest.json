@@ -1,0 +1,15 @@
+{
+  "_epic": "SHELL",
+  "_note": "Per-domain style fragments, merged in THIS ORDER by HelmShell.buildStyle() at load. Order == draw order (bottom layer first). The merge of helm-base + these fragments is byte-equivalent to the legacy web/style.json. To add map layers for your epic: create a helm-<epic>-*.json fragment (namespace every source/layer id helm-<epic>-*) and insert its filename here at the right draw position. See web/SHELL.md.",
+  "base": "helm-base.json",
+  "fragments": [
+    "helm-chart-basemaps.json",
+    "helm-chart-depth.json",
+    "helm-route-line.json",
+    "helm-wx-wind.json",
+    "helm-place-whereto.json",
+    "helm-place-poi.json",
+    "helm-ais-targets.json",
+    "helm-place-saved.json"
+  ]
+}

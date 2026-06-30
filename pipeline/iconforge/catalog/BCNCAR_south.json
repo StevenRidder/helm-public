@@ -1,0 +1,27 @@
+{
+  "id": "BCNCAR_south",
+  "s52_token": "BCNCAR",
+  "name": "South cardinal beacon",
+  "category": "beacon",
+  "meaning": "Pass to the south of this mark; safe water lies to the south.",
+  "invariants": {
+    "colors": [
+      "yellow",
+      "black"
+    ],
+    "topmark": "two_cones_point_down",
+    "light_flare": false,
+    "shape_class": "beacon",
+    "distinguishing": "yellow above black; topmark two cones BOTH points down; fixed beacon on a base",
+    "anchor": [
+      0.5,
+      0.88
+    ]
+  },
+  "reference": null,
+  "siblings": [
+    "BCNCAR_north",
+    "BCNCAR_east",
+    "BCNCAR_west"
+  ]
+}

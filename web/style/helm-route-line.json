@@ -1,0 +1,25 @@
+{
+  "_epic": "ROUTE",
+  "_note": "Active route line (ROUTE-2). Owned by ROUTE. The `route` source + `route-line` layer are driven live from engine geometry by index.html (updateRouteFromEngine) and used as a `beforeId` insertion anchor by WX/radar/isobars/depth-contours — keep the id `route-line` stable. New ROUTE layers should be namespaced helm-route-*. The source starts EMPTY — no hardcoded demo route; geometry comes only from the engine (route.create/activate) or the in-session editor.",
+  "sources": {
+    "route": {
+      "type": "geojson",
+      "data": { "type": "FeatureCollection", "features": [] }
+    }
+  },
+  "layers": [
+    {
+      "id": "route-line",
+      "type": "line",
+      "source": "route",
+      "layout": {
+        "line-cap": "round",
+        "line-join": "round"
+      },
+      "paint": {
+        "line-color": "#d6219a",
+        "line-width": 3
+      }
+    }
+  ]
+}

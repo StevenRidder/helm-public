@@ -1,0 +1,30 @@
+# Helm — Martin tile server config (optional, server-side).
+#
+# Martin (https://github.com/maplibre/martin) serves MBTiles / PMTiles / PostGIS
+# as TileJSON + XYZ over HTTP. The Helm Engine already serves S-52 ENC tiles on
+# :8082; Martin is the off-the-shelf option for serving the *offline chart packs*
+# the pipeline produces, so we don't hand-roll a tile server.
+#
+# Run:
+#   martin --config pipeline/martin/config.yaml
+#   # then in web/style.json, point a raster source at:
+#   #   http://127.0.0.1:3000/key-west-sat/{z}/{x}/{y}
+#   # or load the TileJSON:  http://127.0.0.1:3000/key-west-sat
+#
+# Install: cargo install martin   |   brew install martin   |   docker run ghcr.io/maplibre/martin
+
+listen_addresses: "0.0.0.0:3000"
+
+# Serve every tileset under web/data by filename (mbtiles + pmtiles).
+mbtiles:
+  paths:
+    - ../../web/data
+
+pmtiles:
+  paths:
+    - ../../web/data
+
+# Example explicit source (uncomment to pin an id/path instead of auto-discovery):
+# pmtiles:
+#   sources:
+#     key-west-sat: ../../web/data/key-west-sat.pmtiles

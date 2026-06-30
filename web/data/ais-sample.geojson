@@ -1,0 +1,12 @@
+{
+  "type": "FeatureCollection",
+  "_comment": "Helm AIS sample (synthetic) -- a handful of vessels for the prototype. sog=speed over ground (kn), cog=course over ground (deg true), hdg=heading (deg true), cpa=closest point of approach to ownship (nm), tcpa=time to CPA (min; negative=opening), cpaValid=engine CPA solution valid, class=0 Class A/1 Class B, navStatus=AIS nav-status code. Tuned for a variety of AIS-4 cases: 2 danger (cone), 1 caution, 2 normal, 1 moored (no velocity vector).",
+  "features": [
+    { "type": "Feature", "geometry": { "type": "Point", "coordinates": [-81.805, 24.555] }, "properties": { "name": "Sea Fox", "mmsi": 369000001, "sog": 6.2, "cog": 95, "hdg": 96, "cpa": 1.8, "tcpa": 14.0, "cpaValid": true, "class": 0, "navStatus": 0, "type": "vessel" } },
+    { "type": "Feature", "geometry": { "type": "Point", "coordinates": [-81.776, 24.56] }, "properties": { "name": "Conch Express", "mmsi": 367000123, "sog": 12.4, "cog": 210, "hdg": 208, "cpa": 0.42, "tcpa": 8.5, "cpaValid": true, "class": 0, "navStatus": 0, "type": "vessel" } },
+    { "type": "Feature", "geometry": { "type": "Point", "coordinates": [-81.752, 24.5] }, "properties": { "name": "Reef Wanderer", "mmsi": 338000777, "sog": 0.0, "cog": 0, "hdg": 0, "cpa": 3.1, "cpaValid": true, "class": 1, "navStatus": 5, "type": "vessel" } },
+    { "type": "Feature", "geometry": { "type": "Point", "coordinates": [-81.73, 24.535] }, "properties": { "name": "Marathon Maru", "mmsi": 367111222, "sog": 18.7, "cog": 305, "hdg": 304, "cpa": 0.15, "tcpa": 5.2, "cpaValid": true, "class": 0, "navStatus": 0, "type": "vessel" } },
+    { "type": "Feature", "geometry": { "type": "Point", "coordinates": [-81.7, 24.512] }, "properties": { "name": "Salty Paws", "mmsi": 366998877, "sog": 4.5, "cog": 140, "hdg": 141, "cpa": 2.6, "tcpa": 22.0, "cpaValid": true, "class": 1, "navStatus": 0, "type": "vessel" } },
+    { "type": "Feature", "geometry": { "type": "Point", "coordinates": [-81.84, 24.48] }, "properties": { "name": "Gulf Drifter", "mmsi": 368445566, "sog": 9.1, "cog": 60, "hdg": 61, "cpa": 5.0, "tcpa": 40.0, "cpaValid": true, "class": 0, "navStatus": 0, "type": "vessel" } }
+  ]
+}

@@ -1,0 +1,118 @@
+{
+  "schema_version": "vulkan.render_command_stream.v0",
+  "resource_table": {
+    "fonts": [
+      {
+        "resource_id": "font.chart-label",
+        "family": "OpenCPN S-52 label fixture",
+        "weight": "regular"
+      }
+    ]
+  },
+  "command_groups": [
+    {
+      "group_id": "s52-text-pass",
+      "commands": [
+        {
+          "type": "draw_text",
+          "command_id": "cmd.text.harbor",
+          "text": "Harbor label",
+          "font_ref": "font.chart-label",
+          "position": [5, 2],
+          "s52_semantics": {
+            "object_class": "OBJNAM",
+            "display_category": "standard",
+            "visible": true,
+            "order_key": [1, 1, 5, 4, 10]
+          },
+          "placement": {
+            "label_kind": "text",
+            "priority": 50,
+            "collision_policy": "declutter-box",
+            "visible": true
+          }
+        },
+        {
+          "type": "draw_sounding",
+          "command_id": "cmd.sounding.shoal",
+          "depth_m": 7.4,
+          "formatted_text": "7.4",
+          "font_ref": "font.chart-label",
+          "position": [3, 6],
+          "s52_semantics": {
+            "object_class": "SOUNDG",
+            "display_category": "standard",
+            "safety_class": "shoal",
+            "visible": true,
+            "order_key": [1, 1, 6, 4, 20]
+          },
+          "placement": {
+            "label_kind": "sounding",
+            "priority": 60,
+            "collision_policy": "sounding-grid",
+            "safety_class": "shoal",
+            "visible": true
+          }
+        },
+        {
+          "type": "draw_text",
+          "command_id": "cmd.light.label",
+          "text": "Fl(2) 10s",
+          "font_ref": "font.chart-label",
+          "position": [8, 3],
+          "s52_semantics": {
+            "object_class": "LIGHTS",
+            "display_category": "standard",
+            "visible": true,
+            "order_key": [1, 1, 7, 4, 30]
+          },
+          "placement": {
+            "label_kind": "light_label",
+            "priority": 70,
+            "collision_policy": "light-description",
+            "visible": true
+          }
+        },
+        {
+          "type": "draw_text",
+          "command_id": "cmd.text.scamin-hidden",
+          "text": "Small-scale label",
+          "font_ref": "font.chart-label",
+          "position": [9, 8],
+          "s52_semantics": {
+            "object_class": "OBJNAM",
+            "display_category": "standard",
+            "visible": false,
+            "order_key": [1, 1, 8, 4, 40]
+          },
+          "placement": {
+            "label_kind": "text",
+            "priority": 10,
+            "visible": false,
+            "cull_reason": "scamin"
+          }
+        },
+        {
+          "type": "draw_text",
+          "command_id": "cmd.text.complex-script",
+          "text": "Complex text",
+          "font_ref": "font.chart-label",
+          "position": [2, 8],
+          "s52_semantics": {
+            "object_class": "OBJNAM",
+            "display_category": "standard",
+            "visible": true,
+            "order_key": [1, 1, 9, 4, 50]
+          },
+          "placement": {
+            "label_kind": "text",
+            "priority": 40,
+            "visible": true,
+            "requires_shaping": true,
+            "defer_reason": "complex_shaping"
+          }
+        }
+      ]
+    }
+  ]
+}

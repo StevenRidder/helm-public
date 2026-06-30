@@ -1,0 +1,31 @@
+{
+"tilejson_template": "radar/{frame}/{z}/{x}/{y}.png",
+"minzoom": 9,
+"maxzoom": 11,
+"frames": [
+{
+"id": "t0",
+"minutes": -40
+},
+{
+"id": "t1",
+"minutes": -30
+},
+{
+"id": "t2",
+"minutes": -20
+},
+{
+"id": "t3",
+"minutes": -10
+},
+{
+"id": "t4",
+"minutes": 0
+},
+{
+"id": "t5",
+"minutes": 10
+}
+]
+}

@@ -1,0 +1,18 @@
+diff --git a/libs/s52plib/src/s52plib.cpp b/libs/s52plib/src/s52plib.cpp
+index 39207d2..0de310c 100644
+--- a/libs/s52plib/src/s52plib.cpp
++++ b/libs/s52plib/src/s52plib.cpp
+@@ -388,6 +388,13 @@ s52plib::s52plib(const wxString &PLib, bool b_forceLegacy) {
+   m_FinalTextScaleFactor = 0;
+   m_TextScaleFactor = 1;
+   m_nTextFactor = 0;
++  // m_nSoundingFactor was left UNINITIALIZED here (only m_nTextFactor was set).
++  // PrepareForRender() then computes m_SoundingsScaleFactor = m_nSoundingFactor*.1+1
++  // from the garbage, so the sounding font point-size (hence every sounding digit's
++  // pixel placement) varied per process -> byte-different tiles run-to-run. The full
++  // app hides this by loading m_nSoundingFactor from config; a headless consumer
++  // never does. Default it to 0 (scale factor 1.0), matching the app default.
++  m_nSoundingFactor = 0;
+   m_isSoundingFontSet = false;
+ 
+   s_color = "color";

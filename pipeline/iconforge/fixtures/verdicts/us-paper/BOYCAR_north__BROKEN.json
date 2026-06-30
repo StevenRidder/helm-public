@@ -1,0 +1,27 @@
+{
+  "criteria": [
+    {
+      "name": "colours_correct",
+      "passed": true,
+      "reason": "black above yellow \u2014 colours fine"
+    },
+    {
+      "name": "topmark_correct",
+      "passed": false,
+      "reason": "topmark cones point DOWN, not up \u2014 this reads as a SOUTH cardinal. Wrong cardinal quadrant is a grounding hazard."
+    },
+    {
+      "name": "light_flare",
+      "passed": true,
+      "reason": "no flare, correct"
+    },
+    {
+      "name": "distinguishing_feature",
+      "passed": false,
+      "reason": "black-over-yellow with down-cones is contradictory"
+    }
+  ],
+  "overall_pass": false,
+  "confidence": 0.93,
+  "sibling_pick": "BOYCAR_south"
+}

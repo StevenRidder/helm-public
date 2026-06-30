@@ -1,0 +1,141 @@
+{
+  "_epic": "CHART",
+  "_note": "Basemaps + S-52 ENC raster. Owned by CHART. Legacy layer ids (navionics/googlesat/bingsat/arcgis/satellite/charts/enc-chart) are grandfathered — index.html references them by name (basemap picker, day/night reskin, ENC tile-origin rewrite). New CHART layers should be namespaced helm-chart-*.",
+  "sources": {
+    "sat": {
+      "type": "raster",
+      "tileSize": 256,
+      "tiles": [
+        "data/sat/{z}/{x}/{y}.jpg"
+      ],
+      "minzoom": 8,
+      "maxzoom": 13,
+      "bounds": [176.9, -18.2, 177.9, -17.2],
+      "attribution": "Sentinel-2 cloudless by EOX (CC-BY-4.0) — baked offline"
+    },
+    "navionics": {
+      "type": "raster",
+      "tileSize": 256,
+      "tiles": [
+        "http://localhost:8091/navionics/{z}/{x}/{y}.png"
+      ],
+      "minzoom": 7,
+      "maxzoom": 17,
+      "bounds": [175.0, -22.5, 180.5, -11.0],
+      "attribution": "Navionics — owned chart pack (Fiji TCL2407)"
+    },
+    "googlesat": {
+      "type": "raster", "tileSize": 256,
+      "tiles": ["http://localhost:8091/googlesat/{z}/{x}/{y}.jpg"],
+      "minzoom": 7, "maxzoom": 17, "bounds": [175.0, -22.5, 180.5, -11.0],
+      "attribution": "Google satellite — owned (Fiji TCL2407)"
+    },
+    "bingsat": {
+      "type": "raster", "tileSize": 256,
+      "tiles": ["http://localhost:8091/bingsat/{z}/{x}/{y}.jpg"],
+      "minzoom": 7, "maxzoom": 17, "bounds": [175.0, -22.5, 180.5, -11.0],
+      "attribution": "Bing satellite — owned (Fiji TCL2407)"
+    },
+    "arcgis": {
+      "type": "raster", "tileSize": 256,
+      "tiles": ["http://localhost:8091/arcgis/{z}/{x}/{y}.jpg"],
+      "minzoom": 7, "maxzoom": 17, "bounds": [175.0, -22.5, 180.5, -11.0],
+      "attribution": "ArcGIS satellite — owned (Fiji TCL2407)"
+    },
+    "charts": {
+      "type": "raster",
+      "tileSize": 256,
+      "tiles": [
+        "https://tileservice.charts.noaa.gov/tiles/50000_1/{z}/{x}/{y}.png"
+      ],
+      "attribution": "NOAA ENC (public domain)"
+    },
+    "enc": {
+      "type": "raster",
+      "tileSize": 256,
+      "minzoom": 10,
+      "maxzoom": 17,
+      "tiles": [
+        "http://127.0.0.1:8090/chart/{z}/{x}/{y}.png"
+      ],
+      "attribution": "S-52 via OpenCPN (Helm Engine)",
+      "_note": "default origin only — index.html rewrites this to the resolved boat-server origin (server-endpoint.js) at load, so it is address-agnostic (localhost / helm.local / LAN IP)"
+    },
+    "helm-chart-online-fill": {
+      "type": "raster",
+      "tileSize": 256,
+      "tiles": [
+        "http://localhost:8095/basemap/eox/{z}/{x}/{y}.jpg"
+      ],
+      "minzoom": 0,
+      "maxzoom": 19,
+      "attribution": "Sentinel-2 cloudless — EOX IT Services (CC-BY-4.0); online fill via helm basemap-fill cache",
+      "_note": "ONLINE-FILL underlay (CHART-16) — GLOBAL (no bounds). Served by services/basemap-fill on :8095 (NOT :8091). index.html transformRequest rewrites the :8095 host for LAN devices, like :8091. Default layer is OFF."
+    }
+  },
+  "layers": [
+    {
+      "_note": "INVARIANT (CHART-16): online-fill MUST stay FIRST in this (first manifest) fragment's layers[] — directly above 'ocean' (helm-base.json), beneath all 4 MBTiles basemaps. visibility:'none' = default OFF = pure-offline baseline. Fails safe: toggle-off / proxy-down / offline / cache-empty all collapse to today's MBTiles-over-ocean stack (can only ADD beneath the charts, never subtract).",
+      "id": "helm-chart-online-fill",
+      "type": "raster",
+      "source": "helm-chart-online-fill",
+      "layout": { "visibility": "none" },
+      "paint": { "raster-fade-duration": 0, "raster-resampling": "linear" }
+    },
+    {
+      "id": "navionics",
+      "type": "raster",
+      "source": "navionics",
+      "paint": { "raster-fade-duration": 0 }
+    },
+    {
+      "id": "googlesat",
+      "type": "raster",
+      "source": "googlesat",
+      "layout": { "visibility": "none" },
+      "paint": { "raster-fade-duration": 0 }
+    },
+    {
+      "id": "bingsat",
+      "type": "raster",
+      "source": "bingsat",
+      "layout": { "visibility": "none" },
+      "paint": { "raster-fade-duration": 0 }
+    },
+    {
+      "id": "arcgis",
+      "type": "raster",
+      "source": "arcgis",
+      "layout": { "visibility": "none" },
+      "paint": { "raster-fade-duration": 0 }
+    },
+    {
+      "id": "satellite",
+      "type": "raster",
+      "source": "sat",
+      "layout": { "visibility": "none" }
+    },
+    {
+      "id": "charts",
+      "type": "raster",
+      "source": "charts",
+      "layout": {
+        "visibility": "none"
+      },
+      "paint": {
+        "raster-opacity": 0.85
+      }
+    },
+    {
+      "id": "enc-chart",
+      "type": "raster",
+      "source": "enc",
+      "layout": {
+        "visibility": "visible"
+      },
+      "paint": {
+        "raster-opacity": 1.0
+      }
+    }
+  ]
+}

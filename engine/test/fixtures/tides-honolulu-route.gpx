@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="Helm" xmlns="http://www.topografix.com/GPX/1/1">
+  <rte>
+    <name>Honolulu Tide Acquisition</name>
+    <rtept lat="21.3069" lon="-157.8583"><name>Honolulu Harbor</name></rtept>
+    <rtept lat="21.3120" lon="-157.8520"><name>Sand Island</name></rtept>
+  </rte>
+</gpx>

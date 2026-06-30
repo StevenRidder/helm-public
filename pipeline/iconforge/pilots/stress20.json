@@ -1,0 +1,255 @@
+{
+  "id": "stress20",
+  "title": "20-symbol Icon Forge stress pilot",
+  "purpose": "Exercise the symbol-generation pipeline across safety-critical orientation, color, conditional danger, pattern, and sibling-confusion classes before scaling beyond the POC fixtures.",
+  "source_policy": {
+    "s52_metadata": "~/.helm/runtime/s57data/chartsymbols.xml",
+    "chart_no_1_reference_root": "references/us-chart-1/",
+    "clean_ip_rule": "Generate fresh owned SVG from Chart No.1 references and style primitives. Use chartsymbols.xml for metadata, lookup conditions, pivots, palette expectations, and sibling discrimination only; do not copy OpenCPN raster artwork into the owned pack."
+  },
+  "qa_gates": [
+    "xml_wellformed",
+    "palette_tokens_defined",
+    "invariant_colours_used",
+    "no_literal_hex",
+    "anchor_in_bounds",
+    "renders",
+    "sibling_discrimination",
+    "hard_pile_on_failure",
+    "atlas_manifest_shape_name_kind_palette_plus_style"
+  ],
+  "required_stress_classes": [
+    "cardinal_all_orientations",
+    "cardinal_beacon_vs_buoy",
+    "lateral_red_green_region_sensitive",
+    "lateral_conical_vs_can_shape",
+    "safe_water_topmark",
+    "special_mark",
+    "dangerous_vs_nondangerous_wreck",
+    "rock_obstruction_wreck_confusion",
+    "area_pattern_restricted_anchorage_caution",
+    "light_flare"
+  ],
+  "entries": [
+    {
+      "id": "BOYCAR_north",
+      "stress_class": ["cardinal_all_orientations"],
+      "s52": {"object_class": "BOYCAR", "lookup_id": "1022", "rcid": "31074", "conditions": ["CATCAM1"], "instruction": "SY(BOYCAR01)"},
+      "symbol": {"name": "BOYCAR01", "description": "cardinal buoy, north, simplified"},
+      "reference_crop": "references/us-chart-1/q-cardinal-marks/BOYCAR_north.png",
+      "invariants": {"colors": ["black", "yellow"], "topmark": "two_cones_point_up", "shape": "buoy", "anchor": [0.5, 0.84]},
+      "siblings": ["BOYCAR_east", "BOYCAR_south", "BOYCAR_west", "BCNCAR_north"],
+      "deliberate_failures": ["flip_topmark_down", "swap_black_yellow_order"],
+      "hard_pile_codes": ["wrong_cardinal_orientation", "wrong_cardinal_colour_order", "sibling_confusion"]
+    },
+    {
+      "id": "BOYCAR_east",
+      "stress_class": ["cardinal_all_orientations"],
+      "s52": {"object_class": "BOYCAR", "lookup_id": "1023", "rcid": "31075", "conditions": ["CATCAM2"], "instruction": "SY(BOYCAR02)"},
+      "symbol": {"name": "BOYCAR02", "description": "cardinal buoy, east, simplified"},
+      "reference_crop": "references/us-chart-1/q-cardinal-marks/BOYCAR_east.png",
+      "invariants": {"colors": ["black", "yellow"], "topmark": "two_cones_base_to_base", "shape": "buoy", "anchor": [0.5, 0.84]},
+      "siblings": ["BOYCAR_north", "BOYCAR_south", "BOYCAR_west"],
+      "deliberate_failures": ["flip_to_west_topmark", "swap_black_yellow_order"],
+      "hard_pile_codes": ["wrong_cardinal_orientation", "wrong_cardinal_colour_order", "sibling_confusion"]
+    },
+    {
+      "id": "BOYCAR_south",
+      "stress_class": ["cardinal_all_orientations"],
+      "s52": {"object_class": "BOYCAR", "lookup_id": "1024", "rcid": "31076", "conditions": ["CATCAM3"], "instruction": "SY(BOYCAR03)"},
+      "symbol": {"name": "BOYCAR03", "description": "cardinal buoy, south, simplified"},
+      "reference_crop": "references/us-chart-1/q-cardinal-marks/BOYCAR_south.png",
+      "invariants": {"colors": ["yellow", "black"], "topmark": "two_cones_point_down", "shape": "buoy", "anchor": [0.5, 0.84]},
+      "siblings": ["BOYCAR_north", "BOYCAR_east", "BOYCAR_west", "BCNCAR_south"],
+      "deliberate_failures": ["flip_topmark_up", "swap_yellow_black_order"],
+      "hard_pile_codes": ["wrong_cardinal_orientation", "wrong_cardinal_colour_order", "sibling_confusion"]
+    },
+    {
+      "id": "BOYCAR_west",
+      "stress_class": ["cardinal_all_orientations"],
+      "s52": {"object_class": "BOYCAR", "lookup_id": "1025", "rcid": "31077", "conditions": ["CATCAM4"], "instruction": "SY(BOYCAR04)"},
+      "symbol": {"name": "BOYCAR04", "description": "cardinal buoy, west, simplified"},
+      "reference_crop": "references/us-chart-1/q-cardinal-marks/BOYCAR_west.png",
+      "invariants": {"colors": ["yellow", "black", "yellow"], "topmark": "two_cones_point_to_point", "shape": "buoy", "anchor": [0.5, 0.84]},
+      "siblings": ["BOYCAR_north", "BOYCAR_east", "BOYCAR_south"],
+      "deliberate_failures": ["flip_to_east_topmark", "drop_middle_black_band"],
+      "hard_pile_codes": ["wrong_cardinal_orientation", "wrong_cardinal_colour_order", "sibling_confusion"]
+    },
+    {
+      "id": "BCNCAR_north",
+      "stress_class": ["cardinal_beacon_vs_buoy"],
+      "s52": {"object_class": "BCNCAR", "lookup_id": "965", "rcid": "31017", "conditions": ["CATCAM1"], "instruction": "SY(BCNCAR01)"},
+      "symbol": {"name": "BCNCAR01", "description": "cardinal beacon, north, simplified"},
+      "reference_crop": "references/us-chart-1/q-cardinal-marks/BCNCAR_north.png",
+      "invariants": {"colors": ["black", "yellow"], "topmark": "two_cones_point_up", "shape": "beacon", "anchor": [0.5, 0.88]},
+      "siblings": ["BCNCAR_south", "BOYCAR_north", "BCNCAR_east", "BCNCAR_west"],
+      "deliberate_failures": ["render_as_buoy", "flip_topmark_down"],
+      "hard_pile_codes": ["wrong_mark_body", "wrong_cardinal_orientation", "sibling_confusion"]
+    },
+    {
+      "id": "BCNCAR_south",
+      "stress_class": ["cardinal_beacon_vs_buoy"],
+      "s52": {"object_class": "BCNCAR", "lookup_id": "967", "rcid": "31019", "conditions": ["CATCAM3"], "instruction": "SY(BCNCAR03)"},
+      "symbol": {"name": "BCNCAR03", "description": "cardinal beacon, south, simplified"},
+      "reference_crop": "references/us-chart-1/q-cardinal-marks/BCNCAR_south.png",
+      "invariants": {"colors": ["yellow", "black"], "topmark": "two_cones_point_down", "shape": "beacon", "anchor": [0.5, 0.88]},
+      "siblings": ["BCNCAR_north", "BOYCAR_south", "BCNCAR_east", "BCNCAR_west"],
+      "deliberate_failures": ["render_as_buoy", "flip_topmark_up"],
+      "hard_pile_codes": ["wrong_mark_body", "wrong_cardinal_orientation", "sibling_confusion"]
+    },
+    {
+      "id": "BOYLAT_conical_red",
+      "stress_class": ["lateral_red_green_region_sensitive", "lateral_conical_vs_can_shape"],
+      "s52": {"object_class": "BOYLAT", "lookup_id": "1029", "rcid": "31081", "conditions": ["BOYSHP1", "COLOUR3,4,3"], "instruction": "SY(BOYLAT14)"},
+      "symbol": {"name": "BOYLAT14", "description": "conical lateral buoy, red, simplified"},
+      "reference_crop": "references/us-chart-1/l-lateral-marks/BOYLAT_conical_red.png",
+      "invariants": {"colors": ["red"], "topmark": null, "shape": "conical_buoy", "anchor": [0.5, 0.84]},
+      "siblings": ["BOYLAT_conical_green", "BOYLAT_can_red", "BOYLAT_can_green"],
+      "deliberate_failures": ["swap_red_green", "render_as_can"],
+      "hard_pile_codes": ["wrong_lateral_colour", "wrong_buoy_shape", "region_sensitive_confusion"]
+    },
+    {
+      "id": "BOYLAT_conical_green",
+      "stress_class": ["lateral_red_green_region_sensitive", "lateral_conical_vs_can_shape"],
+      "s52": {"object_class": "BOYLAT", "lookup_id": "1030", "rcid": "31082", "conditions": ["BOYSHP1", "COLOUR4,3,4"], "instruction": "SY(BOYLAT13)"},
+      "symbol": {"name": "BOYLAT13", "description": "conical lateral buoy, green, simplified"},
+      "reference_crop": "references/us-chart-1/l-lateral-marks/BOYLAT_conical_green.png",
+      "invariants": {"colors": ["green"], "topmark": null, "shape": "conical_buoy", "anchor": [0.5, 0.84]},
+      "siblings": ["BOYLAT_conical_red", "BOYLAT_can_red", "BOYLAT_can_green"],
+      "deliberate_failures": ["swap_green_red", "render_as_can"],
+      "hard_pile_codes": ["wrong_lateral_colour", "wrong_buoy_shape", "region_sensitive_confusion"]
+    },
+    {
+      "id": "BOYLAT_can_red",
+      "stress_class": ["lateral_red_green_region_sensitive", "lateral_conical_vs_can_shape"],
+      "s52": {"object_class": "BOYLAT", "lookup_id": "1031", "rcid": "31083", "conditions": ["BOYSHP2", "COLOUR3,4,3"], "instruction": "SY(BOYLAT24)"},
+      "symbol": {"name": "BOYLAT24", "description": "can shape lateral buoy, red, simplified"},
+      "reference_crop": "references/us-chart-1/l-lateral-marks/BOYLAT_can_red.png",
+      "invariants": {"colors": ["red"], "topmark": null, "shape": "can_buoy", "anchor": [0.5, 0.84]},
+      "siblings": ["BOYLAT_can_green", "BOYLAT_conical_red", "BOYLAT_conical_green"],
+      "deliberate_failures": ["swap_red_green", "render_as_conical"],
+      "hard_pile_codes": ["wrong_lateral_colour", "wrong_buoy_shape", "region_sensitive_confusion"]
+    },
+    {
+      "id": "BOYLAT_can_green",
+      "stress_class": ["lateral_red_green_region_sensitive", "lateral_conical_vs_can_shape"],
+      "s52": {"object_class": "BOYLAT", "lookup_id": "1032", "rcid": "31084", "conditions": ["BOYSHP2", "COLOUR4,3,4"], "instruction": "SY(BOYLAT23)"},
+      "symbol": {"name": "BOYLAT23", "description": "can shape lateral buoy, green, simplified"},
+      "reference_crop": "references/us-chart-1/l-lateral-marks/BOYLAT_can_green.png",
+      "invariants": {"colors": ["green"], "topmark": null, "shape": "can_buoy", "anchor": [0.5, 0.84]},
+      "siblings": ["BOYLAT_can_red", "BOYLAT_conical_red", "BOYLAT_conical_green"],
+      "deliberate_failures": ["swap_green_red", "render_as_conical"],
+      "hard_pile_codes": ["wrong_lateral_colour", "wrong_buoy_shape", "region_sensitive_confusion"]
+    },
+    {
+      "id": "BOYSAW",
+      "stress_class": ["safe_water_topmark"],
+      "s52": {"object_class": "BOYSAW", "lookup_id": "1046", "rcid": "31098", "conditions": [], "instruction": "SY(BOYSAW12)"},
+      "symbol": {"name": "BOYSAW12", "description": "safe water buoy, simplified"},
+      "reference_crop": "references/us-chart-1/l-safe-water-marks/BOYSAW.png",
+      "invariants": {"colors": ["red", "white"], "topmark": "single_sphere", "shape": "buoy", "anchor": [0.5, 0.84]},
+      "siblings": ["BOYISD", "BOYSPP", "BOYLAT_conical_red"],
+      "deliberate_failures": ["horizontal_stripes", "drop_sphere_topmark"],
+      "hard_pile_codes": ["wrong_stripe_orientation", "missing_topmark", "sibling_confusion"]
+    },
+    {
+      "id": "BOYSPP_tss_starboard",
+      "stress_class": ["special_mark"],
+      "s52": {"object_class": "BOYSPP", "lookup_id": "1047", "rcid": "31099", "conditions": ["CATSPM19", "BOYSHP1"], "instruction": "SY(BOYSPP15)"},
+      "symbol": {"name": "BOYSPP15", "description": "special purpose TSS buoy marking the starboard side of the traffic lane, simplified"},
+      "reference_crop": "references/us-chart-1/q-special-marks/BOYSPP_tss_starboard.png",
+      "invariants": {"colors": ["yellow"], "topmark": null, "shape": "conical_buoy", "anchor": [0.5, 0.84]},
+      "siblings": ["BOYSPP_tss_port", "BOYSAW", "BOYLAT_conical_red"],
+      "deliberate_failures": ["swap_to_lateral_colour", "render_as_can"],
+      "hard_pile_codes": ["wrong_special_colour", "wrong_buoy_shape", "sibling_confusion"]
+    },
+    {
+      "id": "WRECKS_nondangerous",
+      "stress_class": ["dangerous_vs_nondangerous_wreck", "rock_obstruction_wreck_confusion"],
+      "s52": {"object_class": "WRECKS", "lookup_id": "1297", "rcid": "31349", "conditions": ["CATWRK3"], "instruction": "SY(FOULGND1) or symbolized non-dangerous wreck path"},
+      "symbol": {"name": "WRECKS04", "description": "non-dangerous wreck, depth unknown"},
+      "reference_crop": "references/us-chart-1/k-rocks-wrecks-obstructions/WRECKS_nondangerous.png",
+      "invariants": {"colors": ["black"], "topmark": null, "shape": "wreck", "anchor": [0.5, 0.55]},
+      "siblings": ["WRECKS_dangerous", "UWTROC_dangerous", "OBSTRN_above_water"],
+      "deliberate_failures": ["add_danger_oval", "render_as_rock"],
+      "hard_pile_codes": ["wrong_danger_class", "wrong_obstruction_family", "sibling_confusion"]
+    },
+    {
+      "id": "WRECKS_dangerous",
+      "stress_class": ["dangerous_vs_nondangerous_wreck", "rock_obstruction_wreck_confusion"],
+      "s52": {"object_class": "WRECKS", "lookup_id": "242", "rcid": "32277", "conditions": [], "instruction": "CS(WRECKS02)"},
+      "symbol": {"name": "WRECKS05", "description": "dangerous wreck, depth unknown"},
+      "reference_crop": "references/us-chart-1/k-rocks-wrecks-obstructions/WRECKS_dangerous.png",
+      "invariants": {"colors": ["black"], "topmark": null, "shape": "wreck_danger_oval", "anchor": [0.5, 0.55]},
+      "siblings": ["WRECKS_nondangerous", "UWTROC_dangerous", "OBSTRN_above_water"],
+      "deliberate_failures": ["drop_danger_oval", "render_as_rock"],
+      "hard_pile_codes": ["wrong_danger_class", "wrong_obstruction_family", "sibling_confusion"]
+    },
+    {
+      "id": "UWTROC_dangerous",
+      "stress_class": ["rock_obstruction_wreck_confusion"],
+      "s52": {"object_class": "UWTROC", "lookup_id": "1276", "rcid": "31328", "conditions": [], "instruction": "CS(OBSTRN04)"},
+      "symbol": {"name": "UWTROC03", "description": "dangerous underwater rock of uncertain depth"},
+      "reference_crop": "references/us-chart-1/k-rocks-wrecks-obstructions/UWTROC_dangerous.png",
+      "invariants": {"colors": ["black"], "topmark": null, "shape": "underwater_rock", "anchor": [0.5, 0.5]},
+      "siblings": ["WRECKS_dangerous", "WRECKS_nondangerous", "OBSTRN_above_water"],
+      "deliberate_failures": ["render_as_wreck", "drop_danger_cue"],
+      "hard_pile_codes": ["wrong_obstruction_family", "wrong_danger_class", "sibling_confusion"]
+    },
+    {
+      "id": "OBSTRN_above_water",
+      "stress_class": ["rock_obstruction_wreck_confusion"],
+      "s52": {"object_class": "OBSTRN", "lookup_id": "121", "rcid": "32158", "conditions": ["CATOBS10"], "instruction": "SY(FLTHAZ02);LS(DASH,1,CSTLN)"},
+      "symbol": {"name": "OBSTRN11", "description": "obstruction in the water which is always above water level"},
+      "reference_crop": "references/us-chart-1/k-rocks-wrecks-obstructions/OBSTRN_above_water.png",
+      "invariants": {"colors": ["black"], "topmark": null, "shape": "obstruction", "anchor": [0.5, 0.5]},
+      "siblings": ["UWTROC_dangerous", "WRECKS_dangerous", "WRECKS_nondangerous"],
+      "deliberate_failures": ["render_as_rock", "render_as_wreck"],
+      "hard_pile_codes": ["wrong_obstruction_family", "sibling_confusion"]
+    },
+    {
+      "id": "RESARE_pattern",
+      "stress_class": ["area_pattern_restricted_anchorage_caution"],
+      "s52": {"object_class": "RESARE", "lookup_id": "167", "rcid": "32202", "conditions": [], "instruction": "CS(RESARE02)"},
+      "symbol": {"name": "RESARE_pattern", "description": "restricted area pattern"},
+      "reference_crop": "references/us-chart-1/n-areas-limits/RESARE_pattern.png",
+      "invariants": {"colors": ["magenta"], "topmark": null, "shape": "area_pattern", "anchor": [0.5, 0.5]},
+      "siblings": ["ACHARE_pattern", "CTNARE_pattern"],
+      "deliberate_failures": ["non_tileable_pattern", "wrong_area_colour"],
+      "hard_pile_codes": ["pattern_not_tileable", "wrong_pattern_family", "sibling_confusion"]
+    },
+    {
+      "id": "ACHARE_pattern",
+      "stress_class": ["area_pattern_restricted_anchorage_caution"],
+      "s52": {"object_class": "ACHARE", "lookup_id": "2", "rcid": "32038", "conditions": [], "instruction": "SY(ACHARE51);CS(RESARE02)"},
+      "symbol": {"name": "ACHARE51", "description": "anchorage area"},
+      "reference_crop": "references/us-chart-1/n-areas-limits/ACHARE_pattern.png",
+      "invariants": {"colors": ["magenta"], "topmark": null, "shape": "area_pattern", "anchor": [0.5, 0.5]},
+      "siblings": ["RESARE_pattern", "CTNARE_pattern"],
+      "deliberate_failures": ["render_as_restricted_area", "wrong_area_symbol"],
+      "hard_pile_codes": ["wrong_pattern_family", "sibling_confusion"]
+    },
+    {
+      "id": "CTNARE_pattern",
+      "stress_class": ["area_pattern_restricted_anchorage_caution"],
+      "s52": {"object_class": "CTNARE", "lookup_id": "34", "rcid": "32070", "conditions": [], "instruction": "SY(CTNARE51);LS(DASH,2,TRFCD)"},
+      "symbol": {"name": "CTNARE51", "description": "caution area, a specific caution note applies"},
+      "reference_crop": "references/us-chart-1/n-areas-limits/CTNARE_pattern.png",
+      "invariants": {"colors": ["magenta"], "topmark": null, "shape": "area_pattern", "anchor": [0.5, 0.5]},
+      "siblings": ["RESARE_pattern", "ACHARE_pattern"],
+      "deliberate_failures": ["render_as_anchorage_area", "wrong_area_symbol"],
+      "hard_pile_codes": ["wrong_pattern_family", "sibling_confusion"]
+    },
+    {
+      "id": "LIGHTS_red_flare",
+      "stress_class": ["light_flare"],
+      "s52": {"object_class": "LIGHTS", "lookup_id": "1131", "rcid": "31183", "conditions": [], "instruction": "CS(LIGHTS05)"},
+      "symbol": {"name": "LIGHTS11", "description": "light flare, red"},
+      "reference_crop": "references/us-chart-1/p-lights/LIGHTS_red_flare.png",
+      "invariants": {"colors": ["red"], "topmark": null, "light_flare": true, "shape": "light_flare", "anchor": [0.5, 0.5]},
+      "siblings": ["LIGHTS_green_flare", "LIGHTS_white_flare", "BOYSAW"],
+      "deliberate_failures": ["missing_flare", "wrong_light_colour"],
+      "hard_pile_codes": ["missing_light_flare", "wrong_light_colour", "sibling_confusion"]
+    }
+  ]
+}

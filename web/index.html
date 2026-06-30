@@ -1,0 +1,2097 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="application-name" content="Helm">
+<meta name="theme-color" content="#05080c">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Helm">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Helm</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/helm-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icons/helm-512.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/helm-180.png">
+<link href="vendor/maplibre-gl/maplibre-gl.css" rel="stylesheet">
+<!-- import map: ESM integration plugins (Lab drawer) resolve bare specifiers to LOCAL vendored
+     bundles (web/vendor/, built with esbuild — offline-first, no CDN at runtime). The shim maps
+     `maplibre-gl` to the page's single MapLibre instance so plugins share it (no second copy,
+     instanceof works). deck.gl's three sub-packages resolve to one bundle (core+luma deduped). -->
+<script type="importmap">
+{
+  "imports": {
+    "maplibre-gl": "./integrations/_maplibre-shim.js",
+    "pmtiles": "./vendor/pmtiles.js",
+    "@geomatico/maplibre-cog-protocol": "./vendor/maplibre-cog-protocol.js",
+    "maplibre-contour": "./vendor/maplibre-contour.js",
+    "terra-draw": "./vendor/terra-draw.js",
+    "terra-draw-maplibre-gl-adapter": "./vendor/terra-draw-maplibre-gl-adapter.js",
+    "maplibre-gl-measures": "./vendor/maplibre-gl-measures.js",
+    "maplibre-gl-temporal-control": "./vendor/maplibre-gl-temporal-control.js",
+    "@deck.gl/mapbox": "./vendor/deck.js",
+    "@deck.gl/layers": "./vendor/deck.js",
+    "@deck.gl/aggregation-layers": "./vendor/deck.js"
+  }
+}
+</script>
+<style>
+  :root{
+    --glass:rgba(13,19,27,.74);--glass2:rgba(30,41,54,.62);
+    --line:rgba(255,255,255,.13);--line2:rgba(255,255,255,.07);
+    --ctext:#eef4f9;--cdim:#9bb0c0;--cdim2:#849bad;
+    --accent:#5bc0ff;--mag:#d6219a;--ok:#46e0a0;--danger:#ff6b6b;--warn:#ffc06a;
+    --windlo:#1aa58c;--windhi:#c8781a;
+  }
+  html,body{margin:0;height:100%;overflow:hidden;background:#05080c;color:var(--ctext);
+    font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-serif}
+  #map{position:absolute;inset:0}
+  /* night-vision film over the WHOLE chart (basemap + vector overlays) — dims/​warms for
+     dusk & night so bright soundings/route/labels don't glare; UI chrome (z>=6) stays above it */
+  #night-film{position:absolute;inset:0;z-index:4;pointer-events:none;background:transparent;transition:background .4s ease}
+
+  /* TOOLS-5 — whole-shell NIGHT palette: a class on <html> swaps every colour var to black + low-saturation
+     red/amber (zero white/blue), so all chrome that uses the vars (toolbar, rail, drawers, instruments,
+     labels) goes dark together. Transient inline-coloured popups (e.g. the AIS card) are a known follow-up. */
+  /* DUSK — warm amber: the gentler evening step (brighter than night). */
+  :root.theme-dusk{
+    --glass:rgba(8,3,1,.84);--glass2:rgba(22,9,4,.72);
+    --line:rgba(224,112,58,.16);--line2:rgba(224,112,58,.07);
+    --ctext:#e0883c;--cdim:#c47433;--cdim2:#a05a29;
+    --accent:#e0703a;--mag:#b04a78;--ok:#c47433;--danger:#ff5a52;--warn:#e0883c;
+  }
+  /* NIGHT — low-saturation RED on black (IHO S-52 night palette / the marine night-vision convention):
+     red preserves dark adaptation and least disturbs sleep. */
+  :root.theme-night{
+    --glass:rgba(10,2,1,.9);--glass2:rgba(26,6,4,.76);
+    --line:rgba(226,74,58,.2);--line2:rgba(226,74,58,.09);
+    --ctext:#e2503c;--cdim:#d04835;--cdim2:#aa3a2a;
+    --accent:#ff5e46;--mag:#c2506a;--ok:#d04835;--danger:#ff5a52;--warn:#e08a4a;
+  }
+  :root.theme-dusk body{background:#0a0604}
+  :root.theme-night, :root.theme-night body{background:#000}
+
+  /* ── TOOLS-5b — night-vision COMPLETENESS: pull EVERY bit of chrome (all text + all icons) into the
+     red (night) / amber (dusk) ramp. The var-swap alone left labels/rail too dark to read as red, the
+     MapLibre control icons blue-grey (a hardcoded filter), and ~30 hardcoded hexes + inline panel
+     colours untouched. The chart is a WebGL canvas, so this DOM sweep can't reach chart/AIS/weather/
+     tack colours — only chrome. `!important` here also overrides inline `style="color:…"` set in JS
+     panels. Two tiers keep depth (floor --cdim, values/titles --ctext); bright-fill pills + active
+     rail/segment accents are restored after so dark-on-colour text and the selected state survive. */
+  :root.theme-dusk body *, :root.theme-night body *{ color:var(--cdim) !important; }
+  :root.theme-dusk body :is(.it .v,.v,.v2,.ttl,.nm,h1,h2,h3,strong,b),
+  :root.theme-night body :is(.it .v,.v,.v2,.ttl,.nm,h1,h2,h3,strong,b){ color:var(--ctext) !important; }
+  :root.theme-dusk body .ri.on, :root.theme-night body .ri.on,
+  :root.theme-dusk body .ri:hover, :root.theme-night body .ri:hover{ color:var(--accent) !important; }
+  /* hardcoded SVG strokes follow the text colour (currentColor icons already do) */
+  :root.theme-dusk svg [stroke]:not([stroke="none"]), :root.theme-night svg [stroke]:not([stroke="none"]){ stroke:currentColor !important; }
+  /* MapLibre + custom map-control icons: swap the blue-grey filter for a red / amber tint */
+  :root.theme-dusk .maplibregl-ctrl-group button .maplibregl-ctrl-icon{ filter:brightness(0) saturate(100%) invert(64%) sepia(48%) saturate(900%) hue-rotate(346deg) brightness(95%) contrast(89%) !important; }
+  :root.theme-night .maplibregl-ctrl-group button .maplibregl-ctrl-icon{ filter:brightness(0) saturate(100%) invert(39%) sepia(85%) saturate(1700%) hue-rotate(335deg) brightness(95%) contrast(90%) !important; }
+  /* keep dark text legible on the (now red/amber) bright-fill pills */
+  :root.theme-dusk body :is(.seg span.on,.conn-btn.primary,.wx button.on,.nc-head .ic,.cpa-role.give,.cpa-role.stand),
+  :root.theme-night body :is(.seg span.on,.conn-btn.primary,.wx button.on,.nc-head .ic,.cpa-role.give,.cpa-role.stand){ color:#1a0503 !important; }
+  #bril-wrap{display:flex;align-items:center;gap:7px;margin-left:8px;padding:0 4px}
+  #bril-wrap[hidden]{display:none}
+  #bril-wrap .ico{font-size:13px;color:var(--cdim)}
+  #bril-wrap input[type=range]{width:84px}
+
+  /* ---- shared glass ---- */
+  .glass{background:var(--glass);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
+    border:.5px solid var(--line);box-shadow:0 18px 60px -24px rgba(0,0,0,.85)}
+
+  /* ---- top toolbar ---- */
+  .tb{position:absolute;top:12px;left:12px;right:12px;height:44px;z-index:7;border-radius:13px;
+    display:flex;align-items:center;gap:11px;padding:0 14px;box-sizing:border-box}
+  .tb .traffic{display:flex;gap:8px}
+  .tb .traffic span{width:12px;height:12px;border-radius:50%}
+  .tb .wordmark{font-size:14px;font-weight:600;letter-spacing:.02em;color:var(--ctext);margin-left:2px}
+  /* navigation data-source badge — always tells the truth about live vs sim vs lost */
+  .srcbadge{display:flex;align-items:center;gap:6px;font-size:10.5px;font-weight:600;letter-spacing:.03em;
+    padding:4px 9px;border-radius:7px;background:var(--glass2);user-select:none;margin-left:10px}
+  .srcbadge .dot{width:8px;height:8px;border-radius:50%;flex:none}
+  .srcbadge.live{color:var(--ok)} .srcbadge.live .dot{background:var(--ok);box-shadow:0 0 6px var(--ok)}
+  .srcbadge.sim{color:var(--warn)} .srcbadge.sim .dot{background:var(--warn)}
+  .srcbadge.simpos{color:var(--warn)} .srcbadge.simpos .dot{background:var(--warn)}
+  .srcbadge.lost{color:#fff;background:var(--danger);animation:srcpulse 1s infinite} .srcbadge.lost .dot{background:#fff}
+  @keyframes srcpulse{0%,100%{opacity:1}50%{opacity:.5}}
+  .stale{opacity:.38;transition:opacity .3s}
+  .tb .spacer{flex:1}
+  .tb .search{display:flex;align-items:center;gap:8px;background:var(--glass2);border-radius:8px;
+    padding:6px 11px;min-width:160px}
+  .tb .search svg{width:14px;height:14px;color:var(--cdim)}
+  .tb .search .ph{font-size:12px;color:var(--cdim);flex:1}
+  .tb .search .kbd{font-size:10px;color:var(--cdim);border:.5px solid var(--line);border-radius:4px;padding:1px 5px}
+  .seg{display:flex;gap:1px;background:var(--glass2);border-radius:8px;padding:2px}
+  .seg span{font-size:11px;color:var(--cdim);padding:5px 10px;border-radius:6px;cursor:pointer;user-select:none}
+  .seg span.on{background:var(--accent);color:#05121d;font-weight:500}
+
+  /* ---- left icon rail ---- */
+  .rail{position:absolute;left:12px;top:68px;width:48px;z-index:6;border-radius:14px;
+    display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 0}
+  .ri{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+    color:var(--cdim);cursor:pointer;transition:background .12s,color .12s}
+  .ri svg{width:20px;height:20px}
+  .ri:hover{color:var(--ctext)}
+  .ri.on{color:var(--accent);background:var(--glass2)}
+  .rail .sep{width:22px;height:.5px;background:var(--line);margin:3px 0}
+
+  /* ---- drawers (hold the existing controls) ---- */
+  .drawer{position:absolute;left:72px;top:68px;width:230px;z-index:6;border-radius:14px;
+    padding:13px 14px;box-sizing:border-box;color:var(--ctext);max-height:calc(100% - 160px);overflow-y:auto;
+    overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y;transform-origin:left center;
+    transition:opacity .26s ease, transform .42s cubic-bezier(.22,1.1,.36,1)}
+  .drawer::-webkit-scrollbar{width:8px}
+  .drawer::-webkit-scrollbar-thumb{background:rgba(255,255,255,.22);border-radius:999px;border:2px solid transparent;background-clip:padding-box}
+  /* keep it in layout so it can fade/slide instead of popping (display:none can't transition) */
+  .drawer[hidden]{display:block;opacity:0;transform:translateX(-12px) scale(.96);pointer-events:none}
+  .drawer h2{font-size:12px;font-weight:600;margin:0 0 4px;letter-spacing:.02em}
+  .drawer .sub{font-size:10.5px;color:var(--cdim);margin:0 0 10px}
+  .lbl{font-size:10px;color:var(--cdim2);margin:12px 0 6px;letter-spacing:.08em;text-transform:uppercase}
+  .row{display:flex;align-items:center;gap:9px;font-size:12.5px;color:#cdd9e3;padding:3px 0;cursor:pointer}
+  .row input{accent-color:var(--accent);width:14px;height:14px}
+  /* ---- Connections settings panel ---- */
+  .conn-list{display:flex;flex-direction:column;gap:6px;margin:6px 0}
+  .conn-row{display:flex;align-items:center;gap:9px;padding:7px 9px;border:.5px solid var(--line);border-radius:10px;background:rgba(255,255,255,.03)}
+  .conn-dot{width:9px;height:9px;border-radius:50%;flex:0 0 auto;box-shadow:0 0 7px currentColor}
+  .conn-main{flex:1;min-width:0}
+  .conn-name{font-size:12.5px;color:var(--ctext);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .conn-meta{font-size:10.5px;color:var(--cdim);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .conn-icon{flex:0 0 auto;width:25px;height:25px;border:none;border-radius:7px;background:rgba(255,255,255,.06);color:var(--cdim);cursor:pointer;font-size:12px;line-height:1}
+  .conn-icon:hover{background:rgba(255,255,255,.14);color:var(--ctext)}
+  .conn-btn{margin-top:8px;padding:7px 12px;border:.5px solid var(--line);border-radius:9px;background:rgba(255,255,255,.05);color:var(--ctext);cursor:pointer;font:inherit;font-size:12px}
+  .conn-btn:hover{background:rgba(255,255,255,.12)}
+  .conn-btn.primary{background:var(--accent);color:#06121d;border-color:transparent;font-weight:600}
+  .conn-form{margin-top:10px;padding:11px;border:.5px solid var(--line);border-radius:11px;background:rgba(255,255,255,.03);display:flex;flex-direction:column;gap:9px}
+  .conn-form-title{font-size:11px;color:var(--cdim);text-transform:uppercase;letter-spacing:.08em}
+  .conn-fld{display:flex;flex-direction:column;gap:4px;font-size:10.5px;color:var(--cdim)}
+  .conn-fld input,.conn-fld select{padding:7px 9px;border:.5px solid var(--line);border-radius:8px;background:rgba(0,0,0,.25);color:var(--ctext);font:inherit;font-size:12.5px;outline:none}
+  .conn-fld input:focus,.conn-fld select:focus{border-color:var(--accent)}
+  .conn-chk{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ctext);cursor:pointer}
+  .conn-chk input{accent-color:var(--accent);width:15px;height:15px}
+  .conn-actions{display:flex;gap:8px}
+  .conn-actions .conn-btn{margin-top:2px;flex:1;text-align:center}
+  .conn-msg{font-size:11.5px;margin-top:8px;min-height:14px}
+
+  /* weather switcher */
+  .wx{display:flex;flex-wrap:wrap;gap:6px}
+  .wx button{font-size:11px;color:#cdd9e3;background:rgba(255,255,255,.05);border:.5px solid var(--line);
+    border-radius:8px;padding:5px 9px;cursor:pointer;transition:background .12s,color .12s}
+  .wx button:hover{background:rgba(255,255,255,.1)}
+  .wx button.on{background:var(--accent);color:#05121d;border-color:var(--accent);font-weight:500}
+
+  /* legend */
+  .legend{margin-top:12px}
+  .legend .bar{height:9px;border-radius:5px;border:.5px solid rgba(255,255,255,.18)}
+  .legend .sc{display:flex;justify-content:space-between;font-size:10px;color:var(--cdim);margin-top:4px}
+
+  /* time scrubber */
+  #time{margin-top:12px}
+  #time .scrub{display:flex;align-items:center;gap:8px}
+  #play{font-size:12px;color:#cdd9e3;background:rgba(255,255,255,.06);border:.5px solid var(--line);
+    border-radius:8px;padding:4px 11px;cursor:pointer}
+  #tslider{flex:1;accent-color:var(--accent)}
+  #wxopacity{--wx-fill:28%;-webkit-appearance:none;appearance:none;height:18px;background:transparent}
+  #wxopacity::-webkit-slider-runnable-track{height:5px;border-radius:999px;border:.5px solid rgba(255,255,255,.24);
+    background:linear-gradient(90deg,var(--accent) 0 var(--wx-fill),rgba(255,255,255,.16) var(--wx-fill) 100%)}
+  #wxopacity::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;margin-top:-7px;
+    border-radius:50%;border:0;background:var(--accent);box-shadow:0 1px 4px rgba(0,0,0,.45);cursor:pointer}
+  #wxopacity::-moz-range-track{height:5px;border-radius:999px;border:.5px solid rgba(255,255,255,.24);background:rgba(255,255,255,.16)}
+  #wxopacity::-moz-range-progress{height:5px;border-radius:999px;background:var(--accent)}
+  #wxopacity::-moz-range-thumb{width:18px;height:18px;border-radius:50%;border:0;background:var(--accent);cursor:pointer}
+  #tlabel{font-size:10px;color:var(--cdim);text-align:center;margin-top:4px}
+
+  .hint{font-size:11px;color:var(--cdim);margin-top:14px;line-height:1.45;
+    padding-top:12px;border-top:.5px solid var(--line)}
+
+  /* ---- Overlays panel: refined two-line rows + iOS-style switches ---- */
+  #drawer-lab{width:248px}
+  #drawer-lab h2{font-size:15px;font-weight:600;letter-spacing:-.012em;margin:0 0 1px}
+  #drawer-lab .sub{margin-bottom:4px}
+  .lsec{font-size:9.5px;color:var(--cdim2);letter-spacing:.11em;text-transform:uppercase;
+    font-weight:600;margin:15px 0 3px}
+  .lrow{display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:8px;margin:0 -8px;border-radius:11px;cursor:pointer;transition:background .15s ease}
+  .lrow:hover{background:rgba(255,255,255,.05)}
+  .lrow:active{background:rgba(255,255,255,.08)}
+  .ltx{display:flex;flex-direction:column;gap:1px;min-width:0}
+  .ltx b{font-size:13px;font-weight:560;color:var(--ctext);letter-spacing:-.006em;line-height:1.25}
+  .ltx i{font-size:10.5px;font-style:normal;color:var(--cdim2);line-height:1.3}
+  .sw{position:relative;flex:0 0 auto;width:38px;height:23px}
+  .sw input{position:absolute;inset:0;opacity:0;margin:0;width:100%;height:100%;cursor:pointer;z-index:2}
+  .swt{position:absolute;inset:0;border-radius:99px;background:rgba(255,255,255,.14);
+    transition:background .22s ease;box-shadow:inset 0 0 0 .5px rgba(255,255,255,.07)}
+  .swt::after{content:"";position:absolute;top:2.5px;left:2.5px;width:18px;height:18px;border-radius:50%;
+    background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.5);
+    transition:transform .24s cubic-bezier(.32,1.25,.5,1)}
+  .sw input:checked + .swt{background:var(--accent);
+    box-shadow:inset 0 0 0 .5px rgba(255,255,255,.1),0 0 16px -3px var(--accent)}
+  .sw input:checked + .swt::after{transform:translateX(15px)}
+  .ltools{display:flex;gap:7px;margin-top:11px}
+  .ltools button{flex:1;font-size:11.5px;color:#cdd9e3;background:rgba(255,255,255,.05);
+    border:.5px solid var(--line);border-radius:9px;padding:9px 8px;cursor:pointer;
+    transition:background .14s,color .14s}
+  .ltools button:hover{background:rgba(255,255,255,.1);color:#fff}
+
+  /* ---- entrance motion ---- */
+  @keyframes rise{from{opacity:0;transform:translateY(10px) scale(.99)}to{opacity:1;transform:none}}
+  @keyframes settle{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  .insp,.ib{animation:rise .55s cubic-bezier(.22,1,.36,1) both}
+  .ib{animation-name:settle;animation-delay:.06s}
+  @media (prefers-reduced-motion:reduce){
+    .insp,.ib{animation:none}
+    .drawer{transition:opacity .15s ease}
+  }
+
+  /* ---- right route inspector ---- */
+  .insp{position:absolute;right:12px;top:68px;width:204px;z-index:6;border-radius:14px;padding:12px}
+  .insp .ttl{display:flex;align-items:center;gap:7px;margin-bottom:9px;cursor:move;user-select:none}
+  .insp .ttl svg{width:15px;height:15px;color:var(--mag)}
+  .insp .ttl span{font-size:13px;font-weight:600;color:var(--ctext);letter-spacing:-.01em}
+  .insp .eta{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:11px}
+  .insp .eta .l{font-size:9px;color:var(--cdim2);letter-spacing:.09em;text-transform:uppercase;font-weight:600}
+  .insp .eta .v{font-size:13px;color:var(--ctext);font-variant-numeric:tabular-nums;font-weight:500}
+  .insp .kpis{display:grid;grid-template-columns:1fr 1fr;gap:11px 14px;margin-bottom:10px}
+  .insp .kpis .k .l{font-size:9px;color:var(--cdim2);letter-spacing:.08em;text-transform:uppercase;font-weight:600}
+  .insp .kpis .k .v{font-size:16px;color:var(--ctext);font-variant-numeric:tabular-nums;font-weight:500;letter-spacing:-.012em;margin-top:1px}
+  .insp hr{border:0;height:.5px;background:var(--line);margin:8px 0}
+  .leg{display:flex;align-items:center;gap:8px;padding:5px 0}
+  .lgd{width:7px;height:7px;border-radius:50%;flex:none}
+  .leg .nm{font-size:11.5px;flex:1}
+  .leg .br{font-size:11px;color:var(--cdim);font-variant-numeric:tabular-nums}
+  .windbar{display:flex;align-items:center;gap:7px}
+  .windbar .l{font-size:10.5px;color:var(--cdim)}
+  .windbar .b{flex:1;height:5px;border-radius:3px;background:linear-gradient(90deg,var(--windlo),var(--windhi))}
+  .windbar .v{font-size:10.5px;color:var(--ctext)}
+
+  /* ---- bottom instrument bar ---- */
+  .ib{position:absolute;left:12px;right:12px;bottom:12px;height:calc(60px * var(--ui-scale, 1));z-index:6;border-radius:16px;
+    display:flex;align-items:center;box-sizing:border-box;overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
+  .ib::-webkit-scrollbar{display:none}
+  .it{flex:1;padding:0 16px;position:relative}
+  .it:not(:first-child)::before{content:"";position:absolute;left:0;top:16px;bottom:16px;width:.5px;background:var(--line)}
+  .it .l{font-size:calc(9px * var(--ui-scale, 1));font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--cdim2)}
+  .it .v{font-size:calc(23px * var(--ui-scale, 1));font-weight:500;color:var(--ctext);font-variant-numeric:tabular-nums;
+    line-height:1.12;letter-spacing:-.018em;margin-top:2px}
+  .it .u{font-size:calc(11px * var(--ui-scale, 1));color:var(--cdim);font-weight:400;letter-spacing:0}
+  .it.wide{flex:1.85;display:flex;align-items:center;justify-content:space-between}
+  .it.wide .v2{font-size:calc(13px * var(--ui-scale, 1));font-weight:500;color:var(--ctext);font-variant-numeric:tabular-nums;
+    white-space:nowrap;letter-spacing:-.01em;margin-top:2px}
+  .it.wide .r{text-align:right}
+
+  /* ---- spacetime "narrate a point" slice card ---- */
+  .narrate{position:absolute;left:50%;transform:translateX(-50%);bottom:80px;width:420px;max-width:calc(100% - 24px);
+    z-index:8;border-radius:14px;padding:13px 15px;box-sizing:border-box}
+  .narrate[hidden]{display:none}
+  .nc-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+  .nc-head .ic{width:22px;height:22px;border-radius:7px;background:#b69cff;color:#1a1030;display:flex;align-items:center;justify-content:center;font-size:13px}
+  .nc-head .ttl{font-size:12.5px;font-weight:600;color:var(--ctext)}
+  .nc-head .pos{font-size:10.5px;color:var(--cdim);font-variant-numeric:tabular-nums}
+  .nc-head .prov{margin-left:auto;font-size:8.5px;font-weight:700;letter-spacing:.05em;color:#b69cff;border:.5px solid #b69cff;border-radius:5px;padding:1px 5px}
+  .nc-head .x{color:var(--cdim2);cursor:pointer;font-size:16px;line-height:1;padding:0 2px}
+  .nc-text{font-size:12.5px;color:#dde6ee;line-height:1.5}
+  .nc-layers{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+  .nc-chip{font-size:10px;border-radius:7px;padding:3px 8px;display:flex;align-items:center;gap:5px;background:var(--glass2);color:#cdd9e3}
+  .nc-chip .t{font-size:8px;font-weight:700;letter-spacing:.03em;padding:0 4px;border-radius:4px}
+  .t-open{color:var(--ok);background:rgba(70,224,160,.14)} .t-owned{color:#b69cff;background:rgba(182,156,255,.14)}
+  .t-rag{color:var(--accent);background:rgba(91,192,255,.14)} .t-locked{color:var(--cdim2);background:rgba(255,255,255,.06)}
+  .t-sim{color:var(--warn);background:rgba(255,192,106,.14)}
+  .nc-foot{font-size:9.5px;color:var(--cdim2);margin-top:9px;line-height:1.45}
+  .narrate-arm{outline:2px dashed var(--accent);outline-offset:-2px}
+
+  /* ---- route-weather ribbon (passage probe along P(t)) ---- */
+  .ribbon{position:absolute;left:12px;right:12px;bottom:76px;z-index:7;border-radius:14px;padding:10px 13px;box-sizing:border-box}
+  .ribbon[hidden]{display:none}
+  .rb-head{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+  .rb-head .ttl{font-size:12px;font-weight:600;color:var(--ctext)}
+  .rb-head .prov{font-size:8.5px;font-weight:700;letter-spacing:.05em;color:#b69cff;border:.5px solid #b69cff;border-radius:5px;padding:1px 5px}
+  .rb-head .x{margin-left:auto;color:var(--cdim2);cursor:pointer;font-size:15px;line-height:1}
+  .rb-text{font-size:11px;color:#dde6ee;line-height:1.45;max-height:46px;overflow:auto;margin-bottom:8px}
+  .rb-legs{display:flex;gap:6px;overflow-x:auto}
+  .rb-leg{flex:1;min-width:60px;text-align:center;background:var(--glass2);border-radius:9px;padding:7px 4px 6px}
+  .rb-leg .t{font-size:9px;color:var(--cdim);white-space:nowrap}
+  .rb-leg .wv{font-size:13px;font-weight:600;color:var(--ctext);font-variant-numeric:tabular-nums;margin-top:3px}
+  .rb-leg .wv .ar{display:inline-block;color:var(--accent);font-size:11px}
+  .rb-leg .se{font-size:9.5px;color:var(--cdim);margin-top:1px}
+  .rb-leg .bar{height:5px;border-radius:3px;margin-top:6px}
+
+  /* ---- restyle MapLibre native controls into glass (zoom + compass, bottom-right) ---- */
+  .maplibregl-ctrl-bottom-right{bottom:80px;right:12px}
+  .maplibregl-ctrl-bottom-right .maplibregl-ctrl-group{
+    background:var(--glass);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
+    border:.5px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:0 18px 60px -24px rgba(0,0,0,.85)}
+  .maplibregl-ctrl-group button{width:38px;height:38px;background:transparent}
+  .maplibregl-ctrl-group button+button{border-top:.5px solid var(--line)}
+  .maplibregl-ctrl-group button .maplibregl-ctrl-icon{filter:invert(92%) sepia(8%) saturate(300%) hue-rotate(170deg)}
+  .maplibregl-ctrl-bottom-left{bottom:80px;left:74px}
+  .maplibregl-ctrl-scale{background:var(--glass2);border:.5px solid var(--line);
+    color:var(--cdim);border-radius:6px;padding:1px 6px;backdrop-filter:blur(10px)}
+  .maplibregl-popup-content{background:var(--glass);backdrop-filter:blur(22px);
+    -webkit-backdrop-filter:blur(22px);border:.5px solid var(--line);border-radius:10px;color:var(--ctext);
+    box-shadow:0 18px 60px -24px rgba(0,0,0,.85)}
+  .maplibregl-popup-anchor-top .maplibregl-popup-tip,
+  .maplibregl-popup-anchor-bottom .maplibregl-popup-tip,
+  .maplibregl-popup-anchor-left .maplibregl-popup-tip,
+  .maplibregl-popup-anchor-right .maplibregl-popup-tip{border-color:transparent;display:none}
+  .maplibregl-popup-close-button{color:var(--cdim)}
+
+  /* ===================== responsive + touch + safe-area (iPhone / iPad) ===================== */
+  /* safe-area insets (notch / home indicator) — these resolve to 0 on devices without them,
+     so desktop layout is unchanged. */
+  .tb{ top:calc(12px + env(safe-area-inset-top)); left:calc(12px + env(safe-area-inset-left)); right:calc(12px + env(safe-area-inset-right)); }
+  .rail{ top:calc(68px + env(safe-area-inset-top)); left:calc(12px + env(safe-area-inset-left)); }
+  .drawer{ top:calc(68px + env(safe-area-inset-top)); left:calc(72px + env(safe-area-inset-left)); }
+  .insp{ top:calc(68px + env(safe-area-inset-top)); right:calc(12px + env(safe-area-inset-right)); }
+  .ib{ bottom:calc(12px + env(safe-area-inset-bottom)); left:calc(12px + env(safe-area-inset-left)); right:calc(12px + env(safe-area-inset-right)); }
+  .maplibregl-ctrl-bottom-right{ bottom:calc(80px + env(safe-area-inset-bottom)); right:calc(12px + env(safe-area-inset-right)); }
+  .maplibregl-ctrl-bottom-left{ bottom:calc(80px + env(safe-area-inset-bottom)); left:calc(74px + env(safe-area-inset-left)); }
+
+  /* bigger hit targets on touch devices (≥44px, Apple HIG) */
+  @media (pointer:coarse){
+    .ri{ width:44px; height:44px; }
+    .seg span{ padding:8px 13px; }
+    .wx button{ padding:8px 12px; }
+    .row{ padding:7px 0; } .row input{ width:18px; height:18px; }
+    .maplibregl-ctrl-group button{ width:44px; height:44px; }
+    *{ -webkit-tap-highlight-color:transparent; }
+  }
+
+  /* phones — collapse chrome; make the instrument bar a swipeable strip */
+  @media (max-width:560px){
+    .tb{ gap:8px; padding:0 10px; }
+    .tb .wordmark, .tb .search{ display:none; }      /* identity carried by the source badge */
+    .seg span{ padding:6px 10px; }
+    .rail{ max-height:calc(100% - 150px); overflow-y:auto; }
+    .drawer{ left:calc(64px + env(safe-area-inset-left)); right:calc(10px + env(safe-area-inset-right)); width:auto; max-height:44vh; }
+    .insp{ width:min(54vw,204px); padding:10px; }
+    .insp .kpis .k .v{ font-size:14px; }
+    .ib{ height:calc(54px * var(--ui-scale, 1)); overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+    .ib::-webkit-scrollbar{ display:none; }
+    .it{ flex:0 0 auto; min-width:86px; }
+    .it.wide{ flex:0 0 auto; min-width:158px; }
+    .it .v{ font-size:19px; }
+  }
+
+  /* ---- measure / ruler HUD (Apple-style glass card) ---- */
+  .measure-hud{position:absolute;top:62px;left:50%;transform:translateX(-50%);z-index:8;
+    border-radius:12px;padding:7px 8px 7px 13px;display:flex;align-items:center;gap:12px;
+    color:var(--ctext);min-width:148px}
+  .measure-hud[hidden]{display:none}
+  .measure-hud .mt{font-size:18px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.05}
+  .measure-hud .ms{font-size:10.5px;color:var(--cdim);margin-top:2px;font-variant-numeric:tabular-nums}
+  .measure-hud .mx{margin-left:auto;cursor:pointer;color:var(--cdim);font-size:13px;width:22px;height:22px;
+    border-radius:6px;display:flex;align-items:center;justify-content:center;flex:none}
+  .measure-hud .mx:hover{background:var(--glass2);color:var(--ctext)}
+
+  /* ---- CPA collision alarm (red glass card, top-center) ---- */
+  .cpa-alarm{position:absolute;top:60px;left:50%;transform:translateX(-50%);z-index:9;max-width:440px;
+    border-radius:13px;padding:11px 12px;display:flex;gap:11px;align-items:flex-start;
+    border:.5px solid rgba(255,90,82,.55);box-shadow:0 18px 60px -20px rgba(0,0,0,.85),0 0 0 1px rgba(255,90,82,.25);
+    animation:cpapulse 1.1s infinite}
+  @keyframes cpapulse{0%,100%{box-shadow:0 18px 60px -20px rgba(0,0,0,.85),0 0 0 1px rgba(255,90,82,.25)}
+    50%{box-shadow:0 18px 60px -20px rgba(0,0,0,.85),0 0 0 2px rgba(255,90,82,.6)}}
+  .cpa-alarm[hidden]{display:none}
+  .cpa-ic{color:var(--danger);font-size:20px;line-height:1.1;flex:none}
+  .cpa-body{flex:1;min-width:0}
+  .cpa-top{display:flex;align-items:center;gap:8px;margin-bottom:3px}
+  .cpa-ttl{font-size:12.5px;font-weight:600;color:#fff}
+  .cpa-role{font-size:9.5px;font-weight:700;letter-spacing:.04em;padding:2px 6px;border-radius:5px;flex:none}
+  .cpa-role.give{background:var(--danger);color:#1a0606}
+  .cpa-role.stand{background:var(--warn);color:#1f1402}
+  .cpa-role.mon{background:var(--glass2);color:var(--cdim)}
+  .cpa-tgt{font-size:11px;color:var(--cdim);font-variant-numeric:tabular-nums;margin-bottom:4px}
+  .cpa-act{font-size:12px;color:#ffd9d6;line-height:1.35}
+  .cpa-rule{font-size:9.5px;color:var(--cdim);border:.5px solid var(--line);border-radius:4px;padding:0 4px;margin-left:3px;white-space:nowrap}
+  .cpa-more{font-size:10.5px;color:var(--warn);margin-top:4px}
+  .cpa-disc{font-size:9.5px;color:var(--cdim2);margin-top:6px;line-height:1.3;border-top:.5px solid var(--line2);padding-top:5px}
+  .cpa-btns{display:flex;flex-direction:column;gap:5px;flex:none}
+  .cpa-btn{cursor:pointer;width:24px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;
+    background:var(--glass2);font-size:12px;color:var(--cdim)}
+  .cpa-btn:hover{color:var(--ctext)}
+
+  /* ---- global "degraded" / error surface (app health — distinct from the top nav alarms) ---- */
+  .degraded-banner{position:absolute;bottom:calc(94px + env(safe-area-inset-bottom));left:50%;
+    transform:translateX(-50%);z-index:9;max-width:440px;width:calc(100% - 32px);box-sizing:border-box;
+    border-radius:13px;padding:10px 12px;display:flex;gap:11px;align-items:flex-start;
+    border:.5px solid rgba(255,192,106,.5)}
+  .degraded-banner[hidden]{display:none}
+  .dg-ic{color:var(--warn);font-size:18px;line-height:1.1;flex:none}
+  .dg-body{flex:1;min-width:0}
+  .dg-ttl{font-size:12.5px;font-weight:600;color:var(--ctext);margin-bottom:2px}
+  .dg-msg{font-size:11px;color:var(--cdim);line-height:1.4;word-break:break-word}
+  .dg-x{color:var(--cdim2);cursor:pointer;font-size:16px;line-height:1;flex:none;padding:0 2px}
+  .dg-x:hover{color:var(--ctext)}
+
+  /* ---- ⌘K command palette (SHELL-3) ---- */
+  #cmdk{position:fixed;inset:0;z-index:30}
+  #cmdk[hidden]{display:none}
+  .cmdk-backdrop{position:absolute;inset:0;background:rgba(3,6,10,.5);backdrop-filter:blur(2px)}
+  .cmdk-box{position:absolute;left:50%;top:18%;transform:translateX(-50%);width:min(560px,calc(100% - 32px));
+    border-radius:14px;padding:8px;box-sizing:border-box;overflow:hidden}
+  #cmdk-input{width:100%;box-sizing:border-box;background:var(--glass2);border:.5px solid var(--line);
+    border-radius:10px;padding:11px 13px;color:var(--ctext);font:15px -apple-system,sans-serif;outline:none}
+  #cmdk-input:focus{border-color:var(--accent)}
+  .cmdk-list{margin-top:7px;max-height:46vh;overflow-y:auto}
+  .cmdk-item{display:flex;align-items:baseline;gap:9px;padding:9px 11px;border-radius:9px;cursor:pointer}
+  .cmdk-item.on,.cmdk-item:hover{background:var(--glass2)}
+  .cmdk-item .cmdk-t{font-size:13px;color:var(--ctext);font-weight:500}
+  .cmdk-item .cmdk-s{font-size:11px;color:var(--cdim)}
+  .cmdk-item .cmdk-g{margin-left:auto;font-size:9.5px;color:var(--cdim2);letter-spacing:.04em;
+    border:.5px solid var(--line);border-radius:5px;padding:1px 6px;white-space:nowrap}
+  .cmdk-empty{padding:14px 11px;font-size:12.5px;color:var(--cdim)}
+  /* EPIC:ROUTE — Routes drawer Saved/Edit tabs (consolidated single Routes panel) */
+  #drawer-routes .rtabs{display:flex;gap:2px;margin:2px 0 10px;border-bottom:.5px solid var(--line)}
+  #drawer-routes .rtab{flex:1;padding:7px 4px 8px;margin-bottom:-.5px;background:none;border:none;
+    border-bottom:2px solid transparent;color:var(--cdim);font:inherit;font-size:12.5px;font-weight:600;
+    letter-spacing:.02em;cursor:pointer}
+  #drawer-routes .rtab:hover{color:var(--ctext)}
+  #drawer-routes .rtab.on{color:var(--ctext);border-bottom-color:var(--accent)}
+  /* EPIC:ROUTE — editable waypoint-name field in the Edit tab's waypoint list */
+  .wp-name{width:100%;min-width:0;background:transparent;border:none;border-bottom:1px dashed transparent;
+    color:var(--ctext);font:inherit;font-size:12.5px;font-weight:600;padding:1px 0}
+  .wp-name:hover{border-bottom-color:var(--line)}
+  .wp-name:focus{outline:none;border-bottom-color:var(--accent)}
+  .wp-name::placeholder{color:var(--cdim);font-weight:500}
+</style>
+</head>
+<body>
+<div id="map"></div>
+
+<!-- Global "degraded" banner (CLIENT-4): shown when a feature/bootstrap/map error is surfaced. -->
+<div id="degraded-banner" class="degraded-banner glass" hidden role="alert" aria-live="assertive">
+  <div class="dg-ic">⚠</div>
+  <div class="dg-body"><div class="dg-ttl" id="dg-ttl">Something went wrong</div><div class="dg-msg" id="dg-msg"></div></div>
+  <div class="dg-x" id="dg-x" title="Dismiss" aria-label="Dismiss">×</div>
+</div>
+
+<!-- ========================= TOP TOOLBAR ========================= -->
+<div class="tb glass">
+  <div class="traffic"><span style="background:#ff5f57"></span><span style="background:#febc2e"></span><span style="background:#28c840"></span></div>
+  <span class="wordmark">Helm</span>
+  <span class="srcbadge sim" id="data-src" title="Navigation data source"><span class="dot"></span><span id="data-src-txt">SIM</span></span>
+  <div class="spacer"></div>
+  <div class="search">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+    <span class="ph">Search…</span><span class="kbd">⌘K</span>
+  </div>
+  <div class="seg" id="theme-seg">
+    <span class="on" data-theme="day">Day</span><span data-theme="dusk">Dusk</span><span data-theme="night">Night</span>
+  </div>
+  <div id="bril-wrap" hidden title="Night brilliance — dim the chart toward black for night vision">
+    <span class="ico" aria-hidden="true">◐</span>
+    <input id="bril" type="range" min="0" max="100" value="45" aria-label="Night brilliance">
+  </div>
+</div>
+
+<!-- ========================= LEFT ICON RAIL ========================= -->
+<div class="rail glass">
+  <div class="ri on" data-rail="chart" title="Chart">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21 3 6"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>
+  </div>
+  <div class="ri" data-rail="layers" title="Layers">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"><polygon points="12 2 22 8.5 12 15 2 8.5 12 2"/><polyline points="2 15.5 12 22 22 15.5"/></svg>
+  </div>
+  <div class="ri" data-rail="weather" title="Weather">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"><path d="M17.5 18a4.5 4.5 0 0 0 0-9 6 6 0 0 0-11.6 1.5A4 4 0 0 0 6 18z"/></svg>
+  </div>
+  <div class="ri" data-rail="routes" title="Routes">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="2.5"/><circle cx="18" cy="5" r="2.5"/><path d="M8 17 C 14 13 10 7 16 6"/></svg>
+  </div>
+  <!-- AIS-10: the AIS rail icon is now the consolidated hub's registered boat button (web/ais-hub.js) -->
+  <div class="ri" data-rail="places" title="Places">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.3-7-11a7 7 0 0 1 14 0c0 4.7-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+  </div>
+  <div class="ri" data-rail="community" title="Community &amp; where to go">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M3.5 20c0-3 2.7-5 5.5-5s5.5 2 5.5 5"/><path d="M16 5.2a3 3 0 0 1 0 5.6"/><path d="M18.5 20c0-2-.9-3.6-2.3-4.5"/></svg>
+  </div>
+  <div class="sep"></div>
+  <div class="ri" data-rail="measure" title="Measure — range &amp; bearing">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"/><path d="m14.5 12.5 2-2"/><path d="m11.5 9.5 2-2"/><path d="m8.5 6.5 2-2"/><path d="m17.5 15.5 2-2"/></svg>
+  </div>
+  <div class="ri" data-rail="download" title="Download charts">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><polyline points="7 11 12 16 17 11"/><path d="M5 20h14"/></svg>
+  </div>
+  <div class="ri" data-rail="lab" title="Lab — awesome-maplibre">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6"/><path d="M10 3v6.5L5 18a2 2 0 0 0 1.8 3h10.4A2 2 0 0 0 19 18l-5-8.5V3"/><line x1="8" y1="14" x2="16" y2="14"/></svg>
+  </div>
+  <div class="ri" data-rail="settings" title="Settings">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 13a7.6 7.6 0 0 0 0-2l2-1.5-2-3.4-2.4 1a7.6 7.6 0 0 0-1.7-1l-.4-2.6h-3.8l-.4 2.6a7.6 7.6 0 0 0-1.7 1l-2.4-1-2 3.4 2 1.5a7.6 7.6 0 0 0 0 2l-2 1.5 2 3.4 2.4-1a7.6 7.6 0 0 0 1.7 1l.4 2.6h3.8l.4-2.6a7.6 7.6 0 0 0 1.7-1l2.4 1 2-3.4z"/></svg>
+  </div>
+</div>
+
+<!-- ========================= LAYERS DRAWER (chart toggles) ========================= -->
+<div class="drawer glass" id="drawer-layers" hidden>
+  <h2>Layers</h2>
+  <p class="sub">Chart &amp; data overlays</p>
+  <div class="lbl">Basemap</div>
+  <label class="row"><input type="radio" name="basemap" data-base="navionics" checked> Navionics chart<span style="margin-left:auto;font-size:9.5px;color:#f5c451">yours</span></label>
+  <label class="row"><input type="radio" name="basemap" data-base="googlesat"> Google satellite<span style="margin-left:auto;font-size:9.5px;color:#f5c451">yours</span></label>
+  <label class="row"><input type="radio" name="basemap" data-base="bingsat"> Bing satellite<span style="margin-left:auto;font-size:9.5px;color:#f5c451">yours</span></label>
+  <label class="row"><input type="radio" name="basemap" data-base="arcgis"> ArcGIS satellite<span style="margin-left:auto;font-size:9.5px;color:#f5c451">yours</span></label>
+  <label class="row"><input type="checkbox" data-layer="enc-chart" checked> S-52 ENC<span style="margin-left:auto;font-size:9.5px;color:var(--accent)">engine</span></label>
+  <label class="row"><input type="checkbox" data-layer="helm-chart-online-fill"> Online fill<span style="margin-left:auto;font-size:9.5px;color:var(--accent)">internet</span></label>
+  <div class="lbl">Depth on satellite</div>
+  <label class="row"><input type="checkbox" data-layer="depare-fill" checked> Depth shading</label>
+  <label class="row"><input type="checkbox" data-layer="depcnt-line" checked> Depth contours <span style="margin-left:auto;font-size:9.5px;color:var(--cdim2)">ENC</span></label>
+  <label class="row"><input type="checkbox" data-contours> Depth contours <span style="margin-left:auto;font-size:9.5px;color:var(--cdim2)">DEM · smooth</span></label>
+  <label class="row"><input type="checkbox" data-layer="soundg-text" checked> Soundings <span style="margin-left:auto;font-size:9.5px;color:var(--cdim2)">shallow = warm</span></label>
+  <div class="lbl">Overlays</div>
+  <label class="row"><input type="checkbox" data-layer="route-line" checked> Route</label>
+  <label class="row"><input type="checkbox" data-layer="places" checked> Places</label>
+  <label class="row"><input type="checkbox" data-layer="saved" checked> Saved places<span style="margin-left:auto;font-size:9.5px;color:#f5c451">owned</span></label>
+  <label class="row"><input type="checkbox" data-layer="whereto" checked> Where to go<span style="margin-left:auto;font-size:9.5px;color:#f5c451">AI</span></label>
+  <label class="row"><input type="checkbox" data-layer="ais" checked> AIS</label>
+</div>
+
+<!-- ========================= WEATHER DRAWER (wx switcher + particles + legend + scrubber) ========================= -->
+<div class="drawer glass" id="drawer-weather" hidden>
+  <h2>Weather</h2>
+  <p class="sub">Live models via Open-Meteo</p>
+  <div class="wx" id="wx">
+    <button data-wx="wind" title="10 m wind speed &amp; direction">Wind</button>
+    <button data-wx="gust" title="Wind gusts (peak)">Gust</button>
+    <button data-wx="rain" title="Precipitation / rain rate">Rain</button>
+    <button data-wx="radar" title="Live rain radar nowcast (RainViewer)">Radar</button>
+    <button data-wx="temp" title="Air temperature (2 m)">Temp</button>
+    <button data-wx="sst" title="Sea-surface temperature">SST</button>
+    <button data-wx="clouds" title="Cloud cover">Cloud</button>
+    <button data-wx="waves" title="Significant wave height">Waves</button>
+    <button data-wx="swell" title="Swell height">Swell</button>
+    <button data-wx="pressure" title="Mean sea-level pressure (isobars)">Pressure</button>
+    <button data-wx="cape" title="CAPE — atmospheric instability / thunderstorm potential">CAPE</button>
+    <button data-wx="current" title="Ocean surface current">Current</button>
+    <button data-wx="off" title="Turn off all weather layers">Off</button>
+  </div>
+  <label class="row" style="margin-top:10px"><input type="checkbox" id="particles" checked> Animated particles</label>
+  <div class="row" style="margin-top:2px"><span style="font-size:11px;color:var(--cdim);min-width:74px">Transparency</span><input type="range" id="wxopacity" min="0" max="100" value="28" step="1" style="flex:1;accent-color:var(--accent)"></div>
+  <div class="legend" id="legend" style="display:none">
+    <div class="bar" id="legbar"></div>
+    <div class="sc"><span id="legmin"></span><span id="leglabel"></span><span id="legmax"></span></div>
+  </div>
+  <div id="time" style="display:none">
+    <div class="scrub">
+      <button id="play" title="Play / pause the forecast animation">&#9658;</button>
+      <input type="range" id="tslider" min="0" max="0" value="0" step="1">
+    </div>
+    <div id="tlabel"></div>
+  </div>
+  <div id="wx-notice" style="display:none;margin-top:10px;font-size:11px;color:var(--warn);
+    background:rgba(255,192,106,.1);border:.5px solid var(--warn);border-radius:7px;padding:6px 9px"></div>
+  <div class="hint">Live weather via Open-Meteo (the same models as Windy — see docs/WEATHER-DATA.md).
+    Run the pipeline for depth + offline charts.</div>
+</div>
+
+<!-- ========================= DOWNLOAD DRAWER (OFFLINE-3) ========================= -->
+<div class="drawer glass" id="drawer-download" hidden>
+  <h2>Download charts</h2>
+  <!-- Body built by web/offline.js (OFFLINE-3): source select · lasso bbox · zoom caps ·
+       live tile-count + size estimate · safe pipeline/fetch_tiles.py command handoff. -->
+</div>
+
+<!-- ========================= SETTINGS DRAWER ========================= -->
+<div class="drawer glass" id="drawer-routes" hidden>
+  <!-- EPIC:ROUTE — consolidated Routes panel: Saved (library) + Edit (workspace) tabs.
+       One rail button, two tabs. routes.js owns tab switching; the Edit tab hosts the
+       direct-manipulation editor (route-edit.js) mounted into #route-edit-host. -->
+  <h2>Routes</h2>
+  <div class="rtabs" role="tablist" aria-label="Routes">
+    <button class="rtab on" data-rtab="saved" role="tab" aria-selected="true">Saved</button>
+    <button class="rtab" data-rtab="edit" role="tab" aria-selected="false">Edit</button>
+  </div>
+  <div class="rpane" data-rpane="saved">
+    <p class="sub">Saved routes — tap ▸ to navigate, ✎ to edit, ✕ to delete (stored on the boat)</p>
+    <div id="route-list" class="conn-list"><div class="hint" style="margin:6px 0">Connecting to engine…</div></div>
+    <div id="route-msg" class="conn-msg"></div>
+  </div>
+  <div class="rpane" data-rpane="edit" hidden>
+    <div id="route-edit-host"></div>
+  </div>
+</div>
+
+<div class="drawer glass" id="drawer-settings" hidden>
+  <h2>Settings</h2>
+  <p class="sub">Helm preferences &amp; live-data connections</p>
+
+  <div class="lbl">Connections — live data in</div>
+  <div id="conn-list" class="conn-list"><div class="hint" style="margin:6px 0">Connecting to engine…</div></div>
+  <button id="conn-add-btn" type="button" class="conn-btn" title="Add a boat-data connection (TCP / UDP / serial / SignalK / internet AIS)">+ Add connection</button>
+  <form id="conn-form" class="conn-form" hidden>
+    <div id="conn-form-title" class="conn-form-title">New connection</div>
+    <label class="conn-fld">Name<input id="conn-f-name" autocomplete="off" placeholder="Garmin Vesper Cortex"></label>
+    <label class="conn-fld">Type<select id="conn-f-type"></select></label>
+    <label class="conn-fld">Address (IP or host)<input id="conn-f-addr" autocomplete="off" placeholder="192.168.1.167"></label>
+    <label class="conn-fld">Port<input id="conn-f-port" type="number" min="1" max="65535" placeholder="39150"></label>
+    <label class="conn-chk"><input id="conn-f-en" type="checkbox" checked> Enabled</label>
+    <div class="conn-actions">
+      <button type="submit" class="conn-btn primary" title="Save this connection">Save</button>
+      <button type="button" id="conn-cancel" class="conn-btn" title="Cancel without saving">Cancel</button>
+    </div>
+    <div class="hint" style="margin-top:8px">TCP for a marine WiFi gateway (Vesper Cortex :39150, PredictWind DataHub) — one stream carries GPS + AIS + instruments. SignalK servers: choose the “SignalK — WebSocket” type above. Stored on the engine; survives restart.</div>
+  </form>
+  <div id="conn-msg" class="conn-msg"></div>
+
+  <div class="lbl">Units</div>
+  <div class="row" style="color:var(--ctext);cursor:default">Nautical miles · knots</div>
+  <div class="lbl">Appearance</div>
+  <div class="row" style="color:var(--cdim);cursor:default">Day / Dusk / Night — top bar</div>
+</div>
+
+<!-- ========================= LAB DRAWER (awesome-maplibre integrations) ========================= -->
+<div class="drawer glass" id="drawer-lab" hidden>
+  <h2>Overlays</h2>
+  <p class="sub">Show on the chart</p>
+
+  <div class="lsec">Map</div>
+  <label class="lrow"><span class="ltx"><b>Globe</b><i>Great-circle view</i></span><span class="sw"><input type="checkbox" data-lab="globe"><span class="swt"></span></span></label>
+  <label class="lrow"><span class="ltx"><b>Offline charts</b><i>One file · no signal needed</i></span><span class="sw"><input type="checkbox" data-lab="pmtiles"><span class="swt"></span></span></label>
+
+  <div class="lsec">Depth</div>
+  <label class="lrow"><span class="ltx"><b>Depth contours</b><i>Isolines every 5&nbsp;m</i></span><span class="sw"><input type="checkbox" data-lab="contour"><span class="swt"></span></span></label>
+  <label class="lrow"><span class="ltx"><b>Depth shading</b><i>Shaded relief</i></span><span class="sw"><input type="checkbox" data-lab="mercator"><span class="swt"></span></span></label>
+  <label class="lrow"><span class="ltx"><b>Depth imagery</b><i>Streamed · no tiler</i></span><span class="sw"><input type="checkbox" data-lab="cog"><span class="swt"></span></span></label>
+
+  <div class="lsec">Weather</div>
+  <label class="lrow"><span class="ltx"><b>Rain radar</b><i>Animated · past + nowcast</i></span><span class="sw"><input type="checkbox" data-lab="temporal"><span class="swt"></span></span></label>
+
+  <div class="lsec">Vessels</div>
+  <label class="lrow"><span class="ltx"><b>Vessel traffic</b><i>AIS at scale</i></span><span class="sw"><input type="checkbox" data-lab="ais"><span class="swt"></span></span></label>
+
+  <div class="lsec">Tools</div>
+  <label class="lrow"><span class="ltx"><b>Measure</b><i>Distance &amp; bearing</i></span><span class="sw"><input type="checkbox" data-lab="measures"><span class="swt"></span></span></label>
+  <div class="ltools">
+    <button data-lab-action="draw-route" title="Draw a route on the chart (Lab tool)">Draw route</button>
+    <button data-lab-action="draw-lasso" title="Lasso-select an area on the chart (Lab tool)">Select area</button>
+  </div>
+</div>
+
+<!-- ========================= COMMUNITY DRAWER (where-to-go + give-back, a selectable layer set) ========================= -->
+<div class="drawer glass" id="drawer-community" hidden>
+  <h2>Community</h2>
+  <p class="sub" id="comm-status">Connecting to Helm backend…</p>
+
+  <div class="lbl">Narrate (spacetime probe)</div>
+  <div class="wx"><button id="narrate-arm" data-wx="narr" title="Tap the chart, then get an AI narrative of the conditions there">✨ Narrate a point</button><button id="narrate-path" data-wx="path" title="AI narrative of conditions along the whole active passage">Narrate the passage</button></div>
+  <p class="sub" style="margin:7px 0 0;font-size:10.5px" id="narrate-hint">Tap the chart to fuse the enabled layers at that point &amp; the current time. Only checked layers join the slice.</p>
+
+  <div class="lbl">Where to go</div>
+  <div class="wx"><button id="wt-go" data-wx="go" title="Suggest anchorages / destinations for tonight (AI, wind-aware)">Suggest for tonight</button><button id="wt-clear" data-wx="clear" title="Clear the suggestions">Clear</button></div>
+  <div id="wt-results" style="margin-top:9px;font-size:11.5px"></div>
+
+  <div class="lbl">Give back</div>
+  <label class="row"><input type="checkbox" id="gb-nfl"> Share my position → NoForeignLand<span style="margin-left:auto;font-size:9.5px;color:var(--ok)">push</span></label>
+  <label class="row"><input type="checkbox" id="gb-osm"> Contribute to OpenSeaMap / OSM<span style="margin-left:auto;font-size:9.5px;color:var(--ok)">notes</span></label>
+  <div id="gb-status" style="font-size:10.5px;color:var(--cdim);margin-top:7px;min-height:14px"></div>
+
+  <div class="hint">Runs on open + owned + RAG. NoForeignLand <i>read</i> is an experimental enrichment (off);
+    give-back (position→NFL, contribute→OSM) is opt-in and source-labelled.</div>
+</div>
+
+<!-- ========================= RIGHT ROUTE INSPECTOR ========================= -->
+<!-- Hidden until a REAL active route arrives (applyNav toggles display from the live nav frame's
+     s.route / s.active). No hardcoded demo route — empty legs until the engine sends one. -->
+<div class="insp glass" style="display:none">
+  <div class="ttl" id="insp-handle">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="2.5"/><circle cx="18" cy="5" r="2.5"/><path d="M8 17 C 14 13 10 7 16 6"/></svg>
+    <span id="nv-route-name">Route</span>
+  </div>
+  <div class="eta"><span class="l">ETA</span><span class="v" id="nv-eta">—</span></div>
+  <div class="kpis">
+    <div class="k"><div class="l">Time to go</div><div class="v" id="nv-ttg">—</div></div>
+    <div class="k"><div class="l">DTG</div><div class="v" id="nv-dtg">—</div></div>
+    <div class="k"><div class="l">VMG</div><div class="v" id="nv-vmg">—</div></div>
+    <div class="k"><div class="l">XTE</div><div class="v" id="nv-xte" style="color:var(--ok)">—</div></div>
+  </div>
+  <hr>
+  <div class="leg"><span class="lgd" style="background:var(--mag)"></span><span class="nm" id="nv-leg0nm" style="color:var(--ctext)">—</span><span class="br" id="nv-leg0br"></span></div>
+  <div class="leg"><span class="lgd" style="background:var(--mag);opacity:.5"></span><span class="nm" id="nv-leg1nm" style="color:var(--cdim)">—</span><span class="br" id="nv-leg1br"></span></div>
+</div>
+
+<!-- ========================= ROUTE-WEATHER RIBBON (passage probe) ========================= -->
+<div class="ribbon glass" id="ribbon" hidden>
+  <div class="rb-head"><span class="ttl">✨ Passage briefing</span><span class="prov" id="rb-prov">AI</span><span class="x" id="rb-x">×</span></div>
+  <div class="rb-text" id="rb-text"></div>
+  <div class="rb-legs" id="rb-legs"></div>
+</div>
+
+<!-- ========================= POINT NARRATE CARD ========================= -->
+<div class="narrate glass" id="narrate-card" hidden>
+  <div class="nc-head">
+    <span class="ic">✨</span><span class="ttl" id="nc-ttl">Here · now</span>
+    <span class="pos" id="nc-pos"></span><span class="prov" id="nc-prov">AI</span>
+    <span class="x" id="nc-x">×</span>
+  </div>
+  <div class="nc-text" id="nc-text">…</div>
+  <div class="nc-layers" id="nc-layers"></div>
+  <div class="nc-foot" id="nc-foot"></div>
+</div>
+
+<!-- ========================= BOTTOM INSTRUMENT BAR (static) ========================= -->
+<div class="ib glass">
+  <div class="it"><div class="l">Wind Speed</div><div class="v"><span id="nv-wind">14</span><span class="u"> kt</span></div></div>
+  <div class="it"><div class="l">SOG</div><div class="v"><span id="nv-sog">6.2</span><span class="u"> kn</span></div></div>
+  <div class="it"><div class="l">Wind Dir</div><div class="v"><span id="nv-winddir">95</span><span class="u">°</span></div></div>
+  <div class="it"><div class="l">COG</div><div class="v"><span id="nv-cog">316</span><span class="u">°</span></div></div>
+  <div class="it"><div class="l">Depth</div><div class="v"><span id="nv-depth">8.4</span><span class="u"> m</span></div></div>
+  <div class="it wide">
+    <div><div class="l">Position</div><div class="v2" id="nv-pos">17°29.4′S · 149°49.6′W</div></div>
+    <div class="r"><div class="l">Next</div><div class="v2" id="nv-next">R "4" · 0.3 NM</div></div>
+  </div>
+</div>
+
+<script src="vendor/maplibre-gl/maplibre-gl.js"></script>
+<!-- SHELL: the shared-shell registration seam (HelmShell). MUST load before the feature modules
+     so they can registerPanel / registerCommand / registerStyleFragment from their OWN files
+     instead of editing this monolith. See web/SHELL.md for the three conventions. -->
+<script src="shell.js"></script>
+<script src="persist.js"></script><!-- TOOLS-7: HelmStore — the one fail-loud persistence layer (settings survive reload) -->
+<script src="board.js"></script><!-- BOARD-1: Smart Board composable persisted tile grid -->
+<script src="offline-packs.js"></script><!-- OFFLINE-4: BYO MBTiles/PMTiles catalog + pack selector -->
+<script src="tooltip.js"></script><!-- fast custom hover tooltips (replaces the slow ~1.5s native title delay) -->
+<script src="wx-ramp.js"></script><!-- CLIENT-14: one weather colour-ramp source; must precede wind-layer/field/live -->
+<script src="wind-layer.js"></script>
+<!-- CLIENT-14: field-layer.js (legacy fixed-bbox HelmField) retired — field is rendered by the Live path (wx-live.js / helmwx tiles); legend via wx-ramp.js -->
+<script src="radar.js"></script>
+<script src="isobars.js"></script>
+<!-- WX weather — codec + GRIB2 reader (globals) + probe faces + engines. The UI (hi-res tiles,
+     ensemble spread, PredictWind import) is consolidated INTO the Weather drawer by wx-controls.js,
+     so there are no longer standalone G/E/I rail icons. -->
+<script src="wx-value-codec.js"></script>
+<script src="wx-scene-webgpu.js"></script><!-- WX-19 phase 4: WebGPU GPU tile colouriser (primary target; wx-scene falls back to CPU/WebGL) -->
+<script src="wx-scene.js"></script><!-- WX-19: Environmental Scene renderer (bundle-backed field scene); needs wx-value-codec + wx-ramp -->
+<script src="wx-grib.js"></script>
+<script src="wx-grib2.js"></script>
+<script src="wx-import.js"></script>
+<script src="wx-live.js"></script>
+<script src="wx-controls.js"></script>
+<script src="wx-scrim.js"></script><!-- Windy-parity: dim+desaturate the basemap while a weather overlay is active so it pops; reverts on Off -->
+<script src="nav-source.js"></script>
+<script src="server-endpoint.js"></script>
+<script src="log.js"></script>        <!-- CLIENT-18: HelmLog — leveled, level-filtered logger + ring buffer -->
+<script src="nav-client.js"></script>
+<script src="health-panel.js"></script><!-- CLIENT-20: status panel for engine/feed/runtime diagnostics -->
+<script src="connections.js"></script>
+<script src="routes.js"></script>
+<script src="route-edit.js"></script>
+<script src="track.js"></script>
+<script src="ownship.js"></script>
+<script src="alarms.js"></script>
+<script src="community.js"></script>
+<script src="measure.js"></script>
+<script src="offline.js"></script><!-- OFFLINE-3: real Download drawer (lasso bbox -> size estimate -> fetch_tiles handoff); fills the legacy #drawer-download -->
+<script src="ais-risk.js"></script><!-- single source of truth for AIS collision-risk tiers + palette (used by collision.js, ais-vectors.js, the tap card) -->
+<script src="ais-hub.js"></script><!-- AIS-10: one boat icon -> one AIS panel; the modules below register their surfaces as tabs (HelmAisHub.registerTab) instead of separate rail icons -->
+<script src="collision.js"></script>
+<script src="ais-meta.js"></script>
+<script src="ais-vectors.js"></script><!-- AIS-4: CPA cone + speed-scaled predictor overlay (self-wired via the `ais` source + HelmShell) -->
+<script src="ais-guard.js"></script><!-- AIS-5: guard-zone / proximity alarm (fed the full target list by collision.js + HelmShell) -->
+<script src="ais-distress.js"></script><!-- AIS-7: SART/MOB/EPIRB + DSC distress surfacing (fed the full target list by HelmShell; CONTRACT-10 alarms) -->
+<script src="ais-tracks.js"></script><!-- AIS target trails ("wakes") — client-side accumulation, registers a hub "Tracks" tab -->
+<script src="ais-pins.js"></script><!-- pin multiple AIS targets into a live right-hand column (tap a vessel -> Pin) -->
+<script src="tides.js"></script><!-- TIDES: Tides rail panel + tide-station markers + tap card (HelmShell drop-in) -->
+<script src="ui-text.js"></script><!-- global text legibility: muted-text shade (--cdim) + card text-scale, mounted into Settings -->
+<script src="ais-advisor.js"></script><!-- AIS-12: evasion advisor — quantitative "what to do" on danger targets (reuses HelmColregs); toggleable -->
+<script src="ais-sector.js"></script><!-- AIS-13: safe-course sector — green/red heading ring around ownship (HelmAisAdvisor.safeSector); shares the advisor toggle -->
+<script src="ais-select.js"></script><!-- CLIENT-7: tap a vessel / list row -> feature-state selection highlight (uses CLIENT-5's promoteId) -->
+<script src="ais-buddy.js"></script><!-- AIS-9: buddy / named-MMSI tagging — cyan ring + name on tagged vessels, ★ in the card; client-side localStorage list -->
+<script src="true-wind.js"></script>      <!-- WX-13: pure true-wind derivation (HelmTrueWind, unit-tested) -->
+<script src="true-wind-ui.js"></script>   <!-- WX-13: live readout, registered via HelmShell -->
+<script src="tactics.js"></script>        <!-- opposite-tack assist: tack/gybe + line, on WX-13 true wind (instrument-only) -->
+<script src="safety-dock.js"></script><!-- CHART: movable MOB/anchor-watch/guard safety pill (drag-anywhere, edge-relative persist, double-tap reset) -->
+<script>
+// --- Global error surface (CLIENT-4): a thrown exception or rejected promise must SAY so — never
+// die silently on a safety display. ONLY a failed MAP RESOURCE (tile/sprite/glyph/.png/.pbf — common
+// when offline, non-fatal) is logged-not-bannered; EVERY other fault SURFACES, because on a safety
+// display hiding a real failure (a dead backend, a broken feature) is worse than a stray banner —
+// and connection health already has its own LIVE/STALE/OFFLINE badge. Dismissible + rate-limited so
+// one repeating fault can't spam. window.__helmDegrade(title, detail) is reused by bootstrap + map.on('error').
+(function () {
+  var bn = null, last = Object.create(null);
+  // Narrow ON PURPOSE: do NOT suppress generic "failed to fetch" / "network error" / "aborted" — those
+  // can be a dead nav WebSocket or backend, which MUST surface on a marine display. Map tiles only.
+  var BENIGN = /\b(tile|sprite|glyph)\b|\.(png|pbf)\b/i;
+  function banner() { return bn || (bn = document.getElementById('degraded-banner')); }
+  function degrade(title, detail) {
+    var d = detail == null ? '' : String(detail);
+    console.error('[helm] degraded —', title + (d ? ': ' + d : ''));   // always log the real cause (fail-loud)
+    var b = banner(); if (!b) return;
+    var key = title + '|' + d, t = Date.now();
+    if (last[key] && t - last[key] < 4000) return;                     // rate-limit identical repeats
+    last[key] = t;
+    var tt = document.getElementById('dg-ttl'), mm = document.getElementById('dg-msg');
+    if (tt) tt.textContent = title;
+    if (mm) mm.textContent = d.slice(0, 500);
+    b.hidden = false;
+  }
+  window.__helmDegrade = degrade;
+  window.__helmBenignError = function (m) { return BENIGN.test(String(m || '')); };
+  window.addEventListener('error', function (e) {
+    var m = (e && (e.message || (e.error && e.error.message))) || 'Script error';
+    if (BENIGN.test(m)) return;                                        // resource 404 / benign
+    var where = (e && e.filename) ? ' — ' + String(e.filename).split('/').pop() + ':' + e.lineno : '';
+    degrade('A feature failed', m + where);
+  });
+  window.addEventListener('unhandledrejection', function (e) {
+    var r = e && e.reason, m = (r && (r.message || r)) || 'Unhandled rejection';
+    if (BENIGN.test(m)) return;
+    degrade('A background task failed', m);
+  });
+  var x = document.getElementById('dg-x');
+  if (x) x.addEventListener('click', function () { var b = banner(); if (b) b.hidden = true; });
+})();
+// CLIENT-11: keep the app shell reloadable for LAN companion clients, while the
+// service worker itself keeps live nav/alarm/health endpoints network-only.
+(function () {
+  if (!('serviceWorker' in navigator)) return;
+  var host = location.hostname;
+  var local = host === 'localhost' || host === '127.0.0.1' || host === '[::1]' || host === '::1';
+  if (location.protocol !== 'https:' && !local) return;
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register(new URL('sw.js', location.href).href, { scope: './' }).catch(function (err) {
+      console.warn('[helm-sw] registration failed:', err && err.message);
+    });
+  });
+})();
+// The shell body runs inside an async bootstrap so the per-domain style fragments
+// (web/style/*.json) can be fetched + merged (SHELL-2) BEFORE the map is constructed.
+// HelmShell.buildStyle() falls back to the monolithic style.json if the split manifest is
+// absent, so this is zero-risk. `map` and the cockpit setup live inside main(); window.map is
+// assigned the moment the map exists, and lab.js is loaded only AFTER that (it reads window.map
+// at top level), so its contract is preserved.
+(async function main() {
+  const __initialHash = location.hash;   // capture BEFORE maplibre's hash:true overwrites it with the style default
+  function helmHashView(hash) {
+    const m = String(hash || '').match(/^#(?:map=)?([0-9.]+)\/(-?[0-9.]+)\/(-?[0-9.]+)(?:\/(-?[0-9.]+))?(?:\/(-?[0-9.]+))?$/);
+    if (!m) return null;
+    const zoom = Number(m[1]), lat = Number(m[2]), lon = Number(m[3]);
+    const bearing = m[4] == null ? null : Number(m[4]);
+    const pitch = m[5] == null ? null : Number(m[5]);
+    if (!Number.isFinite(zoom) || !Number.isFinite(lat) || !Number.isFinite(lon)) return null;
+    if (lat < -90 || lat > 90 || lon < -180 || lon > 180) return null;
+    const view = { zoom: zoom, center: [lon, lat] };
+    if (Number.isFinite(bearing)) view.bearing = bearing;
+    if (Number.isFinite(pitch)) view.pitch = pitch;
+    return view;
+  }
+  const __initialView = helmHashView(__initialHash);
+  function helmHashString(map) {
+    const c = map.getCenter();
+    const z = Math.round(map.getZoom() * 100) / 100;
+    const lat = Math.round(c.lat * 100000) / 100000;
+    const lon = Math.round(c.lng * 100000) / 100000;
+    return '#' + z + '/' + lat + '/' + lon;
+  }
+  async function helmResourceExists(url) {
+    try {
+      const r = await fetch(url, { method: 'HEAD', cache: 'no-store' });
+      return !!(r && r.ok);
+    } catch (e) { return false; }
+  }
+  async function preferUserDepthData(style) {
+    if (!style || !style.sources) return;
+    const files = { depare: 'depare.geojson', depcnt: 'depcnt.geojson', soundg: 'soundg.geojson' };
+    await Promise.all(Object.keys(files).map(async (id) => {
+      const src = style.sources[id];
+      if (!src || src.type !== 'geojson') return;
+      const url = 'user-data/' + files[id];
+      if (await helmResourceExists(url)) src.data = url;
+    }));
+  }
+  // Assemble the merged style from the per-domain fragments (SHELL-2). If shell.js somehow didn't
+  // load, fall back to the monolithic style.json so the map still draws (degraded, no registration API).
+  let style;
+  try {
+    style = window.HelmShell
+      ? await HelmShell.buildStyle({ styleDir: 'style', fallback: 'style.json' })
+      : await (await fetch('style.json')).json();
+    await preferUserDepthData(style);
+  } catch (e) {
+    // The map can't be built without a style — surface it explicitly instead of a silent blank page.
+    if (window.__helmDegrade) window.__helmDegrade('Chart failed to load', (e && e.message) || e);
+    else console.error('[helm] style load failed:', e);
+    return;
+  }
+  const mapOptions = Object.assign({
+    container: 'map', style: style, hash: false,
+    // Owned mbtiles basemaps (:8091) + the online-fill cache (:8095, CHART-16) ship localhost
+    // placeholders. Rewrite the HOST to the page host so the iPad/phone on the boat WiFi loads
+    // tiles from THIS Mac. The port is preserved (8091 stays 8091, 8095 stays 8095).
+    // BEFORE the request goes out — including the FIRST tile. A setTiles-in-'load' rewrite loses that race:
+    // the initial batch fires against the placeholder, fatal on a remote device (localhost = the phone).
+    // Port stays 8091 — a ?server= override only relocates the host. Everything else passes through.
+    transformRequest: (url) => {
+      if (window.HelmEndpoint) {
+        var chart = url.match(/\/\/[^/]+:8090\/chart\/(.+)$/);
+        if (chart) {
+          var chartUrl = HelmEndpoint.origin() + '/chart/' + chart[1];
+          var token = HelmEndpoint.token && HelmEndpoint.token();
+          if (token) chartUrl += (chartUrl.indexOf('?') >= 0 ? '&' : '?') + 'token=' + encodeURIComponent(token);
+          return { url: chartUrl };
+        }
+        var m = url.match(/\/\/[^/]+:(8091|8095)\//);
+        if (m) return { url: url.replace(/\/\/[^/]+:(8091|8095)\//, '//' + HelmEndpoint.host() + ':' + m[1] + '/') };
+      }
+      return { url };
+    }
+  }, __initialView || {});
+  const map = new maplibregl.Map(mapOptions);
+  window.map = map;   // debug/automation hook
+  let __hashSyncing = false;
+  function syncHashFromMap() {
+    if (__hashSyncing) return;
+    const next = helmHashString(map);
+    if (location.hash !== next) history.replaceState(null, '', next);
+  }
+  function syncMapFromHash() {
+    const view = helmHashView(location.hash);
+    if (!view) return;
+    __hashSyncing = true;
+    map.jumpTo(view);
+    __hashSyncing = false;
+  }
+  function applyInitialHashView() {
+    if (!__initialView) return;
+    __hashSyncing = true;
+    map.jumpTo(__initialView);
+    __hashSyncing = false;
+  }
+  applyInitialHashView();
+  map.once('load', function () {
+    applyInitialHashView();
+    syncHashFromMap();
+    map.on('moveend', syncHashFromMap);
+  });
+  window.addEventListener('hashchange', syncMapFromHash);
+  if (map.setMaxPitch) map.setMaxPitch(0);          // a chart is flat — no accidental 3D tilt
+  if (map.touchPitch) map.touchPitch.disable();     // two-finger gesture = zoom + rotate only
+  // Surface real map failures (style/source/layer) on the degraded banner; stay quiet on benign
+  // tile/sprite/glyph 404s (common offline) so we never cry wolf.
+  map.on('error', function (ev) {
+    var m = (ev && ev.error && ev.error.message) || (ev && ev.message) || 'map error';
+    if (window.__helmDegrade && !window.__helmBenignError(m)) window.__helmDegrade('Chart error', m);
+    else console.warn('[helm] map:', m);
+  });
+  // Point the S-52 ENC tiles at the resolved boat-server origin (server-endpoint.js) —
+  // localhost on this Mac, or helm.local / a LAN IP on the Mac mini / Pi. Same code path.
+  // (The owned mbtiles basemaps on :8091 are rewritten by transformRequest in the Map
+  // constructor above, which catches the FIRST tile too — setTiles here would lose that race.)
+  map.on('load', () => {
+    // Surface wiring failures rather than silently leaving the style.json default in place.
+    if (!window.HelmEndpoint) { console.error('Helm: server-endpoint.js not loaded — ENC tiles fall back to the style.json default, not the resolved engine origin'); return; }
+    const enc = map.getSource('enc');
+    if (!enc) { console.error('Helm: no "enc" source in style.json — cannot point ENC tiles at the engine'); return; }
+    try { enc.setTiles([HelmEndpoint.tileTemplate()]); }
+    catch (e) { console.error('Helm: failed to set ENC tile origin:', e); }
+  });
+  map.addControl(new maplibregl.NavigationControl({ showCompass: true }), 'bottom-right');
+  map.addControl(new maplibregl.ScaleControl({ unit: 'nautical' }), 'bottom-left');
+  const ownship = HelmOwnship(map, { follow: !__initialView, frameOnFirstFix: !__initialView });  window.__ownship = ownship;   // follow/frame on unless a view was pinned in the URL
+  const alarms = HelmAlarms(map, { onAnchor: (set, pos, radius) =>     // CONTRACT-10: push the anchor watch to the ENGINE so it keeps watch headless
+    { if (window.__navClient && __navClient.send) __navClient.send(set ? { t: 'anchor.set', lat: pos.lat, lon: (pos.lon != null ? pos.lon : pos.lng), radius } : { t: 'anchor.clear' }); } });
+  window.__alarms = alarms;   // depth / anchor / MOB safety alarms + banner (alarms.js)
+
+  // Google-Earth-style seamless zoom: a 3D globe at world scale (you see Earth's curvature)
+  // that smoothly flattens to web-mercator as you zoom to the chart — one continuous surface,
+  // no view/scale toggling. Needs MapLibre v5+; guarded so an older build just stays flat.
+  map.on('style.load', () => { try { if (map.setProjection) map.setProjection({ type: 'globe' }); } catch (e) {} });
+
+  // chart layer toggles (data-layer matches a layer id, or a group prefix like places-/ais-)
+  document.querySelectorAll('.row input[data-layer]').forEach(cb => {
+    cb.addEventListener('change', () => {
+      const id = cb.dataset.layer, vis = cb.checked ? 'visible' : 'none';
+      map.getStyle().layers.filter(l => l.id === id || l.id.startsWith(id + '-') || l.id.startsWith('helm-' + id + '-'))   // also Helm's namespaced layers (helm-ais-* triangles/symbols/lost/tracks/cones — not just the legacy ais-*/label)
+        .forEach(l => map.setLayoutProperty(l.id, 'visibility', vis));
+    });
+  });
+
+  // Online fill (CHART-16): the data-layer handler above toggles visibility; here we persist the
+  // choice like the theme. Default OFF keeps the pure offline chart stack as the baseline.
+  (function () {
+    const cb = document.querySelector('input[data-layer="helm-chart-online-fill"]');
+    if (!cb) return;
+    cb.addEventListener('change', () => { try { if (window.HelmStore) HelmStore.set('ui.onlineFill', cb.checked); } catch (e) {} });
+    const restore = () => {
+      const on = !!(window.HelmStore && HelmStore.get('ui.onlineFill', false));
+      cb.checked = on;
+      try { if (map.getLayer('helm-chart-online-fill')) map.setLayoutProperty('helm-chart-online-fill', 'visibility', on ? 'visible' : 'none'); } catch (e) {}
+    };
+    if (map.isStyleLoaded && map.isStyleLoaded()) restore(); else map.on('load', restore);
+  })();
+
+  // Basemap picker (radios): show the chosen base (your charts vs your satellite), hide the others.
+  const BASEMAPS = ['navionics', 'googlesat', 'bingsat', 'arcgis'];
+  document.querySelectorAll('input[name="basemap"]').forEach(rb => {
+    rb.addEventListener('change', () => {
+      if (!rb.checked) return;
+      const pick = rb.dataset.base;
+      BASEMAPS.forEach(id => { if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', id === pick ? 'visible' : 'none'); });
+    });
+  });
+
+  // DEM depth/terrain contours (maplibre-contour, off-thread) — lazy-loaded the
+  // first time it's switched on, from the LOCAL vendored bundle + LOCAL DEM tiles.
+  let depthContours = null;
+  document.querySelectorAll('.row input[data-contours]').forEach(cb => {
+    cb.addEventListener('change', async () => {
+      try {
+        depthContours = depthContours || await import('./depth-contours.js');
+        if (cb.checked) await depthContours.enable(map, { maplibregl, beforeId: 'route-line' });
+        else depthContours.disable(map);
+      } catch (e) { console.error('[helm] depth contours failed to load', e); cb.checked = false; }
+    });
+  });
+
+  // ---- weather: heatmap color field (HelmField) + animated particles (HelmWind) ----
+  const wind = window.HelmWind ? HelmWind(map) : null;
+  window.__helmWind = wind;                    // shared with Live (wx-live.js) to drive particles over the viewport
+  if (wind) wind.setNeutral(true);            // particles are white; color comes from the field
+  let field = null;   // CLIENT-14: legacy HelmField retired — stays null; Live owns the field, legend via HelmWxRamp. Residual `if (field)` guards below are vestigial no-ops (removed with the renderer rewrite in WX-19).
+  const radar = window.HelmRadar ? HelmRadar(map, { beforeId: 'route-line' }) : null;
+  const iso = window.HelmIsobars ? HelmIsobars(map, { beforeId: 'route-line' }) : null;  // smooth pressure isobars
+  const measureBtn = document.querySelector('.ri[data-rail="measure"]');
+  const measure = window.HelmMeasure ? HelmMeasure(map, { onChange: a => { if (measureBtn) measureBtn.classList.toggle('on', a); } }) : null;
+  const collision = window.HelmCollision ? HelmCollision(map) : null;
+  const VECTOR = { wind: 'wind.json', waves: 'waves.json', swell: 'swell.json', current: 'current.json' };
+  // Windy-style wind colour ramp (knots -> rgb): muted blue (calm) through teal,
+  // green, yellow, orange, red, to purple (storm). Overrides the field's stops.
+  const WINDY_WIND = (window.HelmWxRamp ? HelmWxRamp.stopsFor('wind') : []);   // CLIENT-14: single shared ramp source (was a duplicated literal)
+  const fieldOpts = n => n === 'wind' ? { stops: WINDY_WIND } : undefined;
+  let frame = 0, forecast = null, playTimer = null, activeWx = 'wind';
+  const fieldUrl = n => forecast ? `data/field-${n}-t${frame}.json` : `data/field-${n}.json`;
+  // CLIENT-14: build the legend from the single shared ramp (web/wx-ramp.js) so it matches the field
+  // + particles exactly — replaces reading stops off the retired legacy HelmField.
+  const WX_UNITS = { wind: 'kn', gust: 'kn', rain: 'mm', temp: '°C', clouds: '%', pressure: 'hPa', cape: 'J/kg', current: 'kn', waves: 'm', swell: 'm', sst: '°C' };
+  function legendFromRamp(name) {
+    if (!window.HelmWxRamp) return null;
+    const stops = HelmWxRamp.stopsFor(name);
+    if (!stops || !stops.length) return null;
+    return { vmin: stops[0][0], vmax: stops[stops.length - 1][0], stops, unit: WX_UNITS[name] || '', layer: name };
+  }
+  const velUrl = n => forecast ? `data/${n}-t${frame}.json` : `data/${VECTOR[n]}`;
+
+  let wxNoticeTimer = null;
+  function wxNotice(layer, msg) {       // surface a failed weather load instead of silently showing nothing
+    const n = document.getElementById('wx-notice'); if (!n) return;
+    n.textContent = msg || ('⚠ ' + layer + ' data unavailable — not fetched (run the pipeline)');
+    n.style.display = 'block';
+    if (wxNoticeTimer) clearTimeout(wxNoticeTimer);
+    wxNoticeTimer = setTimeout(() => { n.style.display = 'none'; }, 7000);
+  }
+  function wxNoticeClear() { const n = document.getElementById('wx-notice'); if (n) n.style.display = 'none'; }
+
+  function buildLegend(f) {
+    const leg = document.getElementById('legend');
+    if (!f) { leg.style.display = 'none'; return; }
+    const span = (f.vmax - f.vmin) || 1;
+    const grad = f.stops.map(s => {
+      const pct = Math.max(0, Math.min(100, (s[0] - f.vmin) / span * 100));
+      const c = s[1], a = c.length > 3 ? c[3] : 1;
+      return `rgba(${c[0]},${c[1]},${c[2]},${a}) ${pct}%`;
+    }).join(',');
+    document.getElementById('legbar').style.background = `linear-gradient(90deg, ${grad})`;
+    document.getElementById('legmin').textContent = Math.round(f.vmin);
+    document.getElementById('legmax').textContent = Math.round(f.vmax) + ' ' + f.unit;
+    document.getElementById('leglabel').textContent = f.layer;
+    leg.style.display = 'block';
+  }
+
+  function setWeather(name) {
+    document.querySelectorAll('#wx button').forEach(b => b.classList.toggle('on', b.dataset.wx === name));
+    activeWx = name; window.__activeWx = name;            // shared with the spacetime probe's layer filter
+    // Re-engage the weather mode (default: Live · fills view) for the new layer. Without this, picking a
+    // layer only showed the legacy fixed-bbox field; Live (viewport-filling) never kicked in. Radar is a
+    // separate live nowcast and owns its own path below, so leave it alone.
+    if (name !== 'radar' && window.HelmWxControls && window.HelmWxControls.apply) setTimeout(window.HelmWxControls.apply, 40);
+    if (iso) { if (name === 'pressure') iso.load(fieldUrl('pressure')); else iso.setVisible(false); }   // smooth isobars on the pressure layer
+    if (name === 'radar') {
+      if (field) field.setVisible(false); if (wind) wind.setVisible(false); buildLegend(null);
+      // Radar is a LIVE online nowcast (RainViewer) — the one weather layer that needs internet.
+      // If the fetch fails (offline on the boat), say so plainly instead of showing nothing.
+      if (radar) radar.load().then(n => n ? wxNoticeClear()
+        : wxNotice('radar', '⚠ Radar needs an internet connection — the live precipitation nowcast is unavailable offline.'));
+      return;
+    }
+    if (radar) radar.setVisible(false);
+    if (name === 'off') { if (field) field.setVisible(false); if (wind) wind.setVisible(false); buildLegend(null); return; }
+    // CLIENT-14: legacy fixed-bbox HelmField retired. The Live path (HelmWxControls.apply, engaged
+    // above) renders the field from the gateway/Open-Meteo; the legend comes from the shared ramp.
+    wxNoticeClear(); buildLegend(legendFromRamp(name));
+    const partOn = document.getElementById('particles').checked;
+    if (wind) {
+      if (VECTOR[name] && partOn) { wind.load(velUrl(name)); wind.setVisible(true); }
+      else wind.setVisible(false);
+    }
+  }
+
+  function setFrame(i) {
+    if (!forecast) return;
+    frame = Math.max(0, Math.min(forecast.hours - 1, i));
+    document.getElementById('tslider').value = frame;
+    const t = forecast.times && forecast.times[frame];
+    window.__helmTime = t || null;                       // shared with the spacetime probe
+    document.getElementById('tlabel').textContent = t
+      ? new Date(t + 'Z').toLocaleString([], { weekday: 'short', hour: '2-digit', minute: '2-digit' })
+      : ('+' + frame + 'h');
+    if (activeWx && activeWx !== 'radar' && activeWx !== 'off') {
+      if (field) field.load(fieldUrl(activeWx), fieldOpts(activeWx)).then(buildLegend).catch(() => wxNotice(activeWx));
+      if (iso && activeWx === 'pressure') iso.load(fieldUrl('pressure'));   // re-contour isobars for the new frame
+      if (wind && VECTOR[activeWx] && document.getElementById('particles').checked) wind.load(velUrl(activeWx));
+    }
+  }
+  fetch('data/forecast.json').then(r => r.ok ? r.json() : null).then(fc => {
+    if (!fc) return;
+    forecast = fc;
+    const sl = document.getElementById('tslider');
+    sl.max = fc.hours - 1; sl.value = 0;
+    document.getElementById('time').style.display = 'block';
+    sl.addEventListener('input', () => setFrame(+sl.value));
+    const playBtn = document.getElementById('play');
+    playBtn.addEventListener('click', () => {
+      if (playTimer) { clearInterval(playTimer); playTimer = null; playBtn.innerHTML = '&#9658;'; }
+      else { playBtn.innerHTML = '&#10073;&#10073;'; playTimer = setInterval(() => setFrame((frame + 1) % forecast.hours), 900); }
+    });
+    setFrame(0);
+  }).catch(() => {});
+
+  document.querySelectorAll('#wx button').forEach(b => b.addEventListener('click', () => setWeather(b.dataset.wx)));
+  document.getElementById('particles').addEventListener('change', () => {
+    const active = document.querySelector('#wx button.on');
+    if (active) setWeather(active.dataset.wx);
+  });
+
+  const opSlider = document.getElementById('wxopacity');
+  function applyOpacity() {
+    opSlider.style.setProperty('--wx-fill', opSlider.value + '%');
+    const o = (100 - (+opSlider.value)) / 100;     // slider right = more transparent
+    if (field) field.setOpacity(o);
+    if (wind) wind.setOpacity(Math.max(0.04, o * 0.7));
+    if (window.HelmWxLive && HelmWxLive.setOpacity) HelmWxLive.setOpacity(map, o);
+  }
+  opSlider.addEventListener('input', applyOpacity);
+  applyOpacity();
+
+  map.on('load', () => {
+    if (map.getLayer('wind-arrows')) map.setLayoutProperty('wind-arrows', 'visibility', 'none'); // replaced by particles
+    setWeather('off');   // weather defaults OFF — user opts in by picking a layer (which then uses Live · fills view)
+  });
+
+  // click popups (suppressed while the measure tool is active — a click then drops a ruler point)
+  const measuring = () => window.__helmMeasure && window.__helmMeasure.active();
+  map.on('click', 'soundg-text', e => { if (measuring()) return;
+    new maplibregl.Popup().setLngLat(e.lngLat).setHTML('Depth: ' + escHtml(e.features[0].properties.DEPTH) + ' m').addTo(map); });
+  map.on('click', 'places-icon', e => { if (measuring()) return; const p = e.features[0].properties;
+    new maplibregl.Popup().setLngLat(e.lngLat).setHTML('<b>' + escHtml(p.name || p.kind) + '</b><br>' + escHtml(p.kind)).addTo(map); });
+  // ---- AIS: live engine-driven targets + rich tap inspector ----
+  // The engine streams a per-fix `ais` array (range/brg/CPA/TCPA computed by OpenCPN's
+  // AisDecoder). We drive the `ais` map source from it and render the full target detail
+  // on tap. In sim mode (no engine) the static sample in style.json stays.
+  const AIS_CLASS = { 0: 'Class A', 1: 'Class B', 2: 'AtoN', 3: 'Base station',
+                      5: 'DSC', 6: 'SART', 7: 'ARPA', 9: 'Meteo' };
+  // CLIENT-18: one null-safe HTML escaper for EVERY untrusted string that reaches innerHTML/setHTML —
+  // AIS names (open-radio, attacker-broadcastable), OSM place names, saved-place notes, AI text.
+  const escHtml = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const aisEsc = escHtml;   // back-compat alias used by the AIS detail card
+  // Only let http(s) links through from untrusted place data — neutralise javascript:/data: hrefs.
+  const safeUrl = u => { try { const x = new URL(u, location.href); return (x.protocol === 'http:' || x.protocol === 'https:') ? x.href : ''; } catch (e) { return ''; } };
+  const aisNum = (v, d) => (v == null || isNaN(v)) ? '—' : (+v).toFixed(d);
+  // AIS text fields are fixed-width, right-padded with '@' (6-bit value 0) and/or spaces.
+  // Strip the padding so "MOIN@@@@@@@@@@@@@@@@" shows as "MOIN" (and an all-pad field -> empty).
+  const aisName = s => { const n = String(s == null ? '' : s).replace(/@+/g, '').trim(); return /^unknown$/i.test(n) ? '' : n; };
+  const aisAge = sec => sec == null ? null : (sec < 90 ? Math.round(sec) + ' s' : Math.round(sec / 60) + ' min') + ' ago';
+  // Themed chip — quiet glass to match the card (rgba surface + hairline border), not a candy pill.
+  // Freshness state reads from a small coloured dot (green fresh / amber aging / red stale); the chip
+  // itself stays in the card's muted palette. Shared base used by the source chip too.
+  const AIS_CHIP = 'display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--cdim);'
+    + 'background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.13);padding:4px 10px;border-radius:9px';
+  const aisFreshChip = sec => {
+    if (sec == null) return '';
+    const a = +sec, dot = a <= 15 ? '#43d17d' : a <= 120 ? '#f5c451' : '#ff8a82';
+    const txt = a < 90 ? Math.round(a) + 's ago' : Math.round(a / 60) + 'm ago';
+    return '<span style="' + AIS_CHIP + (a > 120 ? ';color:#ffb4ae' : '') + '">'
+      + '<span style="width:7px;height:7px;border-radius:50%;background:' + dot + ';flex:0 0 auto"></span>'
+      + (a > 120 ? 'stale · ' : 'updated ') + txt + '</span>';
+  };
+  // Source chip — resolve the engine's source connection id to its friendly name (the conns list rides
+  // the nav frame). Lets you tell "via Vesper AIS" from "via DataHub" from a 3rd-party feed at a glance.
+  const aisSourceLabel = id => {
+    if (!id) return '';
+    const c = (window.__helmConns || []).find(x => x && x.id === id);
+    return c ? (c.name || id) : id;
+  };
+  window.HelmAisFmt = { freshChip: aisFreshChip, sourceLabel: aisSourceLabel, age: aisAge };   // shared with the pinned-target cards (ais-pins.js)
+  // Redesigned AIS target card (OpenCPN-class). Every static/voyage field is read
+  // DEFENSIVELY (?? hide-row) so the card works today on the engine's 13-field payload
+  // and lights up the rest — type, nav status, call sign, destination/ETA, size, ROT —
+  // the moment the engine forwards what OpenCPN's decoder already has. Flag + risk tiers
+  // + LOST state are frontend-derived and live now.
+  // Redesigned for the helm: larger type (iPad + low-vision), a big two-up CPA/TCPA safety stat
+  // color-coded to the risk tier, plus freshness + source chips and a pin button. Static/voyage
+  // fields are still read DEFENSIVELY (?? hide-row) so it degrades gracefully on a thin payload.
+  function aisPopupHTML(p) {
+    const meta = window.HelmAisMeta || {};
+    const cls = AIS_CLASS[p.class] != null ? AIS_CLASS[p.class] : (p.class != null ? 'Class ' + p.class : '');
+    const name = aisName(p.name) || ('MMSI ' + (p.mmsi ?? '?'));
+    const fl = meta.flag ? meta.flag(p.mmsi) : '';
+    const type = meta.shipType ? meta.shipType(p.shipType ?? p.type) : null;
+    const ns = meta.navStatus ? meta.navStatus(p.navStatus) : null;
+    const callsign = aisName(p.callsign ?? p.callSign);
+    const dest = aisName(p.destination ?? p.dest);
+
+    const valid = p.cpaValid !== false && p.cpa != null;
+    let tone = 'ok', riskLabel = 'Safe · clear';
+    const _rt = HelmAisRisk.tier(p);
+    if (_rt === 'danger') { tone = 'bad'; riskLabel = '⚠ DANGER · collision risk'; }
+    else if (_rt === 'caution') { tone = 'warn'; riskLabel = '⚠ Caution'; }
+    const toneCol = { bad: '#ff5a52', warn: '#f5c451', ok: '#43d17d' }[tone];
+    const cpa = valid ? aisNum(p.cpa, 2) : '—';
+    const tcpa = (valid && p.tcpa != null) ? (+p.tcpa).toFixed(0) : '—';
+    const tcpaOpening = valid && p.tcpa != null && (+p.tcpa) < 0;
+    const stale = p.ageSec != null && p.ageSec > 120;
+
+    // big stat box. CPA/TCPA are the THREAT pair → tinted to the risk tier. SOG/Range are CONTEXT →
+    // pass neutral=true so they read big but never alarm-coloured (range/speed aren't a tier signal).
+    const stat = (l, v, u, extra, neutral) => '<div style="flex:1;background:rgba(255,255,255,.04);border:1px solid ' + (neutral ? 'rgba(255,255,255,.10)' : toneCol + '55') + ';border-radius:11px;padding:8px 11px">'
+      + '<div style="font-size:11.5px;letter-spacing:.05em;color:var(--cdim)">' + l + '</div>'
+      + '<div style="font-size:23px;font-weight:600;color:' + ((neutral || tone === 'ok') ? '#e6eef5' : toneCol) + ';line-height:1.1">' + v
+      + '<span style="font-size:12.5px;color:var(--cdim)"> ' + u + '</span></div>' + (extra || '') + '</div>';
+
+    const row = (l, v) => '<div style="display:flex;justify-content:space-between;gap:14px;font-size:14px;padding:2px 0">'
+      + '<span style="color:var(--cdim)">' + l + '</span><span style="font-variant-numeric:tabular-nums">' + v + '</span></div>';
+    const sec = t => '<div style="font-size:10.5px;letter-spacing:.07em;color:var(--cdim);text-transform:uppercase;margin:10px 0 3px">' + t + '</div>';
+
+    // SOG + Range are promoted to the big-stat grid above; Motion keeps the directional detail.
+    const motion = [
+      row('COG', aisNum(p.cog, 0) + '°'),
+      (p.hdg != null && p.hdg < 360) ? row('HDG', aisNum(p.hdg, 0) + '°') : '',
+      (meta.rot && meta.rot(p.rot) != null) ? row('ROT', meta.rot(p.rot)) : '',
+      (p.altitude != null && +p.altitude > 0) ? row('Altitude', Math.round(p.altitude) + ' m') : '',   // SAR aircraft (AIS msg 9)
+      (p.brg != null) ? row('Bearing', aisNum(p.brg, 0) + '°') : ''
+    ].join('');
+
+    let voyage = '';
+    if (dest || p.eta) voyage = sec('Voyage')
+      + (dest ? row('→ Dest', aisEsc(dest)) : '') + (p.eta ? row('ETA', aisEsc(String(p.eta))) : '');
+    let size = '';
+    if (p.length || p.beam || p.draught) size = row('Size',
+      (p.length ? Math.round(p.length) + ' × ' + (p.beam ? Math.round(p.beam) : '?') + ' m' : '')
+      + (p.draught ? '  ·  ' + (+p.draught).toFixed(1) + ' m draught' : ''));
+
+    let weather = '';   // AIS-11: weather/met station readout (only the fields the station actually broadcasts)
+    if (p.met) {
+      const mt = (typeof p.met === 'string' ? (function () { try { return JSON.parse(p.met); } catch (e) { return null; } })() : p.met) || {};   // MapLibre stringifies nested feature props — parse back to an object
+      const w = [];
+      const wrow = (l, v) => { if (v != null && v !== '') w.push(row(l, v)); };
+      wrow('Wind', mt.windKn != null ? (mt.windKn + ' kn' + (mt.windDir != null ? ' @ ' + mt.windDir + '°' : '')) : null);
+      wrow('Gust', mt.gustKn != null ? mt.gustKn + ' kn' : null);
+      wrow('Pressure', mt.press != null ? mt.press + ' hPa' : null);
+      wrow('Air temp', mt.airTemp != null ? mt.airTemp + ' °C' : null);
+      wrow('Humidity', mt.humid != null ? mt.humid + ' %' : null);
+      wrow('Water temp', mt.waterTemp != null ? mt.waterTemp + ' °C' : null);
+      wrow('Waves', mt.waveM != null ? (mt.waveM + ' m' + (mt.wavePer != null ? ' / ' + mt.wavePer + ' s' : '') + (mt.waveDir != null ? ' @ ' + mt.waveDir + '°' : '')) : null);
+      wrow('Current', mt.curKn != null ? (mt.curKn + ' kn' + (mt.curDir != null ? ' @ ' + mt.curDir + '°' : '')) : null);
+      wrow('Sea state', mt.seaState != null ? 'Bft ' + mt.seaState : null);
+      if (w.length) weather = sec('Weather station') + w.join('');
+    }
+
+    let badge = '';
+    if (ns && meta.navStyle) { const st = meta.navStyle(ns.tone);
+      badge = '<span style="display:inline-block;font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:10px;margin:2px 0 6px;'
+        + 'background:' + st.bg + ';color:' + st.fg + '">' + st.icon + ' ' + ns.label + '</span>'; }
+
+    const subline = p.met
+      ? ['Weather station', p.mmsi ? 'MMSI ' + p.mmsi : ''].filter(Boolean).join(' · ')
+      : [p.sar ? '✈ SAR aircraft' : '', cls, type, callsign ? 'Call ' + aisEsc(callsign) : '', p.mmsi ? 'MMSI ' + p.mmsi : ''].filter(Boolean).join(' · ');
+
+    const fresh = aisFreshChip(p.ageSec);
+    const srcLabel = aisSourceLabel(p.source);
+    const srcChip = srcLabel ? '<span style="' + AIS_CHIP + '">' + aisEsc(srcLabel) + '</span>' : '';
+    const pinned = !!(window.HelmAisPins && HelmAisPins.has && HelmAisPins.has(p.mmsi));
+    const pinBtn = '<button onclick="window.aisPinFromCard&&window.aisPinFromCard(' + (p.mmsi || 0) + ')" title="' + (pinned ? 'Unpin' : 'Pin this target') + '" '
+      + 'style="border:1px solid rgba(255,255,255,.2);background:' + (pinned ? 'rgba(95,208,176,.2)' : 'transparent') + ';color:' + (pinned ? '#5dd0b0' : '#cdd9e3') + ';font-size:15px;border-radius:9px;width:36px;height:36px;cursor:pointer;flex:0 0 auto">📌</button>';
+    // AIS-9: buddy / named-MMSI tag — ★ toggles a client-side known-vessel tag (cyan ring + name on chart).
+    const isBud = !!(window.HelmAisBuddy && HelmAisBuddy.isBuddy && HelmAisBuddy.isBuddy(p.mmsi));
+    const buddyBtn = '<button onclick="window.aisToggleBuddy&&window.aisToggleBuddy(' + (p.mmsi || 0) + ')" title="' + (isBud ? 'Remove buddy tag' : 'Tag as buddy') + '" '
+      + 'style="border:1px solid ' + (isBud ? 'rgba(55,199,255,.5)' : 'rgba(255,255,255,.2)') + ';background:' + (isBud ? 'rgba(55,199,255,.18)' : 'transparent') + ';color:' + (isBud ? '#37c7ff' : '#cdd9e3') + ';font-size:15px;border-radius:9px;width:36px;height:36px;cursor:pointer;flex:0 0 auto">' + (isBud ? '★' : '☆') + '</button>';
+    const buddyRow = isBud ? '<div style="display:flex;align-items:center;gap:6px;margin:0 0 6px">'
+      + '<span style="color:#37c7ff;font-size:12px;white-space:nowrap">★ Buddy</span>'
+      + '<input value="' + aisEsc(HelmAisBuddy.name(p.mmsi) || '') + '" placeholder="name (optional)" maxlength="40" '
+      + 'oninput="window.aisSetBuddyName&&aisSetBuddyName(' + (p.mmsi || 0) + ',this.value)" '
+      + 'style="flex:1;min-width:0;font-size:12px;padding:3px 8px;border:1px solid rgba(55,199,255,.3);border-radius:6px;background:transparent;color:var(--ctext)"></div>' : '';
+
+    // AIS-12: evasion advisor — quantitative "what to do" on a danger target (toggleable; reuses HelmColregs + a relative-motion solve).
+    let avoid = '';
+    if (_rt === 'danger' && window.HelmAisAdvisor && HelmAisAdvisor.isEnabled && HelmAisAdvisor.isEnabled()) {
+      const ad = HelmAisAdvisor.adviceFor(p);
+      if (ad) {
+        let line;
+        if (ad.needWind) line = 'Set the wind (in the AIS panel) for the give-way call.';
+        else if (ad.side === 'hold') line = 'Hold course &amp; speed — be ready to act.';
+        else if (ad.turnDeg != null && ad.achievable) line = '↻ ≥' + ad.turnDeg + '° to ' + ad.side + ' to clear ' + ad.limit + ' NM'
+          + (ad.newCourse != null ? ' — make good ' + Math.round(ad.newCourse) + '° over ground' : '')
+          + (ad.slowToKn != null ? ', or slow to ' + ad.slowToKn + ' kn' : '');
+        else if (ad.turnDeg != null) line = 'Best out: ↻ ' + ad.turnDeg + '° to ' + ad.side + ' → ' + ad.clearBy + ' NM (can\'t reach ' + ad.limit + ' NM — she\'s too close)'
+          + (ad.slowToKn != null ? '; or slow to ' + ad.slowToKn + ' kn' : '');
+        else if (ad.slowToKn != null) line = 'Slow to ' + ad.slowToKn + ' kn to clear.';
+        else line = 'No course or speed change clears — reduce speed and verify visually.';
+        // AIS-14: the advised course is a ground track. If set & drift are entered, give the heading to steer.
+        let steerLine = '';
+        if (ad.newCourse != null && ad.setDrift) {
+          const sDeg = Math.round(ad.setDrift.setDeg), dKn = ad.setDrift.driftKn;
+          if (ad.steerHeading != null) steerLine = 'Steer ~' + Math.round(ad.steerHeading) + '° to make that track good through the ' + dKn + ' kn set (' + sDeg + '°)';
+          else if (ad.makeGoodUnreachable) steerLine = 'The ' + dKn + ' kn set (' + sDeg + '°) is too strong to hold that ground track at your speed — open the range another way.';
+        }
+        // Visual propulsion override — your eyes beat the AIS registry (a "sailing" vessel can be motoring).
+        const kind = window.HelmColregsKind ? HelmColregsKind(p) : null;
+        let kindRow = '';
+        if (kind && (kind.ais === 'sail' || ad.sail || kind.override)) {
+          const eff = kind.override || (kind.ais === 'unknown' ? null : kind.ais), src = kind.override ? 'you set' : 'from AIS';
+          const kbtn = (k, lbl) => { const sel = (k === 'auto') ? !kind.override : (eff === k);
+            return '<button type="button" onclick="window.aisSetKind&&aisSetKind(' + (p.mmsi || 0) + ',\'' + k + '\')" '
+              + 'style="cursor:pointer;font-size:11px;padding:3px 9px;border-radius:7px;border:1px solid ' + (sel ? '#5dd0b0' : 'rgba(255,255,255,.18)') + ';background:' + (sel ? 'rgba(95,208,176,.18)' : 'transparent') + ';color:var(--ctext)">' + lbl + '</button>'; };
+          kindRow = '<div style="font-size:10.5px;color:var(--cdim);margin-top:7px">Her propulsion: <span style="color:#cdd9e3">' + (eff || 'unknown') + '</span> <span style="opacity:.7">(' + src + ')</span> — what do you actually see?</div>'
+            + '<div style="display:flex;gap:5px;margin-top:4px">' + kbtn('sail', 'Sailing') + kbtn('power', 'Motoring') + kbtn('auto', 'AIS') + '</div>';
+        }
+        const caveat = ad.sail ? ('Based on her AIS type unless you set it above — a registered sailing vessel can be motoring (then power rules apply).'
+          + (ad.rule === 'Rule 12' ? ' Her tack is inferred from her course and the wind.' : '')) : '';
+        avoid = sec('Avoid')
+          + '<div style="background:rgba(255,90,82,.10);border:1px solid #ff5a5240;border-radius:9px;padding:8px 10px">'
+          + (ad.action ? '<div style="font-size:12.5px;color:#ffd0cc;margin-bottom:4px">' + aisEsc(ad.action) + (ad.rule ? ' <span style="color:var(--cdim)">· ' + aisEsc(ad.rule) + '</span>' : '') + '</div>' : '')
+          + '<div style="font-size:13.5px;font-weight:600;color:#ff9a93">' + line + '</div>'
+          + (steerLine ? '<div style="font-size:11.5px;color:#cdd9e3;margin-top:3px">⊕ ' + steerLine + '</div>' : '')
+          + kindRow
+          + (caveat ? '<div style="font-size:10px;color:#f0c98a;margin-top:6px">⚠ ' + caveat + '</div>' : '')
+          + '<div style="font-size:10px;color:var(--cdim);margin-top:5px">Advisory — keep a lookout; you remain responsible under the Rules.</div>'
+          + '</div>';
+      }
+    }
+
+    return '<div class="ais-card" style="min-width:240px' + (stale ? ';opacity:.6' : '') + '">'
+      + '<div style="display:flex;align-items:center;gap:9px;margin-bottom:2px">'
+      +   '<span style="font-weight:600;font-size:18px;flex:1;line-height:1.15">' + aisEsc(name) + (fl ? ' <span style="font-size:1.15em;line-height:1;vertical-align:-1px">' + fl + '</span>' : '') + '</span>'
+      +   buddyBtn + pinBtn
+      + '</div>'
+      + (subline ? '<div style="font-size:12px;color:var(--cdim);margin-bottom:6px">' + subline + '</div>' : '')
+      + buddyRow
+      + badge
+      + '<div style="display:flex;gap:8px;margin:8px 0 4px">'
+      +   stat('CPA', cpa, 'NM') + stat('TCPA', tcpa, 'min', tcpaOpening ? '<div style="font-size:10.5px;color:#5dd0b0">opening</div>' : '')
+      + '</div>'
+      + '<div style="display:flex;gap:8px;margin:0 0 4px">'
+      +   stat('SOG', aisNum(p.sog, 1), 'kn', '', true) + stat('Range', aisNum(p.range, 2), 'NM', '', true)
+      + '</div>'
+      + '<div style="font-size:12.5px;font-weight:600;color:' + toneCol + ';margin:0 0 2px">' + riskLabel + '</div>'
+      + avoid
+      + weather
+      + sec('Motion') + motion
+      + voyage + size
+      + '<div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:10px">' + fresh + srcChip
+      +   (p.posDoubtful ? '<span style="display:inline-flex;align-items:center;gap:5px;font-size:12.5px;color:#412402;background:#ef9f27;padding:5px 10px;border-radius:16px">⚠ position doubtful</span>' : '')
+      + '</div>'
+      + '</div>';
+  }
+  // AIS detail card — a FREE, draggable inspector (not map-anchored). It opens beside the tapped
+  // vessel but is always clamped fully on-screen (never under the top bar / left rail / bottom HUD),
+  // and you can drag it anywhere by its header. Static snapshot — pin it (HelmAisPins) to watch it
+  // live. One card at a time. Replaces the old maplibregl.Popup, which could spawn half off-screen
+  // and couldn't be moved.
+  var _aisCard = null, _aisCardBody = null, _aisCardProps = null, _aisCardDragging = false;
+  var AIS_CARD_SAFE = { top: 54, left: 58, bottom: 70, pad: 8 };   // keep clear of the chrome
+  function closeAisCard() { if (_aisCard) { _aisCard.remove(); _aisCard = null; } }
+  function clampAisCard(el, x, y) {
+    var s = AIS_CARD_SAFE, w = el.offsetWidth, h = el.offsetHeight;
+    var maxX = window.innerWidth - w - s.pad, maxY = window.innerHeight - s.bottom - h;
+    x = Math.max(s.left, Math.min(x, Math.max(s.left, maxX)));
+    y = Math.max(s.top, Math.min(y, Math.max(s.top, maxY)));
+    el.style.left = Math.round(x) + 'px'; el.style.top = Math.round(y) + 'px';
+  }
+  function makeAisCardDraggable(card, handle) {
+    var sx, sy, ox, oy, dragging = false;
+    function move(e) {
+      if (!dragging) return;
+      var pt = e.touches ? e.touches[0] : e;
+      clampAisCard(card, ox + (pt.clientX - sx), oy + (pt.clientY - sy));
+      if (e.cancelable) e.preventDefault();
+    }
+    function up() {
+      dragging = false; _aisCardDragging = false;
+      document.removeEventListener('mousemove', move); document.removeEventListener('mouseup', up);
+      document.removeEventListener('touchmove', move); document.removeEventListener('touchend', up);
+    }
+    function down(e) {
+      if (e.target.closest('button')) return;                 // never start a drag from a button
+      dragging = true; _aisCardDragging = true;
+      var pt = e.touches ? e.touches[0] : e;
+      sx = pt.clientX; sy = pt.clientY;
+      ox = parseFloat(card.style.left) || 0; oy = parseFloat(card.style.top) || 0;
+      document.addEventListener('mousemove', move); document.addEventListener('mouseup', up);
+      document.addEventListener('touchmove', move, { passive: false }); document.addEventListener('touchend', up);
+      e.preventDefault();
+    }
+    handle.addEventListener('mousedown', down);
+    handle.addEventListener('touchstart', down, { passive: false });
+  }
+  function openAisCard(props, point) {
+    closeAisCard();
+    var card = document.createElement('div');
+    card.className = 'helm-ais-card';
+    card.style.cssText = 'position:fixed;z-index:20;width:min(92vw,340px);max-height:78vh;overflow-y:auto;'
+      + 'background:rgba(13,23,34,.97);border:1px solid rgba(255,255,255,.14);border-radius:14px;'
+      + 'box-shadow:0 18px 50px -16px rgba(0,0,0,.9);color:#e6eef5;-webkit-overflow-scrolling:touch';
+    var head = document.createElement('div');
+    head.style.cssText = 'display:flex;align-items:center;justify-content:space-between;cursor:move;'
+      + 'padding:7px 11px 1px;touch-action:none;user-select:none;-webkit-user-select:none';
+    head.innerHTML = '<span style="font-size:10.5px;letter-spacing:.12em;color:var(--cdim)">⠿ DRAG</span>'
+      + '<button data-close aria-label="Close" title="Close" style="border:none;background:transparent;'
+      + 'color:#9bb0c0;font-size:21px;line-height:1;cursor:pointer;padding:0 2px 2px">×</button>';
+    var body = document.createElement('div');
+    body.style.cssText = 'padding:2px 13px 13px';
+    body.innerHTML = aisPopupHTML(props);
+    card.appendChild(head); card.appendChild(body);
+    document.body.appendChild(card);
+    var x = (point && point.x != null) ? point.x + 16 : (window.innerWidth - card.offsetWidth) / 2;
+    var y = (point && point.y != null) ? point.y + 16 : 96;
+    clampAisCard(card, x, y);
+    head.querySelector('[data-close]').addEventListener('click', closeAisCard);
+    makeAisCardDraggable(card, head);
+    _aisCard = card; _aisCardBody = body; _aisCardProps = props;
+    return card;
+  }
+  // Visual propulsion override (Rule 12/18 honesty): your eyes correct the AIS registry — re-render live.
+  window.aisSetKind = function (mmsi, kind) {
+    if (window.HelmAisAdvisor && HelmAisAdvisor.setTargetKind) HelmAisAdvisor.setTargetKind(mmsi, kind);
+    if (_aisCardBody && _aisCardProps && +_aisCardProps.mmsi === +mmsi) _aisCardBody.innerHTML = aisPopupHTML(_aisCardProps);
+  };
+  // AIS-9: buddy tag — toggle re-renders the card (flips the ★ + shows the name row); name edit does NOT
+  // re-render (would lose input focus mid-type — the chart ring/label update via the helm:ais-buddy event).
+  window.aisToggleBuddy = function (mmsi) {
+    if (window.HelmAisBuddy) HelmAisBuddy.toggle(mmsi);
+    if (_aisCardBody && _aisCardProps && +_aisCardProps.mmsi === +mmsi) _aisCardBody.innerHTML = aisPopupHTML(_aisCardProps);
+  };
+  window.aisSetBuddyName = function (mmsi, name) { if (window.HelmAisBuddy) HelmAisBuddy.set(mmsi, name); };
+  // Live-refresh the open detail card every nav frame (mirrors the pinned cards) so SOG/CPA/TCPA/range
+  // AND the red→amber→green tier colour track the engine instead of freezing at tap time. Fed the SAME
+  // normalised feature props the map source gets (so sentinels stay desentineled). Skips mid-drag and
+  // preserves the card's scroll position across the innerHTML swap; if the target dropped from the feed
+  // this frame, keeps the last render rather than blanking.
+  function refreshAisCard(feats) {
+    if (!_aisCard || !_aisCardBody || !_aisCardProps || _aisCardDragging) return;
+    // Don't yank the card out from under an active edit (e.g. the buddy-name field) — the innerHTML swap
+    // would drop focus + the half-typed value. Resume next frame once focus leaves the input.
+    var ae = document.activeElement;
+    if (ae && _aisCard.contains(ae) && /^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName || '')) return;
+    var mmsi = +_aisCardProps.mmsi;
+    if (!mmsi || !Array.isArray(feats)) return;          // non-MMSI cards (some weather/base stations) → leave static
+    var fresh = null;
+    for (var i = 0; i < feats.length; i++) { var p = feats[i].properties; if (p && +p.mmsi === mmsi) { fresh = p; break; } }
+    if (!fresh) return;
+    _aisCardProps = fresh;
+    var sc = _aisCard.scrollTop;                          // the card div is the scroll container (overflow-y:auto)
+    _aisCardBody.innerHTML = aisPopupHTML(fresh);
+    _aisCard.scrollTop = sc;
+  }
+  // A rotate/resize must never strand the card off-screen; Esc dismisses it.
+  window.addEventListener('resize', function () { if (_aisCard) clampAisCard(_aisCard, parseFloat(_aisCard.style.left) || 0, parseFloat(_aisCard.style.top) || 0); });
+  window.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeAisCard(); });
+  window.openAisCard = openAisCard; window.closeAisCard = closeAisCard;   // debug/automation hook (like window.map)
+  // Pin from the card: pinning docks a live card on the right, so close the floating one (mirrors the
+  // map-tap card). Unpinning from an already-pinned target's card leaves it open so you can re-pin.
+  function aisPinFromCard(mmsi) {
+    if (!window.HelmAisPins) return;
+    var wasPinned = HelmAisPins.has && HelmAisPins.has(mmsi);
+    HelmAisPins.toggle(mmsi);
+    if (!wasPinned) closeAisCard();
+  }
+  window.aisPinFromCard = aisPinFromCard;
+  // AIS targets → the `ais` source. The source carries promoteId:'mmsi' (CLIENT-5) so each target's
+  // feature.id == its MMSI — a stable id for tap hit-testing and future incremental updates.
+  function updateAisFromEngine(list) {
+    if (!Array.isArray(list)) return;
+    try {
+      const src = map.getSource('ais'); if (!src) return;
+      const feats = list
+        .filter(t => t && isFinite(t.lon) && isFinite(t.lat))
+        .map(t => ({ type: 'Feature', id: t.mmsi, geometry: { type: 'Point', coordinates: [t.lon, t.lat] },
+                     // Normalise the AIS "not available" sentinels to null so we never render them as
+                     // real data: SOG 1023 → 102.3 kn (a moored Class-B with no GPS speed would show as
+                     // a 100-kn ghost + a huge AIS-4 predictor), COG 3600 → 360°. A target not reporting
+                     // speed/course must read "—", not a fake value.
+                     properties: { ...t, name: aisName(t.name),
+                       sog: (t.sog != null && +t.sog <= 102.2) ? t.sog : null,
+                       cog: (t.cog != null && +t.cog < 360) ? t.cog : null } }));   // strip '@' padding for the map label too
+      src.setData({ type: 'FeatureCollection', features: feats });
+      refreshAisCard(feats);   // keep the open detail card live (SOG/CPA/TCPA/range + tier colour) — same normalised props
+    } catch (e) { /* style not ready this tick */ }
+  }
+  // ---- live route line: drive the `route` source from the engine's route geometry, and highlight
+  // the active leg. The source starts EMPTY (no hardcoded demo file); sim mode pushes its own
+  // geometry via nav frames the same way the engine does. ----
+  let routeActiveAdded = false;
+  function ensureRouteActiveLayer() {
+    if (routeActiveAdded || !map.getLayer('route-line') || map.getLayer('route-active')) { routeActiveAdded = true; return; }
+    map.addLayer({
+      id: 'route-active', type: 'line', source: 'route',
+      filter: ['==', ['get', 'leg'], 'active'],
+      layout: { 'line-cap': 'round', 'line-join': 'round' },
+      paint: { 'line-color': '#ff8ad4', 'line-width': 5, 'line-opacity': 0.95 }
+    });
+    routeActiveAdded = true;
+  }
+  function updateRouteFromEngine(r) {
+    // Expose the full route (coords + per-waypoint names + route name) for the editor — the map
+    // `route` source below is geometry-only, so route-edit.js reads names from here.
+    window.__route = (r && Array.isArray(r.coords) && r.coords.length >= 2) ? r : null;
+    if (!r || !Array.isArray(r.coords) || r.coords.length < 2) return;
+    try {
+      const src = map.getSource('route'); if (!src) return;
+      const feats = [{ type: 'Feature', properties: { leg: 'all' }, geometry: { type: 'LineString', coordinates: r.coords } }];
+      const a = r.activeLeg;
+      if (a != null && a >= 0 && a + 1 < r.coords.length)
+        feats.push({ type: 'Feature', properties: { leg: 'active' }, geometry: { type: 'LineString', coordinates: [r.coords[a], r.coords[a + 1]] } });
+      src.setData({ type: 'FeatureCollection', features: feats });
+      ensureRouteActiveLayer();
+    } catch (e) { /* style not ready this tick */ }
+  }
+  // AIS tap -> rich detail card. Bound to the live vessel layers (collision.js renders vessels on
+  // helm-ais-vessel-tri now, SART/AtoN/base on helm-ais-symbol); 'ais-vessels' is the hidden legacy
+  // layer, kept only so an older style still works.
+  ['helm-ais-vessel-tri', 'helm-ais-symbol', 'ais-vessels'].forEach(layer => {
+    map.on('mouseenter', layer, () => { map.getCanvas().style.cursor = 'pointer'; });
+    map.on('mouseleave', layer, () => { map.getCanvas().style.cursor = ''; });
+    map.on('click', layer, e => { if (measuring()) return; openAisCard(e.features[0].properties, e.point); });
+  });
+
+  // ================= CHROME UI wiring =================
+  // The shell's BUILT-IN drawers (the panels that shipped before the SHELL registration API).
+  // New epics should NOT add to this map — they call HelmShell.registerPanel({...}) from their own
+  // module instead (see web/SHELL.md), which appends a rail button + drawer with no edit here.
+  // The two systems are kept mutually exclusive: opening a built-in drawer closes any registered
+  // panel (HelmShell.closeAllPanels), and opening a registered panel closes these (setLegacyCloser).
+  (function () {
+    const drawers = { layers: 'drawer-layers', weather: 'drawer-weather', download: 'drawer-download', settings: 'drawer-settings', lab: 'drawer-lab', community: 'drawer-community', routes: 'drawer-routes' };
+    // only the built-in rail buttons — registered panels wire their OWN click handler in shell.js
+    const builtinKeys = new Set(Object.keys(drawers).concat(['ais', 'places', 'measure', 'chart']));
+    const rail = Array.from(document.querySelectorAll('.ri[data-rail]')).filter(b => builtinKeys.has(b.dataset.rail));
+    function activeDrawerFrom(target) {
+      const d = target && target.closest && target.closest('.drawer');
+      return d && !d.hidden && d.scrollHeight > d.clientHeight ? d : null;
+    }
+    function wheelPixels(e, d) {
+      const unit = e.deltaMode === 1 ? 16 : (e.deltaMode === 2 ? d.clientHeight : 1);
+      return e.deltaY * unit;
+    }
+    document.addEventListener('wheel', e => {
+      const d = activeDrawerFrom(e.target);
+      if (!d) return;
+      const before = d.scrollTop;
+      d.scrollTop = Math.max(0, Math.min(d.scrollHeight - d.clientHeight, before + wheelPixels(e, d)));
+      if (d.scrollTop !== before) { e.preventDefault(); e.stopPropagation(); }
+    }, { capture: true, passive: false });
+    let drawerTouch = null;
+    document.addEventListener('touchstart', e => {
+      const d = activeDrawerFrom(e.target);
+      drawerTouch = d && e.touches && e.touches.length === 1 ? { d, y: e.touches[0].clientY } : null;
+    }, { capture: true, passive: true });
+    document.addEventListener('touchmove', e => {
+      if (!drawerTouch || !e.touches || e.touches.length !== 1) return;
+      const y = e.touches[0].clientY, d = drawerTouch.d, before = d.scrollTop;
+      d.scrollTop = Math.max(0, Math.min(d.scrollHeight - d.clientHeight, before + (drawerTouch.y - y)));
+      drawerTouch.y = y;
+      if (d.scrollTop !== before) { e.preventDefault(); e.stopPropagation(); }
+    }, { capture: true, passive: false });
+    document.addEventListener('touchend', () => { drawerTouch = null; }, { capture: true, passive: true });
+    function closeDrawers() { Object.values(drawers).forEach(id => { const d = document.getElementById(id); if (d) d.hidden = true; }); }
+    if (window.HelmShell) HelmShell.setLegacyCloser(() => { closeDrawers(); rail.forEach(r => r.classList.remove('on')); });
+    function setActive(btn) { rail.forEach(r => r.classList.toggle('on', r === btn)); }
+    rail.forEach(btn => btn.addEventListener('click', () => {
+      const key = btn.dataset.rail;
+      if (window.HelmShell) HelmShell.closeAllPanels();   // opening a built-in drawer closes any registered panel
+      if (drawers[key]) {                              // panels: layers / weather / download / settings
+        const d = document.getElementById(drawers[key]), wasOpen = !d.hidden;
+        closeDrawers(); d.hidden = wasOpen;
+        rail.forEach(r => r.classList.toggle('on', !wasOpen && r === btn));
+        if (!wasOpen && key === 'routes' && window.HelmRoutes) { window.HelmRoutes.refresh(); if (HelmRoutes.showTab) HelmRoutes.showTab('saved'); }   // reload saved routes + land on Saved tab
+      } else if (key === 'ais' || key === 'places') { // toggle that chart layer group via its checkbox
+        const cb = document.querySelector('.row input[data-layer="' + key + '"]');
+        if (cb) { cb.checked = !cb.checked; cb.dispatchEvent(new Event('change')); }
+        btn.classList.toggle('on');
+      } else if (key === 'measure') {                  // range/bearing ruler mode
+        if (measure) measure.toggle();
+      } else if (key === 'chart') {                    // home
+        closeDrawers(); setActive(btn);
+        if (measure && measure.active()) measure.toggle();
+      }
+      // keep the ruler's highlight truthful even when another rail button reshuffles 'on'
+      if (measureBtn) measureBtn.classList.toggle('on', !!(measure && measure.active()));
+    }));
+  })();
+
+  // Day / Dusk / Night (TOOLS-5) — a real night display: dim+desaturate EVERY raster basemap, swap the
+  // whole UI shell to a black/red night palette (zero white/blue), and a brilliance control that takes the
+  // chart toward black for night vision. A raster chart's white background can't truly reach black by
+  // dimming (it's a flat image) — the red film does the rest of the darkening + the tint.
+  (function () {
+    const film = document.createElement('div'); film.id = 'night-film'; document.body.appendChild(film);
+    // NIGHT: hard dim + full desaturate + NO hue shift. (The old 205° pushed the chart toward BLUE — the
+    // single worst colour for both night vision and melatonin. brightness-max is then driven by brilliance.)
+    const THEMES = {
+      day:   { 'raster-brightness-min': 0, 'raster-brightness-max': 1,    'raster-saturation': 0,     'raster-contrast': 0,     'raster-hue-rotate': 0 },
+      dusk:  { 'raster-brightness-min': 0, 'raster-brightness-max': 0.6,  'raster-saturation': -0.32, 'raster-contrast': 0.03,  'raster-hue-rotate': 0 },
+      night: { 'raster-brightness-min': 0, 'raster-brightness-max': 0.3,  'raster-saturation': -0.85, 'raster-contrast': -0.05, 'raster-hue-rotate': 0 }
+    };
+    const NIGHT_TINT = '24,6,3';                 // deep-red film (rgb); opacity comes from brilliance
+    const seg = document.querySelectorAll('#theme-seg span');
+    const brilWrap = document.getElementById('bril-wrap');
+    const bril = document.getElementById('bril');
+    let cur = 'day';
+
+    // Apply a raster recipe to EVERY raster layer in the style (navionics / sat / google / bing / arcgis /
+    // charts / enc) — NOT a hardcoded id list, so whatever basemap you're on actually dims.
+    function paintRasters(p) {
+      try { (map.getStyle().layers || []).forEach(l => { if (l.type === 'raster')
+        Object.keys(p).forEach(k => { try { map.setPaintProperty(l.id, k, p[k]); } catch (e) {} }); }); } catch (e) {}
+    }
+    // brilliance v∈[0..1] (night only): one slider drives basemap brightness + red-film opacity together,
+    // from "dim" to "near-black red". Persisted via HelmStore so it survives a reload.
+    function applyBrilliance() {
+      if (cur !== 'night') { film.style.background = (cur === 'dusk') ? 'rgba(74,34,10,0.28)' : 'transparent'; return; }
+      const v = (window.HelmStore ? +HelmStore.get('ui.nightBrilliance', 45) : 45) / 100;
+      paintRasters({ 'raster-brightness-max': 0.55 - 0.45 * v });           // 0.55 (dimmer) → 0.10 (darkest)
+      film.style.background = 'rgba(' + NIGHT_TINT + ',' + (0.18 + 0.62 * v).toFixed(2) + ')';   // 0.18 → 0.80
+    }
+    function applyTheme(t) {
+      const p = THEMES[t]; if (!p) return;
+      cur = t;
+      paintRasters(p);
+      document.documentElement.classList.toggle('theme-night', t === 'night');   // swaps every colour var
+      document.documentElement.classList.toggle('theme-dusk', t === 'dusk');
+      if (window.HelmUiText) HelmUiText.apply();   // release/re-apply ui-text's inline --cdim so night/dusk own the muted-text colour
+      if (brilWrap) brilWrap.hidden = (t !== 'night');
+      applyBrilliance();
+    }
+    function selectTheme(t, persist) {
+      if (!THEMES[t]) t = 'day';
+      seg.forEach(o => o.classList.toggle('on', o.dataset.theme === t));
+      applyTheme(t);
+      if (persist && window.HelmStore) HelmStore.set('ui.theme', t);
+    }
+    seg.forEach(s => s.addEventListener('click', () => selectTheme(s.dataset.theme, true)));
+    if (bril) {
+      bril.value = window.HelmStore ? HelmStore.get('ui.nightBrilliance', 45) : 45;
+      bril.addEventListener('input', () => { if (window.HelmStore) HelmStore.set('ui.nightBrilliance', +bril.value); applyBrilliance(); });
+    }
+    const restore = () => selectTheme(window.HelmStore ? HelmStore.get('ui.theme', 'day') : 'day', false);
+    restore();                                  // set the segment + paint NOW (don't depend on the load race)
+    if (!map.isStyleLoaded()) map.once('load', restore);   // re-apply once the raster layers exist
+  })();
+
+  // make the route box draggable by its title bar
+  (function () {
+    const insp = document.querySelector('.insp'), handle = document.getElementById('insp-handle');
+    if (!insp || !handle) return;
+    let drag = false, ox = 0, oy = 0;
+    handle.addEventListener('mousedown', e => {
+      const r = insp.getBoundingClientRect();
+      insp.style.left = r.left + 'px'; insp.style.top = r.top + 'px'; insp.style.right = 'auto';
+      drag = true; ox = e.clientX - r.left; oy = e.clientY - r.top; e.preventDefault();
+    });
+    window.addEventListener('mousemove', e => {
+      if (!drag) return;
+      insp.style.left = Math.max(0, Math.min(window.innerWidth - insp.offsetWidth, e.clientX - ox)) + 'px';
+      insp.style.top = Math.max(0, Math.min(window.innerHeight - 40, e.clientY - oy)) + 'px';
+    });
+    window.addEventListener('mouseup', () => { drag = false; });
+  })();
+
+  // ============ LIVE NAV FEED ============
+  // Prefer the live Helm Engine over the resolved boat-server origin (server-endpoint.js → the
+  // engine's WS /nav — OpenCPN's real Routeman driven headless); fall back to the in-browser sim
+  // (nav-source.js) only when no engine was ever reached. Both emit the SAME state shape, so the
+  // cockpit code below is identical for real, simulated, local, and remote nav.
+  (function () {
+    const set = (id, v) => { const e = document.getElementById(id); if (e && v != null) e.textContent = v; };
+    function applyNav(s) {
+      if (s.pos) window.__helmPos = { lat: s.pos.lat, lon: s.pos.lon };   // shared with community.js
+      const miss = k => s.sources && s.sources[k] === 'missing';   // no real sensor → show '—', never a fabricated 0
+      set('nv-sog', (+s.sog).toFixed(1)); set('nv-cog', s.cog); set('nv-hdg', miss('hdg') ? '—' : s.hdg);
+      set('nv-depth', miss('depth') ? '—' : (+s.depth).toFixed(1)); set('nv-wind', miss('wind') ? '—' : Math.round(s.wind.spd));
+      set('nv-winddir', miss('wind') ? '—' : Math.round(s.wind.dir));
+      const hasRoute = !!(s.route && s.route.coords && s.route.coords.length >= 2);   // no active route → no route readouts/inspector
+      set('nv-pos', s.posStr); set('nv-next', hasRoute ? s.active.nextWp : '—');
+      set('nv-route-name', (s.active.name && s.active.name.trim()) || 'Route');   // real route name from the engine (route.create / GPX), not a hardcoded label
+      set('nv-eta', s.active.eta); set('nv-ttg', s.active.ttg); set('nv-vmg', s.active.vmg);
+      set('nv-dtg', s.active.dtg); set('nv-xte', s.active.xte);
+      // Suppress the route inspector when the active route clearly isn't being navigated here
+      // (e.g. the engine still has the Key West demo route active while you're elsewhere — DTG
+      // of hundreds/thousands of NM). Reappears the moment a real, nearby route is active.
+      { const dtgNM = parseFloat(String(s.active.dtg).replace(/[^\d.]/g, '')), insp = document.querySelector('.insp');
+        // hasRoute (from above): no active route → hide the inspector (a 'Route to Marina' demo placeholder until a real route arrives)
+        if (insp) insp.style.display = (hasRoute && s.active.nextWp && isFinite(dtgNM) && dtgNM <= 500) ? '' : 'none'; }
+      // per-field source kept truthful, but as an unobtrusive tooltip (no on-screen dots)
+      const src = s.sources;
+      const mark = (id, key) => { const e = document.getElementById(id); if (e && src) e.title = key.toUpperCase() + ' source: ' + src[key]; };
+      mark('nv-pos', 'pos'); mark('nv-sog', 'sog'); mark('nv-cog', 'cog');
+      mark('nv-depth', 'depth'); mark('nv-wind', 'wind'); mark('nv-winddir', 'wind');
+      if (s.active.legs[0]) { set('nv-leg0nm', s.active.legs[0].name); set('nv-leg0br', s.active.legs[0].brg); }
+      if (s.active.legs[1]) { set('nv-leg1nm', s.active.legs[1].name); set('nv-leg1br', s.active.legs[1].brg); }
+      ownship.update(s);   // smooth glide + follow / course-up (ownship.js)
+      alarms.onNav(s);     // depth / anchor / MOB safety alarms (alarms.js) — CPA handled by collision.js
+      if (s.ais) updateAisFromEngine(s.ais);          // live AIS targets (range/brg/CPA/TCPA from the engine)
+      if (s.conns) { window.__helmConns = s.conns; if (window.HelmConnections) HelmConnections.onState(s.conns); }   // live connection status (+ shared map for the AIS source chip)
+      if (window.HelmTrack) HelmTrack.onState(s);                                 // ownship breadcrumb trail
+      if (window.HelmTrueWindUI) HelmTrueWindUI.onNav(s);                          // WX-13: live true-wind readout (TWS/TWD/TWA)
+      if (window.HelmShell) HelmShell.dispatchNav(s);                              // SHELL-5: fan this frame to any module-registered HelmShell.onNav() listeners
+      if (s.route) updateRouteFromEngine(s.route);    // live route line from OpenCPN's model route
+      if (collision && s.pos) {                        // CPA alarm + COLREGs avoidance guidance (collision.js)
+        // AIS feed health: at least one connection actually receiving — else "monitoring offline"
+        const aisAlive = Array.isArray(s.conns) && s.conns.some(c => c && c.status === 'connected');
+        collision.update({ cog: +s.cog, sog: +s.sog, lon: s.pos.lon, lat: s.pos.lat }, s.ais || [], aisAlive);
+      }
+    }
+    // Always show the truth about where nav data comes from. Critically: if the
+    // live engine DROPS, do NOT silently fall back to the simulator presenting a
+    // plausible fake position — that masks a lost real feed. Surface it as an
+    // alarm and mark the readings stale. The sim is only ever used when no engine
+    // was present to begin with (honest prototype mode).
+    function setSource(state, info) {
+      window.__navSource = state;
+      const b = document.getElementById('data-src'), t = document.getElementById('data-src-txt');
+      if (!b) return;
+      const age = info && info.age != null ? Math.round(info.age / 1000) : null;
+      const where = info && info.endpoint ? ' · ' + info.endpoint : '';
+      b.classList.remove('live', 'sim', 'lost', 'simpos');
+      if (state === 'live') { b.classList.add('live'); t.textContent = 'LIVE'; b.title = 'Live navigation from the Helm Engine' + where; }
+      else if (state === 'simpos') { b.classList.add('simpos'); t.textContent = 'ENGINE · SIM POS'; b.title = 'Engine connected, position simulated (no GPS/NMEA feed wired)' + where; }
+      else if (state === 'lagging') { b.classList.add('live'); t.textContent = 'LIVE · ' + age + 's'; b.title = 'Update delayed ' + age + 's — link is lagging' + where; }
+      else if (state === 'stale' || state === 'lost') { b.classList.add('lost'); t.textContent = 'STALE' + (age != null ? ' · ' + age + 's' : ''); b.title = 'No fresh fix for ' + (age != null ? age + 's' : 'a while') + ' — readings are NOT current' + where; }
+      else if (state === 'offline') { b.classList.add('lost'); t.textContent = 'OFFLINE'; b.title = 'Disconnected from the engine — reconnecting…' + where; }
+      else { b.classList.add('sim'); t.textContent = 'SIM'; b.title = 'Simulated navigation (no engine running)'; }
+      // grey the instruments when the feed is not current — NEVER show stale data as live
+      const bad = (state === 'stale' || state === 'lost' || state === 'offline');
+      document.querySelectorAll('.ib').forEach(e => e.classList.toggle('stale', bad));  // route box stays solid
+      if (window.__ownship) __ownship.setActive(!bad);   // freeze the boat when the feed isn't current
+      if (window.__alarms) __alarms.onSource(state, info);   // hold + AUDIBLE feed-loss/no-fix alarm (alarms.js, ALARM-9/10)
+    }
+    // The robust client (nav-client.js) resolves the boat-server address (server-endpoint.js),
+    // merges snapshot/delta frames, runs the age watchdog (LIVE/LAGGING/STALE), reconnects over
+    // flaky WiFi, and falls back to the honest in-browser sim ONLY if no engine was ever reached.
+    // The address is whatever you loaded the page from — localhost here, helm.local / a LAN IP on
+    // the boat — so this single line behaves identically local or remote.
+    window.__navClient = HelmNavClient(applyNav,
+      st => { if (st.phase === 'alarm') { if (window.__alarms) __alarms.fromEngine(st.alarm); } else {
+        setSource(st.phase, st);
+        if (window.HelmHealthPanel && HelmHealthPanel.onStatus) HelmHealthPanel.onStatus(st);
+      } },
+      { onCommand: m => { if (window.HelmConnections) HelmConnections.onCommand(m); if (window.HelmRoutes) HelmRoutes.onCommand(m); if (window.HelmRouteEdit) HelmRouteEdit.onCommand(m); },
+        onAlarm: a => { if (window.__alarms) __alarms.fromAlarm(a); },              // CONTRACT-10: engine alarm raise/update → banner/beep
+        onAlarmClear: id => { if (window.__alarms) __alarms.clearById(id); } });    // CONTRACT-10: engine alarm.clear → remove banner
+      // NO sim fallback — real engine/NMEA (Vesper) position only; if no engine, show an honest empty state, never a fabricated boat
+    if (window.HelmConnections) HelmConnections.init({ client: window.__navClient });   // Connections settings UI
+    if (window.HelmRoutes) HelmRoutes.init({ client: window.__navClient });             // saved-route management UI
+    if (window.HelmTrack) HelmTrack.init({ map: window.map });   // draws the auto-recorded track line (no control)
+    if (window.HelmAisTracks) HelmAisTracks.init({ map: window.map });   // AIS target trails ("wakes")
+    if (window.HelmAisPins) HelmAisPins.init({ map: window.map });       // pinned-target live cards
+    if (window.HelmAisSelect) HelmAisSelect.init({ map: window.map });   // CLIENT-7: tap-to-select highlight (feature-state)
+  })();
+
+  // ============ CLIENT-8: AIS viewport cull — debounced map moveend/zoomend → navClient.setBbox ============
+  // The server (CONTRACT-8) filters the AIS channel to the viewport [w,s,e,n] so we never stream
+  // targets outside the visible area. Rapid pan+zoom gestures coalesce into one sub.update (debounce).
+  (function () {
+    if (!window.__navClient || !window.map) return;
+    const m = window.map, DEBOUNCE = 300, MARGIN = 0.15;   // 15% lookahead so targets don't pop at the edge
+    let t = null;
+    function send() {
+      t = null;
+      try {
+        const b = m.getBounds(); if (!b) { __navClient.setBbox(null); return; }
+        const w = b.getWest(), s = b.getSouth(), e = b.getEast(), n = b.getNorth();
+        const dw = e - w, dh = n - s;
+        // world view / antimeridian wrap → a bbox cull is useless or unrepresentable; stream all targets
+        if (!(dw > 0 && dw <= 180 && dh > 0 && dh <= 90)) { __navClient.setBbox(null); return; }
+        const mw = dw * MARGIN, mh = dh * MARGIN;
+        __navClient.setBbox([w - mw, s - mh, e + mw, n + mh]);
+      } catch (err) { try { __navClient.setBbox(null); } catch (e2) {} }
+    }
+    const enqueue = () => { if (t) clearTimeout(t); t = setTimeout(send, DEBOUNCE); };
+    m.on('moveend', enqueue);
+    m.on('zoomend', enqueue);
+  })();
+
+  // ============ COMMUNITY: where-to-go + give-back (selectable layers) ============
+  (function () {
+    if (!window.HelmCommunity) return;
+    const comm = HelmCommunity(map);
+    window.__helmCommunity = comm;
+    const statusEl = document.getElementById('comm-status');
+    function setStatus(online) {
+      if (!statusEl) return;
+      statusEl.textContent = online ? 'Helm backend connected · open + owned + RAG'
+        : 'Backend offline — local sample (run backend/: uvicorn main:app --port 8090)';
+      statusEl.style.color = online ? 'var(--ok)' : 'var(--warn)';
+    }
+    comm.onStatus(setStatus);
+    comm.health().then(h => { if (h && h.ok) { comm.loadPlaces(); comm.loadSaved(); } });
+
+    const resultsEl = document.getElementById('wt-results');
+    function renderResults(j) {
+      if (!resultsEl) return;
+      if (j.offline) { resultsEl.innerHTML = '<div style="color:var(--warn)">Start the backend for live suggestions.</div>'; return; }
+      const recs = j.recommendations || [];
+      if (!recs.length) { resultsEl.innerHTML = '<div style="color:var(--cdim)">No suggestions.</div>'; return; }
+      resultsEl.innerHTML = recs.map((r, i) => {
+        const c = r.confidence, col = c === 'good' ? 'var(--ok)' : c === 'fair' ? 'var(--warn)' : 'var(--cdim)';
+        const srcs = (r.sources || []).map(s => s.label).join(' · ');
+        return '<div class="wt-card" data-lat="' + r.place.lat + '" data-lon="' + r.place.lon + '" ' +
+          'style="border:.5px solid var(--line);border-radius:9px;padding:8px 9px;margin-bottom:7px;cursor:pointer">' +
+          '<div style="display:flex;align-items:center;gap:6px"><b style="color:#f5c451">#' + (i + 1) + '</b>' +
+          '<span style="font-weight:600;color:var(--ctext);flex:1">' + r.place.name + '</span>' +
+          '<span style="font-size:9px;color:' + col + ';border:.5px solid ' + col + ';border-radius:4px;padding:0 4px">' + c + '</span></div>' +
+          '<div style="color:#cdd9e3;margin-top:3px;line-height:1.4">' + ((r.reasons || [])[0] || '') + '</div>' +
+          '<div style="color:var(--cdim2);font-size:9.5px;margin-top:4px">' + srcs + (r.nfl ? ' · NFL' : '') + ' · ' + r.llm + '</div></div>';
+      }).join('');
+      resultsEl.querySelectorAll('.wt-card').forEach(el => el.addEventListener('click', () =>
+        map.flyTo({ center: [+el.dataset.lon, +el.dataset.lat], zoom: 13 })));
+    }
+    document.getElementById('wt-go').addEventListener('click', async () => {
+      const c = map.getCenter();
+      const wd = parseFloat((document.getElementById('nv-winddir') || {}).textContent) || 45;
+      const ws = parseFloat((document.getElementById('nv-wind') || {}).textContent) || 15;
+      resultsEl.innerHTML = '<div style="color:var(--cdim)">Researching…</div>';
+      renderResults(await comm.whereTo({ query: 'Safe spot for tonight near here',
+        position: { lat: c.lat, lon: c.lng }, boat: { draft: 1.8 },
+        forecast: { windFromDeg: wd, windKt: ws }, top: 3 }));
+    });
+    document.getElementById('wt-clear').addEventListener('click', () => { comm.clearWhereTo(); resultsEl.innerHTML = ''; });
+
+    const gbStatus = document.getElementById('gb-status'), say = t => { if (gbStatus) gbStatus.textContent = t; };
+    document.getElementById('gb-nfl').addEventListener('change', async e => {
+      if (!e.target.checked) return say('Position sharing off.');
+      const p = window.__helmPos || { lat: map.getCenter().lat, lon: map.getCenter().lng };
+      const r = await comm.nflPush({ lat: p.lat, lon: p.lon });
+      say(r.offline ? 'Backend offline — would push when connected.' : 'NFL push: ' + r.status + ' (' + r.mode + ').');
+    });
+    document.getElementById('gb-osm').addEventListener('change', async e => {
+      if (!e.target.checked) return say('OSM contribution off.');
+      const c = map.getCenter();
+      const r = await comm.osmNote({ lat: c.lat, lon: c.lng, text: 'Helm: anchorage/POI note (review).' });
+      say(r.offline ? 'Backend offline.' : 'OSM note: ' + r.status + ' (' + r.mode + ').');
+    });
+
+    // ---- spacetime probe: arm → tap a point → narrate the fused slice at (lat,lon,t) ----
+    let armed = false;
+    const armBtn = document.getElementById('narrate-arm'), card = document.getElementById('narrate-card');
+    const hint = document.getElementById('narrate-hint');
+    function setArmed(on) {
+      armed = on; armBtn.classList.toggle('on', on);
+      map.getCanvas().classList.toggle('narrate-arm', on);
+      map.getCanvas().style.cursor = on ? 'crosshair' : '';
+      hint.textContent = on ? 'Tap the chart now…' : 'Tap the chart to fuse every layer at that point & the current time.';
+    }
+    armBtn.addEventListener('click', () => setArmed(!armed));
+    document.getElementById('nc-x').addEventListener('click', () => { card.hidden = true; });
+
+    // selectable layers drive the slice (ADR-0007): only checked layers join the probe
+    function enabledLayers() {
+      const on = id => { const cb = document.querySelector('.row input[data-layer="' + id + '"]'); return cb ? cb.checked : false; };
+      const layers = [];
+      if (window.__activeWx && window.__activeWx !== 'off') layers.push('weather');
+      if (on('places')) layers.push('places');
+      if (on('saved')) layers.push('saved');
+      if (on('soundg-text') || on('depare-fill')) layers.push('depth');
+      if (on('ais')) layers.push('ais');
+      if (on('charts') || on('enc-chart') || on('depare-fill')) layers.push('chart');
+      layers.push('climate');                              // contextual, always available
+      return layers;
+    }
+
+    // probe along the route P(t): sample times by distance/speed, narrate the passage
+    function hav(a, b) { const R = 3440.065, r = x => x * Math.PI / 180;
+      const dLat = r(b[1] - a[1]), dLon = r(a[0] - b[0]);
+      const s = Math.sin(dLat / 2) ** 2 + Math.cos(r(a[1])) * Math.cos(r(b[1])) * Math.sin(dLon / 2) ** 2;
+      return R * 2 * Math.asin(Math.sqrt(s)); }
+    async function buildPath() {
+      let coords = [];
+      // Probe the REAL active route from the live `route` source (engine geometry) — not a hardcoded
+      // file. No active route → fall back to the boat's current view (honest: there's no passage yet).
+      try { const src = map.getSource('route'); const data = src && src.serialize && src.serialize().data;
+        const f = data && Array.isArray(data.features) && data.features.find(x => x && x.geometry && x.geometry.type === 'LineString');
+        coords = (f && f.geometry && f.geometry.coordinates) || []; } catch (e) {}
+      if (coords.length < 2) { const c = map.getCenter(); return [{ lat: c.lat, lon: c.lng, t: window.__helmTime || null }]; }
+      const N = coords.length, step = Math.max(1, Math.floor(N / 6)), idx = [];
+      for (let i = 0; i < N; i += step) idx.push(i); if (idx[idx.length - 1] !== N - 1) idx.push(N - 1);
+      const startT = window.__helmTime ? new Date(window.__helmTime + 'Z') : new Date();
+      const spd = 5; let cum = 0; const pts = [];
+      idx.forEach((i, k) => { if (k > 0) cum += hav(coords[idx[k - 1]], coords[i]);
+        const t = new Date(startT.getTime() + (cum / spd) * 3600 * 1000);
+        pts.push({ lat: coords[i][1], lon: coords[i][0], t: t.toISOString().slice(0, 16) }); });
+      return pts;
+    }
+    // wind colour ramp (knots → rgb) — Windy-style, for the ribbon bars
+    const windCol = kt => { const S = [[0,[98,113,183]],[10,[52,171,151]],[16,[123,183,80]],[22,[225,200,60]],[30,[232,130,50]],[40,[214,70,74]],[55,[150,60,150]]];
+      kt = kt || 0; let a = S[0], b = S[S.length-1];
+      for (let i=0;i<S.length-1;i++){ if (kt>=S[i][0] && kt<=S[i+1][0]){ a=S[i]; b=S[i+1]; break; } }
+      const f = b[0]===a[0]?0:(kt-a[0])/(b[0]-a[0]); const c=k=>Math.round(a[1][k]+(b[1][k]-a[1][k])*f);
+      return 'rgb(' + c(0) + ',' + c(1) + ',' + c(2) + ')'; };
+    const ribbon = document.getElementById('ribbon');
+    document.getElementById('rb-x').addEventListener('click', () => { ribbon.hidden = true; });
+    document.getElementById('narrate-path').addEventListener('click', async () => {
+      ribbon.hidden = false;
+      document.getElementById('rb-text').textContent = 'Narrating the passage…';
+      document.getElementById('rb-legs').innerHTML = '';
+      const j = await comm.briefing({ points: await buildPath(), boat: { draft: 1.8 }, layers: enabledLayers() });
+      if (j.offline) { document.getElementById('rb-text').textContent = 'Backend offline — run backend/ to narrate the passage.'; return; }
+      document.getElementById('rb-prov').textContent = (j.provider || 'ai').toUpperCase();
+      document.getElementById('rb-text').textContent = j.narration || '—';
+      document.getElementById('rb-legs').innerHTML = (j.legs || []).map(lg => {
+        const t = lg.t ? new Date(lg.t + 'Z').toLocaleString([], { weekday: 'short', hour: '2-digit' }) : 'leg ' + lg.leg;
+        const kt = lg.windKt, dir = (lg.windFromDeg || 0) + 180;
+        const wind = kt == null ? '—' : '<span class="ar" style="transform:rotate(' + dir + 'deg)">↑</span> ' + Math.round(kt);
+        const sea = lg.waveM != null ? '〜' + lg.waveM + 'm' : (lg.rainMm ? '🌧' + lg.rainMm : '');
+        const h = kt == null ? 0 : Math.min(100, kt * 2.2);
+        return '<div class="rb-leg"><div class="t">' + t + '</div><div class="wv">' + wind + '</div>' +
+          '<div class="se">' + sea + '</div><div class="bar" style="background:' + windCol(kt) + ';width:' + Math.max(30, h) + '%;margin:6px auto 0"></div></div>';
+      }).join('');
+    });
+    const tierClass = s => ({ open: 't-open', owned: 't-owned', rag: 't-rag', nfl: 't-locked', engine: 't-open', sample: 't-sim', sim: 't-sim' }[s] || 't-open');
+    function renderNarrate(j, ll) {
+      const txt = document.getElementById('nc-text'), lay = document.getElementById('nc-layers'), foot = document.getElementById('nc-foot');
+      if (j.offline) { card.hidden = false; txt.textContent = 'Backend offline — run backend/ (uvicorn main:app --port 8090) to narrate the slice.'; lay.innerHTML = ''; foot.textContent = ''; return; }
+      const L = j.layers || {}, pt = j.point || {};
+      txt.textContent = j.narration || '—';
+      document.getElementById('nc-prov').textContent = (j.provider || 'ai').toUpperCase();
+      document.getElementById('nc-pos').textContent = ll.lat.toFixed(3) + ', ' + ll.lng.toFixed(3);
+      const when = pt.weatherValidAt || pt.t;
+      document.getElementById('nc-ttl').textContent = when
+        ? 'Here · ' + new Date(when + 'Z').toLocaleString([], { weekday: 'short', hour: '2-digit', minute: '2-digit' }) : 'Here · now';
+      const w = (L.weather && (L.weather.atTime || L.weather.now)) || null, chips = [];
+      if (L.weather && L.weather.error) chips.push(['🌬 wx n/a', 'open']);
+      else if (w) chips.push(['🌬 ' + (w.windKt ?? '?') + 'kt @' + (w.windFromDeg ?? '?') + '°', 'open']);
+      if (L.weather && L.weather.sea && L.weather.sea.waveM != null) chips.push(['〜 ' + L.weather.sea.waveM + 'm', 'open']);
+      if (w && w.rainMm) chips.push(['🌧 ' + w.rainMm + 'mm', 'open']);
+      if (w && w.pressureHpa != null) chips.push(['◔ ' + Math.round(w.pressureHpa) + 'hPa', 'open']);
+      if (L.weather && L.weather.current && L.weather.current.velKn != null) chips.push(['↝ ' + L.weather.current.velKn + 'kn cur', 'open']);
+      if (L.depth && L.depth.nearestChartedM != null) chips.push(['▾ ' + L.depth.nearestChartedM + 'm', 'open']);
+      if (L.ais && L.ais.count) chips.push(['⛴ ' + L.ais.count + ' AIS', L.ais.source || 'sample']);
+      if (L.places && L.places.length) chips.push(['⚓ ' + L.places[0].name + ' ' + L.places[0].distanceNm + 'NM', L.places[0].source]);
+      if (L.climate) chips.push(['☀ climate', 'open']);
+      if (L.nfl) chips.push([L.nfl.locked ? '🔒 NFL locked' : 'NFL on', 'nfl']);
+      if (L.chart) chips.push(['▦ chart', 'open']);
+      lay.innerHTML = chips.map(c => '<span class="nc-chip">' + c[0] + '<span class="t ' + tierClass(c[1]) + '">' + c[1] + '</span></span>').join('');
+      const srcs = (j.sources || []).map(s => s.title).filter((v, i, a) => a.indexOf(v) === i).slice(0, 6).join(' · ');
+      foot.textContent = (L ? 'Fused ' + Object.keys(L).length + ' layers · ' : '') + srcs + ' · verify on official charts';
+      card.hidden = false;
+    }
+    map.on('click', async (e) => {
+      if (!armed) return;
+      setArmed(false);
+      card.hidden = false;
+      document.getElementById('nc-text').textContent = 'Narrating the slice…';
+      document.getElementById('nc-layers').innerHTML = '';
+      document.getElementById('nc-foot').textContent = '';
+      renderNarrate(await comm.narrate({ lat: e.lngLat.lat, lon: e.lngLat.lng,
+        t: window.__helmTime || null, boat: { draft: 1.8 }, nflEnabled: false,
+        layers: enabledLayers() }), e.lngLat);
+    });
+
+    map.on('click', 'saved-icon', e => { const p = e.features[0].properties;
+      const _u = safeUrl(p.sourceUrl);
+      new maplibregl.Popup().setLngLat(e.lngLat).setHTML('<b>★ ' + escHtml(p.name || 'Saved') + '</b><br>' + escHtml(p.note || p.kind) +
+        (_u ? '<br><a href="' + escHtml(_u) + '" target="_blank" rel="noopener noreferrer" style="color:#5bc0ff">source ↗</a>' : '')).addTo(map); });
+    map.on('click', 'whereto-rank', e => { const p = e.features[0].properties;
+      new maplibregl.Popup().setLngLat(e.lngLat).setHTML('<b>#' + escHtml(p.rank) + ' ' + escHtml(p.name || '') + '</b><br>confidence: ' + escHtml(p.confidence)).addTo(map); });
+    ['saved-icon', 'whereto-rank'].forEach(l => {
+      map.on('mouseenter', l, () => map.getCanvas().style.cursor = 'pointer');
+      map.on('mouseleave', l, () => map.getCanvas().style.cursor = '');
+    });
+  })();
+
+  // ================= SHELL: boot the registration seam =================
+  // Now that `map` and the left rail exist, drain every queued registerPanel/registerCommand
+  // (feature modules called these from their own files during load) and wire them live. From
+  // here on, registrations apply immediately. This is the moment the SHELL API goes "hot".
+  if (window.HelmShell) HelmShell.boot({ map: map, railEl: document.querySelector('.rail') });
+  // Registered panels append their rail icon at the bottom; fix the order so functional icons sit
+  // with their group and Lab + Settings stay pinned to the very bottom (Settings last).
+  (function () {
+    try {
+      const rail = document.querySelector('.rail');
+      if (!rail) return;
+      const q = s => rail.querySelector(s);
+      const ais = q('.ri[data-rail="helm-ais"]'), routes = q('.ri[data-rail="routes"]');
+      if (ais && routes) rail.insertBefore(ais, routes);   // AIS (ship) just above Routes
+      const lab = q('.ri[data-rail="lab"]'), settings = q('.ri[data-rail="settings"]');
+      if (lab) rail.appendChild(lab);                       // Lab → bottom group…
+      if (settings) rail.appendChild(settings);             // …Settings last of all
+    } catch (e) { console.warn('rail: could not reorder icons:', e && e.message); }
+  })();
+
+  // ================= SHELL-3: ⌘K command palette =================
+  // A stable palette that lists EVERY HelmShell.registerCommand({...}) entry. Epics append one
+  // command from their own module — no edit here. TOOLS-3/AI-6 own richer fuzzy-go-to + NL; this
+  // is the baseline chrome + the hook they build on (HelmShell.commands / runCommand / onCommandsChanged).
+  if (window.HelmShell) (function () {
+    const palette = document.createElement('div');
+    palette.id = 'cmdk'; palette.hidden = true;
+    palette.innerHTML =
+      '<div class="cmdk-backdrop"></div>' +
+      '<div class="cmdk-box glass" role="dialog" aria-label="Command palette">' +
+        '<input id="cmdk-input" type="text" placeholder="Type a command…" autocomplete="off" spellcheck="false">' +
+        '<div id="cmdk-list" class="cmdk-list"></div>' +
+      '</div>';
+    document.body.appendChild(palette);
+    const input = palette.querySelector('#cmdk-input');
+    const list = palette.querySelector('#cmdk-list');
+    let all = [], shown = [], sel = 0;
+
+    HelmShell.onCommandsChanged(cmds => { all = cmds; if (!palette.hidden) refilter(); });
+
+    function score(c, q) {                          // simple subsequence fuzzy match
+      const hay = (c.title + ' ' + c.subtitle + ' ' + c.group + ' ' + (c.keywords || []).join(' ')).toLowerCase();
+      if (!q) return 0;
+      let i = 0; for (const ch of q) { i = hay.indexOf(ch, i); if (i < 0) return -1; i++; }
+      return 1;
+    }
+    function refilter() {
+      const q = input.value.trim().toLowerCase();
+      shown = all.filter(c => score(c, q) >= 0);
+      sel = 0; renderList();
+    }
+    function renderList() {
+      if (!shown.length) { list.innerHTML = '<div class="cmdk-empty">' + (all.length ? 'No matching command' : 'No commands registered yet') + '</div>'; return; }
+      list.innerHTML = shown.map((c, i) =>
+        '<div class="cmdk-item' + (i === sel ? ' on' : '') + '" data-i="' + i + '">' +
+          '<span class="cmdk-t">' + esc(c.title) + '</span>' +
+          (c.subtitle ? '<span class="cmdk-s">' + esc(c.subtitle) + '</span>' : '') +
+          (c.group ? '<span class="cmdk-g">' + esc(c.group) + '</span>' : '') +
+        '</div>').join('');
+      list.querySelectorAll('.cmdk-item').forEach(el =>
+        el.addEventListener('click', () => run(+el.dataset.i)));
+    }
+    function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+    function open() { palette.hidden = false; input.value = ''; refilter(); setTimeout(() => input.focus(), 0); }
+    function close() { palette.hidden = true; }
+    function run(i) { const c = shown[i]; if (!c) return; close(); HelmShell.runCommand(c.id); }
+
+    input.addEventListener('input', refilter);
+    input.addEventListener('keydown', e => {
+      if (e.key === 'ArrowDown') { sel = Math.min(sel + 1, shown.length - 1); renderList(); e.preventDefault(); }
+      else if (e.key === 'ArrowUp') { sel = Math.max(sel - 1, 0); renderList(); e.preventDefault(); }
+      else if (e.key === 'Enter') { run(sel); e.preventDefault(); }
+      else if (e.key === 'Escape') { close(); }
+    });
+    palette.querySelector('.cmdk-backdrop').addEventListener('click', close);
+    window.addEventListener('keydown', e => {
+      if ((e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'K')) { e.preventDefault(); palette.hidden ? open() : close(); }
+    });
+    // make the always-present toolbar search box open the palette too
+    const tbSearch = document.querySelector('.tb .search'); if (tbSearch) { tbSearch.style.cursor = 'pointer'; tbSearch.addEventListener('click', open); }
+    window.HelmCmdK = { open, close };   // so a command/toolbar entry can open it programmatically
+  })();
+
+  // awesome-maplibre integration lab — load AFTER window.map exists (lab.js reads it at top level)
+  // and after boot, so its Lab drawer wiring sees the fully-built shell. Replaces the old static tag.
+  { const s = document.createElement('script'); s.src = 'integrations/lab.js'; document.body.appendChild(s); }
+})();   // end async main()
+</script>
+</body>
+</html>

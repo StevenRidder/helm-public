@@ -1,0 +1,337 @@
+{
+  "schema_version": "vulkan.render_scene.v0",
+  "scene_id": "s52-semantics-day-standard-z24",
+  "source_epoch": "synthetic-s52-semantics@2026-06-29",
+  "render_view": {
+    "projection": "web_mercator_tile",
+    "geographic_bbox": {
+      "west": -81.805,
+      "south": 24.495,
+      "east": -81.795,
+      "north": 24.505
+    },
+    "center": {
+      "lon": -81.8,
+      "lat": 24.5
+    },
+    "scale_denom": 24000,
+    "rotation_deg": 0,
+    "pixel_size": [
+      8,
+      8
+    ],
+    "device_pixel_ratio": 1,
+    "overzoom": true,
+    "overscan_px": 1
+  },
+  "display_state": {
+    "palette": "day",
+    "display_category": "standard",
+    "safety_depth_m": 10,
+    "shallow_contour_m": 5,
+    "safety_contour_m": 10,
+    "deep_contour_m": 20,
+    "show_text": true,
+    "show_soundings": true,
+    "show_lights": true,
+    "show_meta": false,
+    "simplified_symbols": false,
+    "symbol_style": "paper_chart",
+    "boundary_style": "plain",
+    "two_shade_depth": false,
+    "use_scamin": true,
+    "use_super_scamin": false,
+    "chart_zoom_modifier_vector": 0,
+    "language": "en",
+    "units": "metric"
+  },
+  "resource_table": {
+    "symbols": [
+      {
+        "resource_id": "sym.boyspp",
+        "logical_size": [
+          12,
+          12
+        ],
+        "anchor": [
+          6,
+          6
+        ],
+        "source": "synthetic-symbol"
+      }
+    ],
+    "line_styles": [
+      {
+        "resource_id": "line.safety-contour",
+        "dash": [
+          3,
+          2
+        ]
+      }
+    ],
+    "area_patterns": [],
+    "fonts": [
+      {
+        "resource_id": "font.chart-label",
+        "family": "fixture-sans",
+        "size_px": 10
+      }
+    ],
+    "raster_textures": [],
+    "geometry_buffers": [],
+    "palettes": [
+      {
+        "resource_id": "palette.day",
+        "name": "day"
+      }
+    ]
+  },
+  "command_groups": [
+    {
+      "group_id": "s52-semantic-pass",
+      "chart_priority": 1,
+      "s52_layer": "semantic",
+      "quilt_rank": 1,
+      "commands": [
+        {
+          "type": "fill_area",
+          "command_id": "cmd.area.depare-shoal",
+          "rings": [
+            [
+              [
+                1,
+                1
+              ],
+              [
+                7,
+                1
+              ],
+              [
+                7,
+                7
+              ],
+              [
+                1,
+                7
+              ],
+              [
+                1,
+                1
+              ]
+            ]
+          ],
+          "coordinate_space": "target",
+          "fill": {
+            "palette_ref": "palette.day",
+            "color": "#b9d7e8"
+          },
+          "pattern_ref": null,
+          "opacity": 1,
+          "clip_ref": null,
+          "s52_semantics": {
+            "source_object_id": "DEPARE-SHOAL",
+            "object_class": "DEPARE",
+            "display_category": "displaybase",
+            "display_priority": 1,
+            "lup_type": "plain_boundaries",
+            "render_pass": "area_fill",
+            "source_sequence": 10,
+            "native_scale": 12000,
+            "safety_class": "shoal",
+            "order_key": [
+              1,
+              1,
+              1,
+              0,
+              10
+            ]
+          },
+          "provenance_refs": [
+            "prov.depare-shoal"
+          ]
+        },
+        {
+          "type": "stroke_line",
+          "command_id": "cmd.line.depcnt-safety",
+          "polyline": [
+            [
+              1,
+              5
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              7,
+              5
+            ]
+          ],
+          "coordinate_space": "target",
+          "role": "depth_contour",
+          "contour_m": 10,
+          "stroke": {
+            "color": "#4a6f8a"
+          },
+          "line_style_ref": "line.safety-contour",
+          "width_px": 1,
+          "join": "round",
+          "cap": "round",
+          "dash_phase": 0,
+          "symbol_spacing": null,
+          "s52_semantics": {
+            "source_object_id": "DEPCNT-SAFETY",
+            "object_class": "DEPCNT",
+            "display_category": "displaybase",
+            "display_priority": 3,
+            "lup_type": "lines",
+            "render_pass": "line",
+            "source_sequence": 20,
+            "native_scale": 12000,
+            "safety_class": "safety_contour",
+            "order_key": [
+              1,
+              1,
+              3,
+              2,
+              20
+            ]
+          },
+          "provenance_refs": [
+            "prov.depcnt-safety"
+          ]
+        },
+        {
+          "type": "place_symbol",
+          "command_id": "cmd.symbol.boyspp-standard",
+          "symbol_ref": "sym.boyspp",
+          "position": [
+            5,
+            3
+          ],
+          "coordinate_space": "target",
+          "anchor": [
+            6,
+            6
+          ],
+          "rotation_deg": 0,
+          "scale": 1,
+          "declutter_key": "boy-standard",
+          "priority": 70,
+          "s52_semantics": {
+            "source_object_id": "BOYSPP-STANDARD",
+            "object_class": "BOYSPP",
+            "display_category": "standard",
+            "display_priority": 7,
+            "lup_type": "paper_chart",
+            "render_pass": "symbol",
+            "source_sequence": 30,
+            "native_scale": 12000,
+            "scamin_max_scale": 50000,
+            "order_key": [
+              1,
+              1,
+              7,
+              3,
+              30
+            ]
+          },
+          "provenance_refs": [
+            "prov.boyspp-standard"
+          ]
+        },
+        {
+          "type": "draw_sounding",
+          "command_id": "cmd.sounding.soundg-shoal",
+          "depth_m": 7.4,
+          "formatted_text": "7.4",
+          "position": [
+            3,
+            6
+          ],
+          "coordinate_space": "target",
+          "font_ref": "font.chart-label",
+          "priority": 80,
+          "safety_class": "shoal",
+          "s52_semantics": {
+            "source_object_id": "SOUNDG-SHOAL",
+            "object_class": "SOUNDG",
+            "display_category": "standard",
+            "display_priority": 8,
+            "lup_type": "paper_chart",
+            "render_pass": "sounding",
+            "source_sequence": 40,
+            "native_scale": 12000,
+            "safety_class": "shoal",
+            "order_key": [
+              1,
+              1,
+              8,
+              4,
+              40
+            ]
+          },
+          "provenance_refs": [
+            "prov.soundg-shoal"
+          ]
+        }
+      ]
+    }
+  ],
+  "provenance_table": [
+    {
+      "provenance_id": "prov.depare-shoal",
+      "source_chart_id": "SYNTH-S52-RULES"
+    },
+    {
+      "provenance_id": "prov.depcnt-safety",
+      "source_chart_id": "SYNTH-S52-RULES"
+    },
+    {
+      "provenance_id": "prov.boyspp-standard",
+      "source_chart_id": "SYNTH-S52-RULES"
+    },
+    {
+      "provenance_id": "prov.soundg-shoal",
+      "source_chart_id": "SYNTH-S52-RULES"
+    },
+    {
+      "provenance_id": "prov.lights-other-hidden",
+      "source_chart_id": "SYNTH-S52-RULES"
+    },
+    {
+      "provenance_id": "prov.obstrn-scamin-hidden",
+      "source_chart_id": "SYNTH-S52-RULES"
+    }
+  ],
+  "diagnostics": [
+    {
+      "severity": "info",
+      "code": "semantic.culled",
+      "message": "LIGHTS-OTHER-HIDDEN is outside the Standard display category.",
+      "provenance_refs": [
+        "prov.lights-other-hidden"
+      ],
+      "suggested_action": "Switch display category to all/other for this synthetic object.",
+      "semantic_decision": {
+        "source_object_id": "LIGHTS-OTHER-HIDDEN",
+        "reason": "display_category"
+      }
+    },
+    {
+      "severity": "info",
+      "code": "semantic.culled",
+      "message": "OBSTRN-SCAMIN-HIDDEN is hidden by SCAMIN at display scale 24000.",
+      "provenance_refs": [
+        "prov.obstrn-scamin-hidden"
+      ],
+      "suggested_action": "Zoom in or disable SCAMIN only for explicit debug captures.",
+      "semantic_decision": {
+        "source_object_id": "OBSTRN-SCAMIN-HIDDEN",
+        "reason": "scamin",
+        "scale_denom": 24000,
+        "scamin_max_scale": 12000
+      }
+    }
+  ]
+}

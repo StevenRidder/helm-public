@@ -1,0 +1,36 @@
+diff --git a/libs/IXWebSocket/ixwebsocket/IXHttp.cpp b/libs/IXWebSocket/ixwebsocket/IXHttp.cpp
+index 9c4b9ad..4f0d2e3 100644
+--- a/libs/IXWebSocket/ixwebsocket/IXHttp.cpp
++++ b/libs/IXWebSocket/ixwebsocket/IXHttp.cpp
+@@ -8,5 +8,7 @@
+ #include "IXCancellationRequest.h"
+ #include "IXGzipCodec.h"
+ #include "IXSocket.h"
++#include <algorithm>
++#include <cctype>
+ #include <sstream>
+ #include <vector>
+@@ -197,8 +199,21 @@ namespace ix
+         // Write headers
+         ss.str("");
+-        ss << "Content-Length: " << response->body.size() << "\r\n";
++        std::string contentLength = std::to_string(response->body.size());
++        for (auto&& it : response->headers)
++        {
++            std::string key = it.first;
++            std::transform(key.begin(), key.end(), key.begin(), ::tolower);
++            if (key == "content-length")
++            {
++                contentLength = it.second;
++                break;
++            }
++        }
++        ss << "Content-Length: " << contentLength << "\r\n";
+         for (auto&& it : response->headers)
+         {
+-            ss << it.first << ": " << it.second << "\r\n";
++            std::string key = it.first;
++            std::transform(key.begin(), key.end(), key.begin(), ::tolower);
++            if (key != "content-length") ss << it.first << ": " << it.second << "\r\n";
+         }
+         ss << "\r\n";

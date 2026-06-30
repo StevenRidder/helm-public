@@ -1,0 +1,96 @@
+{
+  "_epic": "CHART",
+  "_note": "Depth-on-satellite: depth-area shading, depth contours, soundings (CHART-7). Owned by CHART. Legacy ids depare-fill/depcnt-line/soundg-text are referenced by the Layers panel checkboxes + the soundg click popup in index.html.",
+  "sources": {
+    "depare": {
+      "type": "geojson",
+      "data": "data/depare.geojson"
+    },
+    "depcnt": {
+      "type": "geojson",
+      "data": "data/depcnt.geojson"
+    },
+    "soundg": {
+      "type": "geojson",
+      "data": "data/soundg.geojson"
+    }
+  },
+  "layers": [
+    {
+      "id": "depare-fill",
+      "type": "fill",
+      "source": "depare",
+      "paint": {
+        "fill-color": [
+          "interpolate", ["linear"],
+          ["coalesce", ["to-number", ["get", "DRVAL1"]], 0],
+          0, "#7fc7ff",
+          3, "#9ed3f0",
+          10, "#bfe2f0",
+          30, "#dceefb"
+        ],
+        "fill-opacity": [
+          "interpolate", ["linear"],
+          ["coalesce", ["to-number", ["get", "DRVAL1"]], 0],
+          0, 0.5,
+          5, 0.32,
+          15, 0.12,
+          40, 0.05
+        ]
+      }
+    },
+    {
+      "id": "depcnt-line",
+      "type": "line",
+      "source": "depcnt",
+      "paint": {
+        "line-color": [
+          "step",
+          ["coalesce", ["to-number", ["get", "VALDCO"]], 99],
+          "#ff9a6b",
+          5, "#bfe6ff"
+        ],
+        "line-width": [
+          "interpolate", ["linear"], ["zoom"],
+          10, 0.7,
+          15, 1.5
+        ],
+        "line-opacity": 0.85
+      }
+    },
+    {
+      "id": "soundg-text",
+      "type": "symbol",
+      "source": "soundg",
+      "layout": {
+        "text-field": [
+          "number-format",
+          [
+            "get",
+            "DEPTH"
+          ],
+          {
+            "max-fraction-digits": 0
+          }
+        ],
+        "text-font": [
+          "Noto Sans Regular"
+        ],
+        "text-size": 11.5,
+        "text-allow-overlap": false
+      },
+      "paint": {
+        "text-color": [
+          "step",
+          ["coalesce", ["to-number", ["get", "DEPTH"]], 99],
+          "#ff7a6b",
+          3, "#ffc06a",
+          6, "#eef6fc"
+        ],
+        "text-halo-color": "#05080c",
+        "text-halo-width": 1.5,
+        "text-halo-blur": 0.4
+      }
+    }
+  ]
+}

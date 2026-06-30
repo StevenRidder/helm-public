@@ -1,0 +1,27 @@
+{
+  "criteria": [
+    {
+      "name": "colours_correct",
+      "passed": true,
+      "reason": "red, white present; no wrong lateral colour"
+    },
+    {
+      "name": "topmark_correct",
+      "passed": true,
+      "reason": "topmark is single_sphere"
+    },
+    {
+      "name": "light_flare",
+      "passed": true,
+      "reason": "flare present == False"
+    },
+    {
+      "name": "distinguishing_feature",
+      "passed": true,
+      "reason": "red and white VERTICAL stripes; single red sphere topmark"
+    }
+  ],
+  "overall_pass": true,
+  "confidence": 0.95,
+  "sibling_pick": "BOYSAW"
+}

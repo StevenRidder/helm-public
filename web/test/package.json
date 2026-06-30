@@ -1,0 +1,13 @@
+{
+  "name": "helm-web-tests",
+  "private": true,
+  "description": "Helm web-client tests: dependency-free unit runner (run.mjs) + Playwright E2E (e2e/).",
+  "scripts": {
+    "test:unit": "node run.mjs",
+    "test:e2e": "playwright test",
+    "test": "node run.mjs && playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.61.1"
+  }
+}

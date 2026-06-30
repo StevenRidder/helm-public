@@ -1,0 +1,27 @@
+{
+  "criteria": [
+    {
+      "name": "colours_correct",
+      "passed": true,
+      "reason": "yellow, black present; no wrong lateral colour"
+    },
+    {
+      "name": "topmark_correct",
+      "passed": true,
+      "reason": "topmark is two_cones_point_down"
+    },
+    {
+      "name": "light_flare",
+      "passed": true,
+      "reason": "flare present == False"
+    },
+    {
+      "name": "distinguishing_feature",
+      "passed": true,
+      "reason": "yellow above black; topmark two cones BOTH points down; fixed beacon on a base"
+    }
+  ],
+  "overall_pass": true,
+  "confidence": 0.95,
+  "sibling_pick": "BCNCAR_south"
+}

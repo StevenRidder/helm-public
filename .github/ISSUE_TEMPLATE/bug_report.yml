@@ -1,0 +1,76 @@
+name: Bug report
+description: Report a reproducible Helm alpha problem.
+title: "[Bug]: "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for testing Helm. Please do not include private chart packs, tokens, or vessel-sensitive screenshots.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What went wrong?
+      placeholder: The browser UI loads, but /catalog returns 500 after starting helm-server...
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction steps
+      description: Include exact commands where possible.
+      placeholder: |
+        1. Ran engine/bootstrap.sh
+        2. Started helm-server with HELM_PORT=9001
+        3. Opened http://127.0.0.1:9001/
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - web cockpit
+        - engine/server
+        - charts/data
+        - AIS/NMEA/SignalK
+        - routes/tracks/alarms
+        - weather
+        - build/install
+        - docs
+        - not sure
+    validations:
+      required: true
+  - type: input
+    id: platform
+    attributes:
+      label: Platform
+      placeholder: macOS 15.5, Apple Silicon, Homebrew wxwidgets@3.2
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or screenshots
+      description: Paste relevant logs. Redact private paths, tokens, chart names, or vessel details as needed.
+      render: shell
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety/data check
+      options:
+        - label: I removed private chart data, credentials, and vessel-sensitive details.
+          required: true

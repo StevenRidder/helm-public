@@ -1,0 +1,196 @@
+{
+  "_epic": "PLACES",
+  "_note": "OSM/OpenSeaMap places overlay — halo + amenity glyph + label (PLACES-1). Owned by PLACES. Legacy ids places-halo/places-icon/places-label are referenced by the Layers checkbox group + the places-icon click popup. New PLACES layers should be namespaced helm-place-*. CLIENT-10: the source is CLUSTERED so dense harbours don't drown in overlapping pins; the halo/icon/label layers filter to unclustered points (point_count absent), and places-cluster/-count render the bubbles. (cross-epic perf hardening; PLACES idle.)",
+  "sources": {
+    "places": {
+      "type": "geojson",
+      "data": "data/places.geojson",
+      "attribution": "(c) OpenStreetMap contributors, ODbL",
+      "cluster": true,
+      "clusterRadius": 50,
+      "clusterMaxZoom": 13,
+      "maxzoom": 14
+    }
+  },
+  "layers": [
+    {
+      "id": "places-cluster",
+      "type": "circle",
+      "source": "places",
+      "filter": ["has", "point_count"],
+      "layout": {
+        "visibility": "visible"
+      },
+      "paint": {
+        "circle-color": "rgba(13,19,27,0.82)",
+        "circle-stroke-color": "#5bc0ff",
+        "circle-stroke-width": 1.4,
+        "circle-radius": ["step", ["get", "point_count"], 13, 10, 17, 50, 22],
+        "circle-pitch-alignment": "map"
+      }
+    },
+    {
+      "id": "places-cluster-count",
+      "type": "symbol",
+      "source": "places",
+      "filter": ["has", "point_count"],
+      "layout": {
+        "visibility": "visible",
+        "text-field": ["get", "point_count_abbreviated"],
+        "text-font": ["Noto Sans Regular"],
+        "text-size": 12,
+        "text-allow-overlap": true
+      },
+      "paint": {
+        "text-color": "#eef4f9",
+        "text-halo-color": "rgba(13,19,27,0.9)",
+        "text-halo-width": 1.0
+      }
+    },
+    {
+      "id": "places-halo",
+      "type": "circle",
+      "source": "places",
+      "filter": ["!", ["has", "point_count"]],
+      "layout": {
+        "visibility": "visible"
+      },
+      "paint": {
+        "circle-radius": 11,
+        "circle-color": "rgba(13,19,27,0.74)",
+        "circle-stroke-width": 1.2,
+        "circle-stroke-color": [
+          "match",
+          [
+            "get",
+            "kind"
+          ],
+          "marina",
+          "#5bc0ff",
+          "anchorage",
+          "#8fd3ff",
+          "fuel",
+          "#f2b441",
+          "dinghy",
+          "#5bc0ff",
+          "water",
+          "#7fd1e0",
+          "chandlery",
+          "#cdd6e0",
+          "rgba(255,255,255,0.13)"
+        ],
+        "circle-pitch-alignment": "map"
+      }
+    },
+    {
+      "id": "places-icon",
+      "type": "symbol",
+      "source": "places",
+      "filter": ["!", ["has", "point_count"]],
+      "layout": {
+        "visibility": "visible",
+        "symbol-sort-key": [
+          "match",
+          [
+            "get",
+            "kind"
+          ],
+          "marina",
+          0,
+          "fuel",
+          1,
+          "anchorage",
+          2,
+          "dinghy",
+          3,
+          "chandlery",
+          4,
+          "water",
+          5,
+          9
+        ],
+        "text-field": [
+          "match",
+          [
+            "get",
+            "kind"
+          ],
+          "marina",
+          "M",
+          "anchorage",
+          "⚓",
+          "fuel",
+          "F",
+          "dinghy",
+          "D",
+          "water",
+          "W",
+          "chandlery",
+          "C",
+          "•"
+        ],
+        "text-font": [
+          "Noto Sans Regular"
+        ],
+        "text-size": 13,
+        "text-allow-overlap": true,
+        "text-ignore-placement": true,
+        "text-anchor": "center"
+      },
+      "paint": {
+        "text-color": [
+          "match",
+          [
+            "get",
+            "kind"
+          ],
+          "marina",
+          "#5bc0ff",
+          "anchorage",
+          "#8fd3ff",
+          "fuel",
+          "#f2b441",
+          "dinghy",
+          "#5bc0ff",
+          "water",
+          "#7fd1e0",
+          "chandlery",
+          "#cdd6e0",
+          "#5bc0ff"
+        ],
+        "text-halo-color": "rgba(13,19,27,0.9)",
+        "text-halo-width": 1.0
+      }
+    },
+    {
+      "id": "places-label",
+      "type": "symbol",
+      "source": "places",
+      "minzoom": 12,
+      "filter": ["!", ["has", "point_count"]],
+      "layout": {
+        "visibility": "visible",
+        "text-field": [
+          "get",
+          "name"
+        ],
+        "text-font": [
+          "Noto Sans Regular"
+        ],
+        "text-size": 11,
+        "text-anchor": "top",
+        "text-offset": [
+          0,
+          1.0
+        ],
+        "text-optional": true,
+        "text-max-width": 9
+      },
+      "paint": {
+        "text-color": "#e8eef5",
+        "text-halo-color": "rgba(13,19,27,0.92)",
+        "text-halo-width": 1.4
+      }
+    }
+  ]
+}

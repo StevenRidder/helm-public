@@ -1,0 +1,37 @@
+{
+  "id": "open-bridge",
+  "stroke_width": 2.6,
+  "corner_radius": 4,
+  "fill_mode": "filled",
+  "line_treatment": "soft",
+  "shadow": false,
+  "palettes": {
+    "day": {
+      "black": "#23201c",
+      "yellow": "#e8b53b",
+      "red": "#cf3b32",
+      "green": "#1f8b4c",
+      "white": "#f7f3ea",
+      "magenta": "#b23a86",
+      "ink": "#23201c"
+    },
+    "dusk": {
+      "black": "#2e2a30",
+      "yellow": "#bf9a3a",
+      "red": "#a8474a",
+      "green": "#39784d",
+      "white": "#e4ddcf",
+      "magenta": "#8f4a78",
+      "ink": "#2e2a30"
+    },
+    "night": {
+      "black": "#3c3942",
+      "yellow": "#6f5f2a",
+      "red": "#743a3e",
+      "green": "#2c563b",
+      "white": "#87837a",
+      "magenta": "#5b3f56",
+      "ink": "#6a6470"
+    }
+  }
+}

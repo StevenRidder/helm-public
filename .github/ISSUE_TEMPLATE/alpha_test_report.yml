@@ -1,0 +1,49 @@
+name: Alpha test report
+description: Share what happened when you tried to build or run Helm.
+title: "[Alpha test]: "
+labels: ["alpha-test", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this for build/run reports, even when nothing is broken. These reports help turn the alpha into a contributor-friendly project.
+  - type: input
+    id: platform
+    attributes:
+      label: Platform
+      placeholder: macOS 15.5, Apple Silicon / Ubuntu 24.04 / Windows 11 WSL
+    validations:
+      required: true
+  - type: textarea
+    id: commands
+    attributes:
+      label: Commands run
+      render: shell
+      placeholder: |
+        brew install wxwidgets@3.2 gpatch cmake gdal node python3
+        engine/bootstrap.sh
+        HELM_PORT=9001 ...
+    validations:
+      required: true
+  - type: dropdown
+    id: result
+    attributes:
+      label: Result
+      options:
+        - built and ran
+        - built but did not run
+        - build failed
+        - docs unclear
+        - not sure
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: What was confusing, surprising, or useful?
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant output
+      render: shell

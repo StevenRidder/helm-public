@@ -1,0 +1,82 @@
+{
+  "fixture_id": "s52-semantics",
+  "title": "Synthetic S-52 semantic rule fixture",
+  "schema_version": "vulkan.render_scene.v0",
+  "scene_id": "s52-semantics-day-standard-z24",
+  "source_file": "source.json",
+  "scene_file": "scene.commands.json",
+  "provenance_file": "provenance.json",
+  "license": {
+    "type": "synthetic",
+    "redistribution": "repo-owned",
+    "notes": "No third-party chart data. Geometry and semantic cases are synthetic."
+  },
+  "capture_matrix": [
+    {
+      "name": "day-standard-z24-semantic-rules",
+      "palette": "day",
+      "display_category": "standard",
+      "safety_depth_m": 10,
+      "projection": "web_mercator_tile",
+      "scale_denom": 24000,
+      "pixel_size": [
+        8,
+        8
+      ]
+    }
+  ],
+  "required_command_types": [
+    "fill_area",
+    "stroke_line",
+    "place_symbol",
+    "draw_sounding"
+  ],
+  "semantic_assertions": {
+    "visible_source_object_ids": [
+      "DEPARE-SHOAL",
+      "DEPCNT-SAFETY",
+      "BOYSPP-STANDARD",
+      "SOUNDG-SHOAL"
+    ],
+    "culled": [
+      {
+        "source_object_id": "LIGHTS-OTHER-HIDDEN",
+        "reason": "display_category"
+      },
+      {
+        "source_object_id": "OBSTRN-SCAMIN-HIDDEN",
+        "reason": "scamin"
+      }
+    ],
+    "ordered_command_ids": [
+      "cmd.area.depare-shoal",
+      "cmd.line.depcnt-safety",
+      "cmd.symbol.boyspp-standard",
+      "cmd.sounding.soundg-shoal"
+    ],
+    "safety_classes": {
+      "cmd.area.depare-shoal": "shoal",
+      "cmd.line.depcnt-safety": "safety_contour",
+      "cmd.sounding.soundg-shoal": "shoal"
+    },
+    "scale_visibility_cases": [
+      {
+        "source_object_id": "OBSTRN-SCAMIN-HIDDEN",
+        "scale_denom": 24000,
+        "visible": false,
+        "reason": "scamin"
+      },
+      {
+        "source_object_id": "OBSTRN-SCAMIN-HIDDEN",
+        "scale_denom": 10000,
+        "visible": true
+      }
+    ]
+  },
+  "expected_hashes": {
+    "source_json_sha256": "0d78e5801d648769aec3bc68e91abfe785c0b5c3e8a7a48363c0c413277e8190",
+    "scene_commands_json_sha256": "b37d6f651b830346b30af121992b741971aacdbf2f11394d0d7ac0e8e23e6cd6",
+    "provenance_json_sha256": "36419496faf4f14aa00a1d3dfb6d41f7c5a13324a78a99fe736ee87aebd8e810"
+  },
+  "expected_images": []
+}

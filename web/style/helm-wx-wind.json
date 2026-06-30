@@ -1,0 +1,59 @@
+{
+  "_epic": "WX",
+  "_note": "Static wind-arrow symbol layer (the GPU particle layer is added imperatively by wind-layer.js). Owned by WX. index.html hides `wind-arrows` on load in favour of particles; keep the id stable. New WX layers should be namespaced helm-wx-*.",
+  "sources": {
+    "wind": {
+      "type": "geojson",
+      "data": "data/wind_points.geojson"
+    }
+  },
+  "layers": [
+    {
+      "id": "wind-arrows",
+      "type": "symbol",
+      "source": "wind",
+      "layout": {
+        "text-field": "↑",
+        "text-font": [
+          "Noto Sans Regular"
+        ],
+        "text-size": 18,
+        "text-rotate": [
+          "%",
+          [
+            "+",
+            [
+              "get",
+              "dir_deg"
+            ],
+            180
+          ],
+          360
+        ],
+        "text-rotation-alignment": "map",
+        "text-allow-overlap": true
+      },
+      "paint": {
+        "text-color": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "get",
+            "speed_kn"
+          ],
+          0,
+          "#1aa58c",
+          12,
+          "#7fae3a",
+          20,
+          "#d98a1a",
+          30,
+          "#dd3b3b"
+        ],
+        "text-opacity": 0.9
+      }
+    }
+  ]
+}

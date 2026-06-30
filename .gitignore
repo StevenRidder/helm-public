@@ -1,0 +1,97 @@
+# macOS
+.DS_Store
+
+# Xcode / Swift (for when app code lands)
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+DerivedData/
+.build/
+*.swiftpm/
+
+# Build artifacts
+build/
+dist/
+*.o
+*.a
+
+# Charts & weather data — large, license-bound, never commit
+*.mbtiles
+*.kap
+*.000
+*.s57
+*.S57
+*.s63
+*.S63
+*.senc
+*.SENC
+*.zip
+*.grb
+*.grb2
+*.grib2
+/charts/
+/cache/
+/chart-packs/
+/basemaps/
+/tiles/
+.helm/
+web/data/charts/
+web/data/sat/
+web/data/wxtiles/
+pipeline/region.env
+
+# Generated design archives can embed local paths; commit expanded assets instead.
+docs/design/app-icons/*.zip
+docs/Helm Icons/Official Icons/*.zip
+
+# Private strategy/research/operator artifacts. Keep the public repo focused on
+# runnable alpha code, safety, licensing, architecture, and public examples.
+CLAUDE.md
+*.docx
+docs/AUDIT-*.md
+docs/BUSINESS-MODEL.md
+docs/BUILD-PLAN-COMMUNITY-LLM.md
+docs/COMPETITIVE.md
+docs/research/
+docs/integrations/nfl-outreach-draft.md
+docs/integrations/*STATUS*.md
+
+# Private product planning and roadmap artifacts. Public releases should show
+# the runnable alpha and guardrails, not the internal feature plan.
+PRD.md
+docs/ROADMAP.md
+docs/FEATURE-*.md
+docs/EPICS.md
+docs/LABS.md
+docs/VISION.md
+docs/SPACETIME-PROBE.md
+docs/WEATHER-ROUTING.md
+docs/BRIEFINGS.md
+docs/PUBLIC-ALPHA-CHECKLIST.md
+docs/HANDOFF-*.md
+docs/*_UI_SPEC.md
+docs/posts/
+docs/mockups/
+docs/decisions/0003-license-posture.md
+docs/decisions/0006-destination-dossier-and-briefings.md
+docs/decisions/0007-spacetime-probe.md
+docs/decisions/0010-distribution-and-packaging-posture.md
+
+# Generated design archives can embed local paths; commit expanded assets instead.
+docs/design/app-icons/*.zip
+docs/Helm Icons/Official Icons/*.zip
+
+# Secrets / API keys (Windy, etc.)
+.env
+.env.*
+# the committed template carries no secrets — keep it tracked
+!.env.example
+*.key
+secrets/
+
+# Editor
+.vscode/
+.idea/
+
+# Local agent/live-machine coordination. Keep these out of the public repo.
+.claude/
+AGENTS.md
