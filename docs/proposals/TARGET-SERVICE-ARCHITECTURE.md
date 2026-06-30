@@ -1,69 +1,58 @@
-# Helm/OpenCPN Target Service Architecture
+# Helm/OpenCPN C++ Target Service Architecture
 
 Status: Draft  
 Date: 2026-07-01  
-Scope: broad end-state service architecture based on current Helm code and renderer seams
+Scope: C++/OpenCPN-native target service architecture based on the public OpenCPN repository and Helm's HELMC++ acceptance gate
 
 ## Purpose
 
-This document starts with the broad target architecture, then uses the current code audit to propose what becomes decoupled, what becomes a service, what stays a module, and what remains inside the safety/chart/nav core.
+This document starts from OpenCPN's public source layout, then proposes the
+C++ service boundaries Helm should expose around it.
 
-The goal is not "microservices everywhere." The goal is a boat system made of small, inspectable, independently testable building blocks with explicit contracts.
+The goal is not "many processes everywhere." The goal is a boat system made of
+small, inspectable, independently testable C++ building blocks with explicit
+contracts. Required boat-side runtime services are C++/CMake/OpenCPN-native.
 
 Interface catalog: [INTERFACE-CATALOG.md](INTERFACE-CATALOG.md)
 
-## Current Code Audit
+Graphic view: [target-service-architecture.svg](target-service-architecture.svg)
 
-Audited source: current Helm `main` branch.
+Canonical Helm runtime gate: [../HELMCXX-ACCEPTANCE.md](../HELMCXX-ACCEPTANCE.md)
 
-### Current Runtime And Tooling Surfaces
+## Source Audit
 
-| Surface | Current location | Size / shape | Current role | Architecture read |
-|---|---|---:|---|---|
-| `helm-server` | `engine/vendor/cli/helm_server.cpp` | 4480 LOC | One-origin C++ runtime: static UI, `/nav` WS, `/chart`, `/query`, `/catalog`, tides endpoints, pairing/auth, TLS/Bonjour, user-data serving, SignalK/AIS/alarms. | Too many responsibilities in one integration file. Keep as gateway/core initially, but extract modules/services. |
-| `helm-packd` | `engine/vendor/cli/helm_packd.cpp` | 2178 LOC | C++ MBTiles/PMTiles/local package service: `/catalog`, `/layers`, `/prefetch`, `/bundle`, range serving. | Good existing microservice. Keep and harden. |
-| `helm-basemap-cache` | `engine/vendor/cli/helm_basemap_cache.cpp` | 766 LOC | C++ online-fill/cache/proxy service: `/basemap/...`, `/stats`, `/health`, upstream proxy/cache. | Good existing microservice. Keep separate. |
-| `helm-wx` | `services/wx/app.py` | 1736 LOC | Python FastAPI environmental bundle/value-tile reference service on `:8093`. | Strong reference implementation; target C++ `helm-envd` after renderer contract stabilizes. |
-| Optional backend | `backend/main.py` plus backend modules | 215 LOC entrypoint | Python FastAPI places, saved pins, reviews, recommendations, dossier/research, give-back. | Keep optional and non-safety. Could split into community/AI services later. |
-| Offline pack/server reference | `pipeline/mbtiles_server.py` | 945 LOC | Python oracle/reference for local pack service behavior. | Keep as reference/tooling; runtime path is `helm-packd`. |
-| Split debug engines | `helm-engine`, `helm-tiles` | C++ debug targets | Nav-only WS and chart-only tile debugging. | Useful proof that seams can be split. |
-| Web cockpit | `web/*.js`, `web/index.html` | Browser client | Thin client consuming HTTP/WS/tile/overlay contracts. | Stays client. Do not move source authority into browser. |
-| Icon Forge | `pipeline/iconforge/` | Python pipeline | Generated symbol asset production, QA, provenance. | Offline/CI asset pipeline, not boat-runtime daemon. |
-| Renderer probes | `engine/vulkan/*` | C++ probes | VSG/offscreen/resource/text-placement work. | Renderer backend/proof code; target runtime stays C++ boundary. |
+Audit target: public [OpenCPN/OpenCPN](https://github.com/OpenCPN/OpenCPN) `master` at commit `6d120d5627dd751e63d7d463fd372cc583b7bfcd` on 2026-07-01.
 
-### Current `helm-server` Responsibilities
+The audit used the public repository, not Helm's vendored runtime tree.
 
-`helm-server` currently owns or hosts:
+### OpenCPN Surfaces
 
-- Static web UI from `HELM_WEB_ROOT`.
-- WebSocket `/nav` stream.
-- Command-plane handling over the nav socket.
-- S-52 chart tile serving at `/chart/{z}/{x}/{y}.png`.
-- Vulkan/legacy renderer selection and fallback.
-- Object query at `/query`.
-- Chart catalog at `/catalog`.
-- Pairing/auth with `POST /pair`.
-- TLS setup and Bonjour advertisement.
-- Health reporting.
-- Tides endpoints:
-  - `/tides/summary`
-  - `/tides/providers`
-  - `/tides/currents`
-  - `/tides/resolve`
-  - `/tides/acquisition`
-  - `/tides/acquisition/status`
-  - `/tides/curve`
-  - `/tides/stations`
-- User-owned overlay static serving at `/user-data/...`.
-- SignalK optional overlay startup.
-- AIS decoder initialization.
-- Alarm replay/ack loop.
+| Surface | Public OpenCPN path | Architecture read |
+|---|---|---|
+| Navigation model | `model/include/model`, `model/src`, `model/CMakeLists.txt` | C++ model layer already contains routes, tracks, nav objects, AIS, comm drivers, ownship state, local APIs, notifications, plugin loading, and persistence surfaces. |
+| Routes and tracks | `model/include/model/routeman.h`, `route.h`, `route_point.h`, `track.h`, `nav_object_database.h`, `navobj_db.h` | Route activation, waypoint progression, GPX/navobj persistence, and track storage belong in the C++ nav service boundary. |
+| Instrument and comm input | `comm_drv_*`, `comm_navmsg*`, `comm_ais.*`, `multiplexer.*`, `own_ship.h` | NMEA 0183, NMEA 2000, Signal K, AIS, and ownship truth are OpenCPN-native C++ concerns. |
+| Chart abstraction | `gui/include/gui/chartbase.h`, `chartdb.h`, `chartdbs.h`, `chartimg.h` | Chart loading, catalog/index, chart stacks, and chart cache are existing C++ chart-service seams. |
+| S-57/S-52 chart path | `gui/include/gui/s57chart.h`, `s57_*`, `s57/CMakeLists.txt`, `data/s57data/*` | Official chart portrayal must remain in the OpenCPN chart/presentation path. S-52 assets live in `data/s57data`. |
+| Canvas and quilting | `gui/include/gui/chcanv.h`, `gl_chart_canvas.h`, `quilt.h`, `viewport.h` | Current GUI rendering mixes canvas interaction, quilting, OpenGL rendering, and viewport math. Helm should extract contracts without moving cartography into clients. |
+| Plugin API | `include/ocpn_plugin.h`, `model/src/ocpn_plugin.cpp`, `model/src/plugin_*` | OpenCPN already has a capability-based plugin contract. Helm proposals should respect this instead of inventing a hidden runtime bus. |
+| Headless/CLI shim | `cli/CMakeLists.txt`, `cli/api_shim.cpp`, `cli/console.cpp` | OpenCPN already carries a command-line/shim precedent useful for bounded headless tests and proof slices. |
+| Weather plugin example | `plugins/grib_pi` | GRIB/weather is C++ plugin/runtime code in OpenCPN. Helm environmental runtime should follow C++ contracts, not a web-service runtime model. |
+| Dashboard/example integrations | `plugins/dashboard_pi`, `plugins/chartdldr_pi`, `plugins/wmm_pi` | These show existing plugin/data-flow patterns for instrument panels, chart download, and magnetic variation. |
 
-That concentration is understandable for the first working boat server. It is not the desired end state.
+### Current OpenCPN Ownership Boundaries
+
+OpenCPN already suggests these boundaries:
+
+- `model/` owns navigation, comms, AIS, nav objects, persistence, notifications, local API, and plugin management substrate.
+- `gui/include/gui` owns chart canvas, chart database, chart display, S-57 chart classes, query UI, quilting, OpenGL canvas, and user-facing GUI surfaces.
+- `s57` and `data/s57data` carry the S-57/S-52 chart and presentation asset path.
+- `include/ocpn_plugin.h` defines the extension capability contract and overlay priorities.
+- `cli` provides a bounded C++ command/headless shim precedent.
+
+Helm should align with these seams instead of inventing a parallel runtime architecture.
 
 ## Target Architecture
-
-Graphic view: [target-service-architecture.svg](target-service-architecture.svg)
 
 ```text
                          clients
@@ -73,25 +62,27 @@ Graphic view: [target-service-architecture.svg](target-service-architecture.svg)
                     helm-gateway
        one-origin TLS, pairing, auth, static UI, routing
                            |
-   ---------------------------------------------------------------
-   |             |             |             |          |          |
-   v             v             v             v          v          v
-helm-navd   helm-chartd   helm-packd   helm-envd   helm-layerd   helm-ai
-nav/AIS/    chart query   local packs  weather/    user/extra    optional
-routes/     S-52/S-101    catalog      metocean    overlays      research
-alarms      presentation  prefetch     bundles     GeoJSON/etc   community
-   |             |             |             |          |
-   |             v             v             v          v
-   |        helm-renderd   helm-cache   field/cache  layer index
-   |        Vulkan/VSG/    GPU/tile     materialized inspection
-   |        WebGPU model   artifacts    bundles
+   ----------------------------------------------------------------
+   |              |              |              |                  |
+   v              v              v              v                  v
+helm-navd    helm-chartd    helm-packd    helm-envd          helm-layerd
+OpenCPN      OpenCPN chart  local packs   environmental      user/extra
+model nav/   DB + S-57/     catalog,      bundles and        overlays and
+AIS/routes   S-52 tiles     layers,       field replay       metadata
+alarms       queries        prefetch
+   |              |              |              |                  |
+   |              v              v              v                  v
+   |         helm-renderd   helm-cache     field/cache       layer index
+   |         neutral model  GPU/tile       artifacts         inspection
+   |         draw backend   artifacts
    |
    v
 hardware/input adapters
-NMEA/SignalK/AIS/GPS/depth/autopilot boundaries
+NMEA 0183 / NMEA 2000 / Signal K / AIS / GPS / depth / pilot boundaries
 ```
 
-Some boxes may remain in one process for a while. The target is contract separation first, process separation second.
+Some boxes may remain in one process for a while. The target is contract
+separation first, process separation second.
 
 ## Service Catalog
 
@@ -102,23 +93,21 @@ Purpose:
 - One-origin TLS endpoint.
 - Pairing and auth.
 - Bonjour/mDNS advertisement.
-- Static web client serving.
-- Reverse proxy/routing to local daemons.
+- Static client serving.
+- Reverse proxy/routing to local C++ daemons.
 - Common health surface.
 
-Current code:
+OpenCPN anchors:
 
-- Mostly in `helm-server.cpp`: TLS, pairing, Bonjour, static serving, auth checks.
+- `model/include/model/mdns_*`
+- `model/include/model/pincode.h`
+- `model/include/model/rest_server.h`
+- `model/include/model/local_api.h`
 
 Split recommendation:
 
-- Module first, service later.
-- Keep it inside `helm-server` until at least two backend daemons are stable behind it.
-
-Why:
-
-- One-origin is a product feature. It hides service complexity from clients.
-- Pairing/auth should not be copy-pasted across every daemon.
+- Keep one-origin behavior as the external product boundary.
+- Keep pairing/auth centralized so each daemon does not grow its own security surface.
 
 Boundary RFC:
 
@@ -130,33 +119,40 @@ Purpose:
 
 - OpenCPN `model/` navigation core.
 - Routes, active route, ETA, XTE, waypoint advance.
-- Track recording.
-- AIS decode and CPA/TCPA.
+- Track recording and nav-object persistence.
+- AIS decode and target state.
 - Nav state stream.
 - Alarm state and ack/replay.
-- Connection adapters for NMEA/SignalK.
+- Connection adapters for NMEA 0183, NMEA 2000, Signal K, GPS, depth, and pilot-status inputs.
 
-Current code:
+OpenCPN anchors:
 
-- `helm-server.cpp` currently hosts `/nav`, command-plane, alarms, SignalK startup, AIS init.
-- OpenCPN model reuse is documented in `docs/OPENCPN-REUSE.md`.
+- `model/include/model/routeman.h`
+- `model/include/model/route.h`
+- `model/include/model/route_point.h`
+- `model/include/model/track.h`
+- `model/include/model/nav_object_database.h`
+- `model/include/model/navobj_db.h`
+- `model/include/model/ais_decoder.h`
+- `model/include/model/ais_target_data.h`
+- `model/include/model/comm_drv_*`
+- `model/include/model/multiplexer.h`
+- `model/include/model/own_ship.h`
 
-Split recommendation:
+Keep authoritative here:
 
-- Extract as C++ module first.
-- Then daemonize if gateway/core pressure or tests justify it.
+- Route progression.
+- CPA/TCPA and AIS state.
+- Ownship/source validity and staleness truth.
+- Alarm state derived from nav/chart/runtime truth.
+- Pilot command preconditions and read-only pilot status.
 
-Keep in core:
+Do not push to clients:
 
-- Safety-critical route/nav/AIS/alarm decisions.
-- Staleness truth.
-- Alarm ack/replay state.
-
-Do not push to browser:
-
-- OpenCPN-derived nav semantics.
+- OpenCPN-derived route/nav semantics.
 - CPA/TCPA authority.
 - Active route progression authority.
+- Source-validity decisions.
 
 Boundary RFC:
 
@@ -168,34 +164,41 @@ Boundary RFC:
 Purpose:
 
 - Chart source loading.
-- S-52/S-101 presentation/compiler execution.
-- Chart tile generation.
+- Chart database/catalog/index behavior.
+- S-57/S-52 chart tile generation.
 - Object query.
-- Chart catalog for official chart products.
+- Chart groups/stacks.
 - Presentation provenance.
 
-Current code:
+OpenCPN anchors:
 
-- `/chart`, `/query`, `/catalog`, legacy S-52 path, and Vulkan fallback live in `helm-server.cpp`.
-- Split debug target `helm-tiles` already proves a chart-only server path.
-- Renderer workstreams for presentation, format conversion, cache, backend, and debug/inspection already show the chart/render seams.
-
-Split recommendation:
-
-- Extract from `helm-server` as a C++ chart module, then separate daemon.
-- This is the most important decoupling after `helm-packd`.
+- `gui/include/gui/chartbase.h`
+- `gui/include/gui/chartdb.h`
+- `gui/include/gui/chartdbs.h`
+- `gui/include/gui/s57chart.h`
+- `gui/include/gui/s57_object_desc.h`
+- `gui/include/gui/s57_query_dlg.h`
+- `s57/CMakeLists.txt`
+- `data/s57data/chartsymbols.xml`
+- `data/s57data/rastersymbols-day.png`
+- `data/s57data/rastersymbols-dusk.png`
+- `data/s57data/rastersymbols-dark.png`
+- `data/s57data/S52RAZDS.RLE`
 
 Keep authoritative here:
 
-- Chart presentation semantics.
+- Official chart portrayal execution.
 - Feature-to-symbol selection for official chart content.
 - Display category, SCAMIN, safety contours, text/soundings.
-- Source-to-render provenance.
+- Chart object query semantics.
+- Source-to-render provenance for official chart content.
 
 Do not let other services own:
 
 - Official chart portrayal.
 - Cartographic z-order/display priority.
+- Safety-contour behavior.
+- Chart feature-to-symbol decisions.
 
 Boundary RFC:
 
@@ -208,23 +211,28 @@ Boundary RFC:
 Purpose:
 
 - Draw-only rendering backend service or module.
-- Vulkan/VSG/offscreen backend.
-- WebGPU artifact parity target.
+- Neutral render model consumption.
+- Native VSG/Vulkan proof backend.
+- Helm WebGPU artifact parity target.
 - Render command stream consumption.
 
-Current code:
+OpenCPN anchors:
 
-- Renderer proof work exists under `engine/vulkan/*`, with related documentation for seam, backend, cache, and WebGPU consumer boundaries.
-- `helm-server.cpp` currently can select Vulkan/legacy renderer for tile requests.
+- `gui/include/gui/gl_chart_canvas.h`
+- `gui/include/gui/gl_tex_cache.h`
+- `gui/include/gui/gl_texture_mgr.h`
+- `gui/include/gui/ocpndc.h`
+- `gui/include/gui/shaders.h`
+- `gui/include/gui/viewport.h`
 
 Split recommendation:
 
 - Keep as module/library until the command stream and cache contract are stable.
-- Do not make renderer a network daemon until there is a measurable reason.
+- Do not make the renderer a network daemon until there is a measured reason.
 
 Why:
 
-- GPU lifecycle, platform windows, and offscreen contexts are operationally fussy.
+- GPU lifecycle, platform windows, and offscreen contexts are operationally sensitive.
 - The seam matters more than process separation.
 
 Boundary RFC:
@@ -237,20 +245,29 @@ Boundary RFC:
 Purpose:
 
 - Local package service.
-- MBTiles/PMTiles serving.
+- MBTiles/PMTiles/package serving.
 - `/catalog`, `/layers`, `/prefetch`, `/bundle`.
 - Region bundles and route-corridor cache advice.
 - Public sidecar metadata allow-listing.
 
-Current code:
+OpenCPN anchors:
 
-- Already C++ in `engine/vendor/cli/helm_packd.cpp`.
-- Python reference/oracle remains `pipeline/mbtiles_server.py`.
+- `gui/include/gui/mbtiles.h`
+- chart database/catalog patterns under `gui/include/gui/chartdb*`
+- plugin chart extension concepts in `include/ocpn_plugin.h`
 
-Split recommendation:
+Keep authoritative here:
 
-- Keep as separate daemon.
-- Treat as the model for future service extraction.
+- Local package identity.
+- Offline package coverage.
+- Pack freshness and source metadata.
+- Package-level inspection envelopes.
+
+Do not own:
+
+- Official chart portrayal.
+- Navigation truth.
+- Environmental field meaning beyond package metadata.
 
 Boundary RFC:
 
@@ -258,27 +275,30 @@ Boundary RFC:
 - `RFC: Portable Nautical Package And Index`
 - `RFC: Route/BBox Prefetch Manifest`
 
-### 6. `helm-basemap-cache`
+### 6. `helm-cache`
 
 Purpose:
 
-- Online-fill tile cache.
-- Remote pack proxy/cache.
-- Stale-while-revalidate tile behavior.
+- Generic tile/cache/proxy service.
+- Cache-first tile replay.
+- Stale-while-revalidate behavior.
+- Online-fill or remote/local-pack fallback when enabled.
 
-Current code:
+OpenCPN anchors:
 
-- Already C++ in `engine/vendor/cli/helm_basemap_cache.cpp`.
-- Python references under `services/basemap-fill` and `services/basemap-proxy-cache`.
+- Existing OpenCPN cache patterns in chart DB and GL texture/cache headers.
+- Helm's C++ runtime cache service follows the same C++ runtime rule.
 
-Split recommendation:
+Do not own:
 
-- Keep separate daemon.
-- Fold Python helpers into dev/reference only.
+- Source chart truth.
+- Chart portrayal.
+- Environmental truth.
+- Route/nav decisions.
 
 Boundary RFC:
 
-- `RFC: Basemap Cache/Proxy Contract`
+- `RFC: Tile Cache/Proxy Contract`
 
 ### 7. `helm-envd`
 
@@ -287,22 +307,26 @@ Purpose:
 - Environmental model-run bundles.
 - Weather/metocean field tiles.
 - Prepared replay of wind/current/waves/temp/rain/cloud layers.
-- Materialization jobs.
+- Materialization and local replay jobs.
 
-Current code:
+OpenCPN anchors:
 
-- Python reference service `services/wx/app.py`.
-- Contract documented in `services/wx/README.md`.
-- WebGPU consumer work already exists for environmental bundles and field-texture rendering.
+- `plugins/grib_pi` demonstrates C++ GRIB/weather parsing and rendering surfaces.
+- `plugins/grib_pi/src/GribReader.h`
+- `plugins/grib_pi/src/GribV2Record.h`
+- `plugins/grib_pi/src/GribOverlayFactory.h`
 
-Split recommendation:
+Keep authoritative here:
 
-- Keep Python reference until WebGPU environmental scene proves the contract.
-- Then port required runtime subset to C++.
+- Prepared environmental bundle manifests.
+- Field tile identity and valid-time metadata.
+- Missing/out-of-coverage/stale environmental states.
+- Source/provenance metadata for environmental data.
 
 Do not own:
 
-- Official S-100 product semantics.
+- Official chart portrayal.
+- Navigation authority.
 - Renderer/backend policy.
 
 Boundary RFC:
@@ -320,272 +344,134 @@ Purpose:
 - Inspection metadata.
 - Local source attribution and freshness.
 
-Current code:
+OpenCPN anchors:
 
-- `/user-data/...` static serving currently lives in `helm-server.cpp`.
-- `helm-packd` already exposes `/layers` and bundle metadata.
-- `backend/` and web code carry places/pins/community overlays.
+- `include/ocpn_plugin.h` overlay callbacks, vector object info, mouse events, and plugin messaging.
+- `gui/include/gui/layer.h`
+- `gui/include/gui/kml.h`
+- `gui/include/gui/shapefile_basemap.h`
 
-Split recommendation:
+Keep separate from:
 
-- Define as target architecture now.
-- Implement initially as `helm-packd` expansion or a module behind gateway.
-- Separate daemon only once ownership diverges from package serving.
+- Official ENC chart products.
+- S-52/S-101 portrayal.
+- Safety-critical route/nav/alarms.
 
 Boundary RFC:
 
 - `RFC: Marine Overlay Layer Manifest`
-- `RFC: Layer Inspection Metadata`
 
-### 9. `helm-tided`
-
-Purpose:
-
-- Tide/current provider catalog.
-- Station resolution.
-- Tide/current curves.
-- Acquisition/cache status.
-- Observed/residual honesty when real observations exist.
-
-Current code:
-
-- Tide code is in `engine/vendor/cli/helm_tides.cpp` and endpoints are mounted inside `helm-server.cpp`.
-
-Split recommendation:
-
-- Extract as C++ module first.
-- Daemonize later if station/catalog acquisition becomes independently scheduled or heavy.
-
-Boundary RFC:
-
-- `RFC: Tide/Current Service Contract`
-
-### 10. `helm-ai`
+### 9. `helm-inspectd`
 
 Purpose:
 
-- Places, reviews, owned pins.
-- Dossier/research.
-- Advisory recommendations.
-- Give-back publishing.
+- Source-to-render inspection.
+- Object query provenance.
+- Pixel/object debug trace.
+- Human and agent debuggability.
 
-Current code:
+OpenCPN anchors:
 
-- Python FastAPI under `backend/`.
+- `s57chart` object query and description surfaces.
+- `ChartDB::GetXMLDescription`.
+- Plugin vector object info callbacks in `ocpn_plugin.h`.
 
-Split recommendation:
+Why:
 
-- Keep optional Python service.
-- Never required for chartplotter safety runtime.
-- If any endpoint becomes core product state, split that state into `helm-layerd` or `helm-navd` first.
+- This is the answer to "AI coded it, can humans inspect it?"
+- Every rendered object should be traceable to source product, compiler rule, primitive, cache artifact, and backend draw.
 
 Boundary RFC:
 
-- `RFC: Advisory Backend Contract`
-- `RFC: Community Places/Giveback Contract`
+- `RFC: Source-To-Render Inspection Trace`
 
-### 11. `helm-forged`
+### 10. `helm-controld`
 
 Purpose:
 
-- Generated symbol asset pipeline.
-- QA and hard-pile.
-- Provenance and clean-IP records.
-- Symbol library manifest generation.
+- Future actuation safety boundary.
+- Read-only pilot status first.
+- Guarded route/heading output later.
+- Approval UI, interlocks, audit log, and self-test.
 
-Current code:
+OpenCPN anchors:
 
-- `pipeline/iconforge/`.
-- Follow-on implementation work for a seed symbol library manifest.
+- `model/include/model/autopilot_output.h`
+- `model/include/model/comm_n0183_output.h`
+- `model/include/model/comm_out_queue.h`
+- route activation and active waypoint state in `routeman.h`
 
-Split recommendation:
+Rules:
 
-- Do not run as boat daemon.
-- Keep as offline/CI tool.
-
-Boundary RFC:
-
-- `RFC: Generated Symbol Library Manifest`
-
-### 12. `helm-controld`
-
-Purpose:
-
-- Future autopilot/control output.
-- Hardware interlocks.
-- Explicit skipper approvals.
-- Audit trail.
-
-Current code:
-
-- Autopilot planning exists in docs/board memory, not as a required current runtime service.
-
-Split recommendation:
-
-- Separate safety-critical future workstream.
-- Do not hide actuation inside nav display, route format, or AI backend.
+- Keep separated from display-only overlays.
+- No implicit AI actuation.
+- No hidden route-follow behavior.
+- Every command needs explicit source, approval, preconditions, and audit.
 
 Boundary RFC:
 
-- `RFC: Autopilot Control Safety Boundary`
+- `RFC: Control Safety Boundary`
 
-## What To Extract From `helm-server`
+## Extraction Order
 
-Priority order:
+### Extract now
 
-1. `chart_service` module  
-   Extract `/chart`, `/query`, chart catalog, renderer choice, tile cache headers, and presentation provenance from the 4480-line integration file.
+1. `helm-packd`: C++ local package/catalog/layers/prefetch/bundle service.
+2. `helm-cache`: C++ tile cache/proxy for online-fill and fallback tile replay.
+3. `helm-envd`: C++ environmental bundle daemon after the field-texture contract is proven.
 
-2. `nav_service` module  
-   Extract nav stream, command handling, connection state, AIS, alarms, and staleness framing.
+### Module first, daemon later
 
-3. `tide_service` module  
-   Extract tide/current endpoint routing and acquisition loop wiring.
+1. `helm-gateway`
+2. `helm-navd`
+3. `helm-chartd`
+4. `helm-renderd`
+5. `helm-layerd`
+6. `helm-inspectd`
 
-4. `gateway` module  
-   Extract TLS, pairing, auth, Bonjour, static UI, and routing.
+### Keep in core unless a hard boundary is proven
 
-5. `user_data/layer_service` module  
-   Extract `/user-data/...` static allow-listing and layer metadata.
+1. Active route progression.
+2. Ownship/source-validity state.
+3. AIS/CPA/TCPA authority.
+4. Alarm state.
+5. Official chart portrayal.
+6. Safety-contour behavior.
+7. Pilot command preconditions.
 
-After those modules exist and have fixture tests, decide which become separate daemons.
+## RFC Queue
 
-## Split Now / Later / Keep
-
-| Candidate | Decision | Why |
-|---|---|---|
-| `helm-packd` | Split now; already split. | Clear local package contract and no chart semantics. |
-| `helm-basemap-cache` | Split now; already split. | Cache/proxy is naturally independent. |
-| Chart rendering/query | Module now, daemon soon. | Too much in `helm-server`; Vulkan seam already exists. |
-| Nav/AIS/routes/alarms | Module now, daemon later. | Safety-critical; needs careful state/ordering. |
-| Tides/currents | Module now, daemon later. | Current endpoints already distinct; acquisition may deserve own scheduler. |
-| Environmental bundles | Python reference now, C++ daemon later. | Contract still maturing through WebGPU scene. |
-| Layer/user-data index | Module or `helm-packd` extension now, daemon later. | Related to packs but may become separate overlay service. |
-| AI/community backend | Keep optional Python. | Not safety-critical and benefits from Python. |
-| Icon Forge | Keep offline/CI. | Asset pipeline, not runtime. |
-| Gateway/auth/discovery | Module now, maybe separate later. | One-origin simplifies clients; avoid premature proxy complexity. |
-| Autopilot/control | Separate future service. | Actuation needs its own safety boundary. |
-
-## RFC Boundaries After Target Architecture
-
-Define RFCs only after the service target is clear:
-
-1. `RFC: Gateway, Pairing, Discovery, And Auth`
-2. `RFC: Nav State, Commands, And Alarm Reliability`
-3. `RFC: Chart Service And Presentation Compiler Boundary`
-4. `RFC: Render Command Stream And Draw Backend`
-5. `RFC: Local Package Service`
-6. `RFC: Environmental Bundle Service`
-7. `RFC: Marine Overlay Layer Manifest`
+1. `RFC: Presentation Compiler Boundary`
+2. `RFC: Chart Service Contract`
+3. `RFC: Nav State And Alarm Stream`
+4. `RFC: Local Package Service`
+5. `RFC: Environmental Bundle Service`
+6. `RFC: Nautical Render Command Stream`
+7. `RFC: Rebuildable GPU Artifact Cache`
 8. `RFC: Source-To-Render Inspection Trace`
-9. `RFC: Generated Symbol Library Manifest`
-10. `RFC: Autopilot Control Safety Boundary`
+9. `RFC: Marine Overlay Layer Manifest`
+10. `RFC: Control Safety Boundary`
 
-## OpenCPN Code Audit Plan
+## Public Framing
 
-The broad architecture is now defined enough to guide audits. Each extraction needs a targeted OpenCPN/Helm audit:
+Use this wording:
 
-### Audit A: Chart Service
+> Helm is a C++/OpenCPN-native boat-server architecture with thin clients and
+> explicit service contracts. The public OpenCPN repository already exposes the
+> useful seams: `model/` for navigation/comms/AIS/nav objects, chart/S-57/S-52
+> classes for portrayal, plugin APIs for extensions, and a CLI/shim precedent
+> for headless proof slices.
 
-Read:
+Avoid this wording:
 
-- `engine/vendor/cli/helm_server.cpp` chart/query/catalog sections.
-- `engine/vendor/cli/helm_tiles.cpp`.
-- OpenCPN chart render path in the vendored build tree after `engine/bootstrap.sh`.
-- Renderer boundary docs and generated contracts.
+- Web clients owning official chart portrayal.
+- Symbol registries owning cartography.
 
-Output:
+## Non-Goals
 
-- list of chart globals;
-- main-thread requirements;
-- cache keys;
-- query/pixel provenance;
-- presentation compiler ownership;
-- extraction patch plan.
-
-### Audit B: Nav Service
-
-Read:
-
-- `helm_server.cpp` nav socket, command handling, alarms.
-- OpenCPN `model/` route, track, AIS, comms paths in the bootstrapped OpenCPN tree.
-- `docs/OPENCPN-REUSE.md`.
-- `docs/STREAMING-API.md`.
-
-Output:
-
-- nav state schema;
-- command schema;
-- alarm reliability semantics;
-- connection adapter model;
-- service/module extraction plan.
-
-### Audit C: Tide Service
-
-Read:
-
-- `engine/vendor/cli/helm_tides.cpp`.
-- `helm_server.cpp` tide endpoints.
-- tide-related docs and tests.
-
-Output:
-
-- endpoint contract;
-- station/provider cache model;
-- acquisition scheduler boundary;
-- observed/residual status plan.
-
-### Audit D: Layer/Package Service
-
-Read:
-
-- `helm_packd.cpp`.
-- `pipeline/mbtiles_server.py`.
-- `pipeline/layer_inventory.py`.
-- `pipeline/region_bundle.py`.
-- `/user-data` serving in `helm_server.cpp`.
-
-Output:
-
-- whether `helm-layerd` is separate or part of `helm-packd`;
-- layer manifest schema;
-- inspection metadata contract;
-- privacy/allow-list rules.
-
-### Audit E: Environmental Service
-
-Read:
-
-- `services/wx/app.py`.
-- `services/wx/README.md`.
-- `web/wx-*` and `web/wx-scene-webgpu.js`.
-
-Output:
-
-- stable bundle contract;
-- C++ port plan;
-- replay/materialize split;
-- WebGPU field texture requirements.
-
-## First Implementation Slice
-
-Do not begin with process orchestration.
-
-Begin by extracting modules from `helm-server.cpp`:
-
-```text
-engine/vendor/cli/helm_gateway.*
-engine/vendor/cli/helm_chart_service.*
-engine/vendor/cli/helm_nav_service.*
-engine/vendor/cli/helm_tide_service.*
-engine/vendor/cli/helm_user_data_service.*
-```
-
-Acceptance for the first slice:
-
-- No endpoint behavior changes.
-- `engine/test-engine.sh` still passes.
-- `/health`, `/nav`, `/chart`, `/query`, `/catalog`, `/tides/*`, `/pair`, and static UI still work.
-- The extracted service modules expose interfaces that could later be hosted behind `helm-gateway`.
-
-This keeps the end-state service architecture real without destabilizing the current boat runtime.
+- Do not replace OpenCPN's chart portrayal.
+- Do not create a parallel charting standards body.
+- Do not move S-52/S-101 decisions into render backends or web clients.
+- Do not invent a new plugin bus where OpenCPN's plugin/data-flow contracts already fit.
+- Do not make every boundary a separate process before the contract is stable.
+- Do not hide optional or experimental features inside required navigation runtime.

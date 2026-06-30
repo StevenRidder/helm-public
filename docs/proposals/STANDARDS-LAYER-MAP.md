@@ -385,11 +385,11 @@ Possible RFC:
 - `RFC: Helm WebGPU Artifact Consumer`
 - `RFC: Object Inspection API`
 
-## Relationship To Microservices Architecture
+## Relationship To Target Service Architecture
 
 This standards map answers what existing standards own. It does not define the runtime service end state.
 
-ADR 0002 and `docs/MICROSERVICES-TARGET-ARCHITECTURE.md` define the broad target service architecture first, then use this standards map to decide which inter-service boundaries deserve RFCs.
+ADR 0013 and [TARGET-SERVICE-ARCHITECTURE.md](TARGET-SERVICE-ARCHITECTURE.md) define the broad C++ target service architecture first, then use this standards map to decide which inter-service boundaries deserve RFCs.
 
 The combined sequence is:
 
@@ -429,7 +429,7 @@ Priority order:
 
 5. `RFC: Rebuildable GPU Artifact Cache`  
    Owner: cache  
-   Reason: keeps GPU artifacts disposable and backend/device-specific.
+   Reason: keeps GPU artifacts disposable and renderer/device-specific.
 
 6. `RFC: Source-To-Render Inspection Trace`  
    Owner: debug/inspection  

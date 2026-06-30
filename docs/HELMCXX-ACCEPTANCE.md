@@ -4,8 +4,9 @@ Status: HELMC++-1 contract for the final C++ runtime acceptance gate.
 
 This document defines what "Helm is C++" means for the project. It does not mean every
 line of Helm becomes C++. It means every required boat-side chartplotter runtime daemon is
-C++/CMake/OpenCPN-native, with Python limited to tooling, references, prototypes, and optional
-non-safety services.
+C++/CMake/OpenCPN-native. Non-C++ code may exist around clients, tooling,
+fixtures, experiments, and optional non-safety features, but not as a required
+boat-side runtime daemon.
 
 ## Scope
 
@@ -38,7 +39,7 @@ The service names are less important than the boundary. Required boat daemons mu
 - independently testable with deterministic fixtures;
 - explicit about stale, offline, out-of-coverage, invalid-pack, and missing-data states;
 - small enough for a human reviewer to understand in one sitting;
-- free of hidden Python, Docker, venv, or developer-machine assumptions.
+- free of hidden scripting-language daemons, Docker, virtual-environment, or developer-machine assumptions.
 
 ## Runtime inventory
 
@@ -48,11 +49,11 @@ The service names are less important than the boundary. Required boat daemons mu
 | `helm-packd` | Local MBTiles/PMTiles packs, catalog, layers, prefetch, bundle manifests | Required C++ runtime. |
 | `helm-basemap-cache` | Cache/proxy for online fill and remote/local pack fallback | C++ when enabled as a runtime service; not required for chart-only installs. |
 | `helm-envd` | Environmental model-run bundle replay/materialization | Required C++ runtime after WX-19 proves the contract. |
-| `backend/` | AI/community/research/advisory backend | May remain Python only if optional and non-safety. |
-| `pipeline/*.py` | Import, bake, conversion, sample generation, fixture tooling | May remain Python as offline tooling, not runtime. |
+| optional advisory/community features | Research, recommendation, publishing, or community integrations | Must remain optional and non-safety unless promoted through a separate C++ runtime decision. |
+| offline data tooling | Import, bake, conversion, sample generation, fixture tooling | Outside required runtime. |
 | `web/` | Browser cockpit, MapLibre, WebGPU, UI tests | Not intended to be C++; client surface remains web-native. |
 | native Apple clients | WKWebView, SwiftUI, MapLibre Native, Metal | Not intended to be C++; thin client over the boat server. |
-| dev/test harnesses | Playwright, smoke helpers, mock engines, local scripts | May use Python or JS when clearly dev/test only. |
+| dev/test harnesses | Playwright, smoke helpers, mock engines, local scripts | Outside required runtime. |
 
 ## Non-C++ allowance
 
@@ -60,19 +61,19 @@ Non-C++ code is allowed when it is visibly outside required boat runtime:
 
 - Browser JavaScript/WebGPU owns the cockpit UI and client rendering.
 - Swift/SwiftUI/Metal may own native Apple client surfaces.
-- Python may own offline import/bake tools and fixture generation.
-- Python may own optional AI/community/research services if they cannot affect safety-critical runtime
-  and Helm remains usable without them.
-- Python/JS may own tests, Playwright harnesses, developer scripts, and references.
+- Offline import/bake tools and fixture generation are outside required runtime.
+- Optional advisory/community/research services may exist only if they cannot affect safety-critical
+  runtime and Helm remains usable without them.
+- Tests, Playwright harnesses, developer scripts, and references are outside required runtime.
 
 Any non-C++ daemon that becomes required for normal chartplotter runtime fails HELMC++ unless it has
 a frozen contract, a C++ port plan, and a visible temporary status.
 
-## Python oracle rule
+## Reference oracle rule
 
-Python reference paths should be used as oracles before they are retired. The C++ replacement must
-match the frozen behavior with fixtures and contract tests before the Python path is deleted or
-demoted to dev/reference-only.
+Reference paths should be used as oracles before they are retired. The C++ replacement must
+match the frozen behavior with fixtures and contract tests before the reference path is deleted or
+demoted to dev-only.
 
 Parity must cover:
 
@@ -91,7 +92,7 @@ must use normalized JSON, normalized headers, semantic image checks, or document
 ## End-to-end proof
 
 The final C++ runtime proof must launch Helm on private ports with required C++ daemons only. It must
-assert that no required Python daemon is running, contacted, or necessary.
+assert that no required non-C++ daemon is running, contacted, or necessary.
 
 The end-to-end harness must prove:
 
@@ -143,7 +144,7 @@ HELMC++ benchmarking must record:
 - no-network behavior;
 - 12-24 hour soak with nav feed plus chart, basemap, weather, and offline-pack traffic.
 
-The comparison baseline is the Python/reference path or the last accepted runtime path. If C++ does
+The comparison baseline is the previous reference path or the last accepted runtime path. If C++ does
 not win a metric, the dossier must explain why the tradeoff is acceptable.
 
 ## Packaging proof
@@ -153,7 +154,7 @@ HELMC++ requires an installable runtime, not a developer-only build.
 Packaging proof must show:
 
 - no Docker requirement;
-- no required Python daemon or venv requirement;
+- no required scripting-language daemon or virtual-environment requirement;
 - fresh-machine macOS install path;
 - fresh-machine Linux/Raspberry-Pi-style install path where supported;
 - no dependency on `/tmp` build artifacts;
@@ -175,7 +176,7 @@ Every C++ runtime service must be boring, bounded, and reviewable:
 - useful service logs and health surfaces;
 - sanitizer/debug builds where practical;
 - no clever template machinery unless it removes real complexity;
-- no line-for-line Python translation when a native C++ shape is clearer;
+- no line-for-line translation from a prototype when a native C++ shape is clearer;
 - reviewer-readable diffs and documentation.
 
 ## Go/no-go rule
@@ -183,15 +184,15 @@ Every C++ runtime service must be boring, bounded, and reviewable:
 HELMC++ passes only when all of the following are true:
 
 - required boat/runtime daemons are C++;
-- no required Python daemon remains;
-- optional Python/backend/tooling surfaces are explicitly non-safety, dev-only, reference-only, or
+- no required non-C++ daemon remains;
+- optional non-runtime surfaces are explicitly non-safety, dev-only, reference-only, or
   offline-only;
-- Python oracle parity is recorded;
-- no-Python runtime E2E passes;
+- reference-oracle parity is recorded;
+- no-required-non-C++ runtime E2E passes;
 - Playwright cockpit proof passes;
 - performance/reliability/soak comparison is recorded;
 - packaging/install proof passes without Docker;
 - maintainability audit has no blocking findings;
 - final evidence links exact PRs, branches, merged SHAs, logs, screenshots, and benchmark artifacts.
 
-If any required runtime path still depends on Python, HELMC++ is not done.
+If any required runtime path still depends on a non-C++ daemon, HELMC++ is not done.

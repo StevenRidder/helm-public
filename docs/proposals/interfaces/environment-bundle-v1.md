@@ -1,9 +1,9 @@
 # Interface: Environmental Bundle Service v1
 
 Schema family: `helm.env.*.v1`  
-Producer: `helm-envd` or current `helm-wx` reference  
-Consumers: WebGPU scene, clients, AI probes, package service  
-Current code anchor: `services/wx/app.py`, `services/wx/README.md`
+Producer: `helm-envd`
+Consumers: WebGPU scene, clients, package service
+Current OpenCPN anchor: `plugins/grib_pi`, especially `GribReader`, `GribV2Record`, and `GribOverlayFactory`
 
 ## Purpose
 
@@ -57,7 +57,7 @@ Schema: `helm.env.bundle.v1`
       "id": "wind",
       "kind": "vector",
       "unit": "kn",
-      "encoding": "helm-wxv1",
+      "encoding": "helm-env-field-v1",
       "s100Alignment": {"productIdentifier": "S-413", "authority": "informative"},
       "tiles": {
         "u": "/bundles/open-meteo/latest/fiji/layers/wind/vector/20260701T000000Z/u/{z}/{x}/{y}.png",
@@ -74,4 +74,3 @@ Schema: `helm.env.bundle.v1`
 - Provider outage may serve stale cache only if marked stale.
 - Replay endpoints must not fetch upstream.
 - Materialize jobs must fail closed on tile/provider budget overflow.
-

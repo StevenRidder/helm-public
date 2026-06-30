@@ -3,7 +3,7 @@
 Schema family: `helm.chart.*.v1`  
 Producer: `helm-chartd`  
 Consumers: gateway, clients, render backend, debug tools  
-Current code anchor: `helm-server.cpp` `/chart`, `/query`, `/catalog`; `helm_tiles.cpp`; presentation, backend, and debug renderer work
+Current OpenCPN anchor: `ChartBase`, `ChartDB`, `s57chart`, `S57ENC`, and `data/s57data`
 
 ## Purpose
 

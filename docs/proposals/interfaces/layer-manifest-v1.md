@@ -1,8 +1,8 @@
 # Interface: Marine Overlay Layer Manifest v1
 
 Schema family: `helm.layer.*.v1`  
-Producer: `helm-layerd`, `helm-packd`, optional backend  
-Consumers: clients, debug tools, AI probes  
+Producer: `helm-layerd`, `helm-packd`
+Consumers: clients, debug tools
 Current code anchors: `helm_packd.cpp`, `pipeline/layer_inventory.py`, `/user-data` serving
 
 ## Purpose
@@ -69,4 +69,3 @@ Future:
 - Private filesystem paths are never exposed.
 - Missing optional layers do not fail chart rendering.
 - Layers must visibly report stale/out-of-coverage status.
-

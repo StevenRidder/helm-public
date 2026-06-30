@@ -7,10 +7,14 @@ Status: Proposed
 ## Context
 
 Helm already has several runtime and tooling surfaces: the one-origin C++
-`helm-server`, C++ package/cache services, Python reference services, browser
-clients, data pipelines, and renderer proof code. That can look like a mixed
-half-Python/half-C++ codebase unless the intended ownership boundaries are made
-explicit.
+`helm-server`, C++ package/cache services, browser clients, data pipelines, and
+renderer proof code. That can look like a mixed source tree unless the intended
+C++ runtime ownership boundaries are made explicit.
+
+The target architecture should be grounded in the public OpenCPN repository, not
+only in Helm's current vendored or transitional code. The relevant public
+OpenCPN seams are `model/`, `gui/include/gui`, `s57`, `data/s57data`,
+`include/ocpn_plugin.h`, and `cli`.
 
 The current public runnable path remains the C++ `helm-server` plus browser
 client. The service architecture is a target shape, not a claim that every box is
@@ -18,7 +22,7 @@ already a production daemon.
 
 ## Decision
 
-Document a broad target service architecture first, then define interface
+Document a broad C++ target service architecture first, then define interface
 contracts for the boundaries between those services.
 
 The target service proposal lives at
@@ -28,8 +32,6 @@ The target service proposal lives at
 
 - Required boat-runtime services should be C++/CMake/OpenCPN-native where
   practical.
-- Python remains acceptable for offline tooling, reference bakers, experiments,
-  and optional AI/community services.
 - A boundary may start as a C++ module before it becomes a separate daemon.
 - The browser/WebGPU client consumes contracts; it does not own chart semantics.
 - Official chart portrayal remains in the chart/presentation layer.

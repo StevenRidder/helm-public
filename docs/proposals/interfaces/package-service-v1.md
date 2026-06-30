@@ -3,7 +3,7 @@
 Schema family: `helm.package.*.v1`  
 Producer: `helm-packd`  
 Consumers: gateway, browser/native clients, offline tooling  
-Current code anchor: `helm_packd.cpp`, `pipeline/mbtiles_server.py`
+Current OpenCPN anchor: `gui/include/gui/mbtiles.h`, chart database/catalog patterns, and plugin chart extension concepts in `include/ocpn_plugin.h`
 
 ## Purpose
 
@@ -81,4 +81,3 @@ Schema: `helm.package.prefetch.v1`
 - Missing packs return `not_configured` or `not_available`.
 - Out-of-bounds requests return `out_of_coverage`.
 - Local filesystem paths are never leaked.
-

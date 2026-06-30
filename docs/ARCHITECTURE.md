@@ -15,11 +15,11 @@ The public alpha has four intentional parts:
         engine/ helm-server, a headless OpenCPN-derived boat server
              |                 |                    |
              v                 v                    v
-      local charts       boat data feeds       optional services
+      local charts       boat data feeds       C++ runtime services
       ENC / MBTiles      NMEA / SignalK        weather / basemap fill
              |
              v
-      pipeline/ local data generation and import tools
+      local data generation and import tools
 ```
 
 This split can look like "several apps" at first glance. It is really a
@@ -27,7 +27,7 @@ boat-server architecture: the C++ process owns navigation-critical computation
 and chart rendering, while the web client is a thin, fast cockpit surface that
 can run on the same machine or another display on the boat LAN. Optional helper
 services exist for data and cache seams, but the end state is **small C++
-runtime services plus Python tooling/prototypes**, not required Python daemons.
+runtime services around OpenCPN-native contracts**.
 See [RUNTIME-SERVICES.md](RUNTIME-SERVICES.md) and the final
 [HELMC++ acceptance contract](HELMCXX-ACCEPTANCE.md).
 
@@ -63,18 +63,19 @@ interactive map and composes Helm's layers: chart tiles, satellite/basemap
 underlays, weather, AIS, routes, tracks, alarms, depth overlays, and instrument
 state.
 
-### `services/`
+### Runtime Services
 
-Services are optional local helpers. They are not required to understand the
-core product. For example, `services/basemap-fill/` can provide an optional
-cache-first online underlay beneath local charts. If a helper graduates into
-required boat runtime, it needs a frozen HTTP/file contract and a C++ port plan.
+Runtime services are C++/CMake/OpenCPN-native when they are required for normal
+boat-side operation. Examples include local package serving, tile cache/proxy
+behavior, and environmental bundle replay. A boundary may start inside the
+current boat server, but the contract should be narrow enough to extract and
+test independently.
 
-### `pipeline/`
+### Data Preparation
 
-The pipeline contains local data tools: chart/depth extraction, demo data
-generation, and weather-layer preparation. Real chart packs, private imagery,
-MBTiles, and runtime caches stay outside Git.
+Data preparation covers chart/depth extraction, demo data generation, and
+weather-layer preparation. Real chart packs, private imagery, MBTiles, and
+runtime caches stay outside Git.
 
 ## Data Boundary
 
@@ -102,8 +103,8 @@ understand all of Helm:
 |---|---|
 | `web/` | UI polish, MapLibre layers, AIS/route/track panels, accessibility, tests |
 | `engine/` | build fixes, protocol behavior, chart rendering, NMEA/SignalK ingest, smoke tests |
-| `services/` | optional local helpers, cache behavior, clear failure modes |
-| `pipeline/` | import tools, data transforms, reproducible sample generation |
+| runtime services | C++ package/cache/environment daemons, clear failure modes |
+| data preparation | import tools, data transforms, reproducible sample generation |
 | `docs/` | setup guides, diagrams, examples, platform notes |
 | `.github/` | issue templates, CI, contribution workflow |
 
@@ -143,7 +144,7 @@ system. The proposed end state is documented separately so contributors can
 review the boundaries without confusing them for current build instructions:
 
 - [proposals/TARGET-SERVICE-ARCHITECTURE.md](proposals/TARGET-SERVICE-ARCHITECTURE.md)
-  maps the current code into target services and extraction order.
+  maps the public OpenCPN source layout into target C++ services and extraction order.
 - [proposals/INTERFACE-CATALOG.md](proposals/INTERFACE-CATALOG.md) defines the
   first-pass contracts between those services.
 - [proposals/STANDARDS-LAYER-MAP.md](proposals/STANDARDS-LAYER-MAP.md) records

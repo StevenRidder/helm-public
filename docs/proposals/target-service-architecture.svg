@@ -1,158 +1,110 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 980" role="img" aria-labelledby="title desc">
-  <title id="title">Helm OpenCPN Vulkan target microservices architecture</title>
-  <desc id="desc">Target service architecture showing clients, gateway, runtime services, data services, rendering services, offline tooling, and future control boundary.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1340" height="980" viewBox="0 0 1340 980" role="img" aria-labelledby="title desc">
+  <title id="title">Helm OpenCPN C++ target service architecture</title>
+  <desc id="desc">Target service diagram showing thin clients, a C++ gateway, C++ OpenCPN-native services, hardware inputs, and public OpenCPN source anchors.</desc>
   <defs>
     <style>
-      text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #17202a; }
-      .title { font-size: 32px; font-weight: 700; }
-      .subtitle { font-size: 16px; fill: #4d5b66; }
-      .lane-title { font-size: 15px; font-weight: 700; fill: #32414b; }
-      .box-title { font-size: 18px; font-weight: 700; }
-      .box-sub { font-size: 12px; fill: #43525d; }
-      .small { font-size: 11px; fill: #5b6872; }
-      .tiny { font-size: 10px; fill: #63717b; }
-      .lane { fill: #f6f8fa; stroke: #d8e0e6; stroke-width: 1; }
-      .client { fill: #eaf4ff; stroke: #4c86c6; stroke-width: 1.5; }
-      .gateway { fill: #fff4dc; stroke: #c89228; stroke-width: 2; }
-      .core { fill: #eaf7ef; stroke: #3b8b5b; stroke-width: 1.6; }
-      .chart { fill: #eef2ff; stroke: #6376c7; stroke-width: 1.6; }
-      .data { fill: #f1fbfb; stroke: #338b93; stroke-width: 1.6; }
-      .tool { fill: #f8f1ff; stroke: #9461b8; stroke-width: 1.4; }
-      .future { fill: #fff0f0; stroke: #c85a5a; stroke-width: 1.5; stroke-dasharray: 7 4; }
-      .boundary { fill: none; stroke: #8896a0; stroke-width: 1.2; stroke-dasharray: 6 6; }
-      .arrow { stroke: #53616c; stroke-width: 2; fill: none; marker-end: url(#arrow); }
-      .arrow-soft { stroke: #7a8791; stroke-width: 1.5; fill: none; marker-end: url(#arrow-soft); stroke-dasharray: 4 5; }
-      .danger { fill: #fff8f8; stroke: #d36b6b; stroke-width: 1.2; }
-      .legend { fill: #ffffff; stroke: #d8e0e6; stroke-width: 1; }
+      text { font-family: Arial, Helvetica, sans-serif; fill: #172026; }
+      .title { font-size: 28px; font-weight: 700; }
+      .subtitle { font-size: 15px; fill: #42525c; }
+      .box { fill: #f7faf9; stroke: #6f8f8a; stroke-width: 1.5; }
+      .core { fill: #eaf4ff; stroke: #2b6cb0; stroke-width: 2; }
+      .hard { fill: #fff3e6; stroke: #b7791f; stroke-width: 2; }
+      .client { fill: #eef7ee; stroke: #3f8f5f; stroke-width: 1.6; }
+      .anchor { fill: #f3f0ff; stroke: #6b46c1; stroke-width: 1.4; }
+      .label { font-size: 17px; font-weight: 700; }
+      .small { font-size: 13px; fill: #4b5c66; }
+      .tiny { font-size: 12px; fill: #596a73; }
+      .arrow { stroke: #2d3a42; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+      .soft { stroke: #82929a; stroke-width: 1.6; fill: none; marker-end: url(#arrow-soft); }
     </style>
-    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
-      <path d="M2,2 L10,6 L2,10 Z" fill="#53616c"/>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#2d3a42"/>
     </marker>
-    <marker id="arrow-soft" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
-      <path d="M2,2 L10,6 L2,10 Z" fill="#7a8791"/>
+    <marker id="arrow-soft" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#82929a"/>
     </marker>
-    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
-      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#0b1820" flood-opacity="0.12"/>
-    </filter>
   </defs>
 
-  <rect width="1400" height="980" fill="#ffffff"/>
+  <rect x="0" y="0" width="1340" height="980" fill="#ffffff"/>
+  <text x="54" y="58" class="title">Helm/OpenCPN C++ Target Service Architecture</text>
+  <text x="54" y="84" class="subtitle">Required boat-side runtime is C++/CMake/OpenCPN-native. Service boundary first; separate process when the contract is stable.</text>
 
-  <text x="70" y="58" class="title">Helm / OpenCPN / Vulkan Target Microservices</text>
-  <text x="70" y="86" class="subtitle">Target architecture first; RFCs define the seams after the service catalog is clear.</text>
+  <rect x="70" y="125" width="1200" height="88" rx="8" class="client"/>
+  <text x="92" y="160" class="label">Thin Clients</text>
+  <text x="92" y="184" class="small">Browser cockpit / iPad / native client / test harnesses consume HTTP, WebSocket, tiles, bundles, and inspection contracts.</text>
 
-  <rect x="54" y="118" width="1292" height="118" rx="10" class="lane"/>
-  <text x="70" y="145" class="lane-title">Clients</text>
-  <rect x="115" y="165" width="210" height="48" rx="8" class="client" filter="url(#shadow)"/>
-  <text x="134" y="190" class="box-title">Web Cockpit</text>
-  <text x="134" y="206" class="box-sub">browser / PWA / test</text>
-  <rect x="375" y="165" width="210" height="48" rx="8" class="client" filter="url(#shadow)"/>
-  <text x="394" y="190" class="box-title">iPad / iPhone</text>
-  <text x="394" y="206" class="box-sub">thin native client</text>
-  <rect x="635" y="165" width="210" height="48" rx="8" class="client" filter="url(#shadow)"/>
-  <text x="654" y="190" class="box-title">Desktop Shell</text>
-  <text x="654" y="206" class="box-sub">macOS / dev browser</text>
-  <rect x="895" y="165" width="250" height="48" rx="8" class="client" filter="url(#shadow)"/>
-  <text x="914" y="190" class="box-title">Automation / Tests</text>
-  <text x="914" y="206" class="box-sub">Playwright, smoke, agents</text>
+  <path class="arrow" d="M670 213 L670 260"/>
+  <rect x="455" y="260" width="430" height="86" rx="8" class="core"/>
+  <text x="480" y="296" class="label">helm-gateway</text>
+  <text x="480" y="320" class="small">C++ one-origin TLS, pairing, auth, static client, routing, common health</text>
 
-  <rect x="485" y="280" width="430" height="92" rx="10" class="gateway" filter="url(#shadow)"/>
-  <text x="525" y="312" class="box-title">helm-gateway</text>
-  <text x="525" y="333" class="box-sub">one-origin TLS, auth, pairing, Bonjour, static UI</text>
-  <text x="525" y="351" class="box-sub">routes client HTTP/WS to local runtime services</text>
+  <path class="arrow" d="M670 346 L670 392"/>
+  <rect x="60" y="392" width="1220" height="240" rx="10" class="box"/>
+  <text x="86" y="424" class="label">C++ Boat Runtime Services</text>
+  <text x="86" y="448" class="small">Names are target boundaries. Some may remain in one process until extraction is justified.</text>
 
-  <path class="arrow" d="M220 214 C220 250 570 248 620 280"/>
-  <path class="arrow" d="M480 214 C500 248 610 250 655 280"/>
-  <path class="arrow" d="M740 214 C740 245 735 250 718 280"/>
-  <path class="arrow" d="M1020 214 C990 255 820 256 785 280"/>
+  <rect x="88" y="480" width="205" height="110" rx="8" class="core"/>
+  <text x="108" y="512" class="label">helm-navd</text>
+  <text x="108" y="536" class="small">OpenCPN model</text>
+  <text x="108" y="556" class="small">routes / AIS / ownship</text>
+  <text x="108" y="576" class="small">alarms / pilot status</text>
 
-  <rect x="54" y="420" width="1292" height="238" rx="10" class="lane"/>
-  <text x="70" y="447" class="lane-title">Required Boat Runtime</text>
+  <rect x="315" y="480" width="205" height="110" rx="8" class="hard"/>
+  <text x="335" y="512" class="label">helm-chartd</text>
+  <text x="335" y="536" class="small">Chart DB + S-57/S-52</text>
+  <text x="335" y="556" class="small">tiles / catalog / query</text>
+  <text x="335" y="576" class="small">presentation authority</text>
 
-  <rect x="88" y="482" width="210" height="92" rx="8" class="core" filter="url(#shadow)"/>
-  <text x="111" y="510" class="box-title">helm-navd</text>
-  <text x="111" y="530" class="box-sub">routes, tracks, AIS</text>
-  <text x="111" y="548" class="box-sub">alarms, staleness</text>
-  <text x="111" y="566" class="tiny">module now, daemon later</text>
+  <rect x="542" y="480" width="205" height="110" rx="8" class="core"/>
+  <text x="562" y="512" class="label">helm-packd</text>
+  <text x="562" y="536" class="small">local packages</text>
+  <text x="562" y="556" class="small">catalog / layers</text>
+  <text x="562" y="576" class="small">prefetch / bundle</text>
 
-  <rect x="330" y="482" width="210" height="92" rx="8" class="chart" filter="url(#shadow)"/>
-  <text x="353" y="510" class="box-title">helm-chartd</text>
-  <text x="353" y="530" class="box-sub">chart tiles, query</text>
-  <text x="353" y="548" class="box-sub">S-52/S-101 presentation</text>
-  <text x="353" y="566" class="tiny">module now, daemon soon</text>
+  <rect x="769" y="480" width="205" height="110" rx="8" class="core"/>
+  <text x="789" y="512" class="label">helm-envd</text>
+  <text x="789" y="536" class="small">environment bundles</text>
+  <text x="789" y="556" class="small">field tiles</text>
+  <text x="789" y="576" class="small">valid-time replay</text>
 
-  <rect x="572" y="482" width="210" height="92" rx="8" class="chart" filter="url(#shadow)"/>
-  <text x="595" y="510" class="box-title">helm-renderd</text>
-  <text x="595" y="530" class="box-sub">draw-only backend</text>
-  <text x="595" y="548" class="box-sub">VSG / WebGPU artifacts</text>
-  <text x="595" y="566" class="tiny">module until seam stabilizes</text>
+  <rect x="996" y="480" width="205" height="110" rx="8" class="core"/>
+  <text x="1016" y="512" class="label">helm-layerd</text>
+  <text x="1016" y="536" class="small">user / overlay layers</text>
+  <text x="1016" y="556" class="small">metadata / provenance</text>
+  <text x="1016" y="576" class="small">inspection envelopes</text>
 
-  <rect x="814" y="482" width="210" height="92" rx="8" class="core" filter="url(#shadow)"/>
-  <text x="837" y="510" class="box-title">helm-tided</text>
-  <text x="837" y="530" class="box-sub">tides, currents</text>
-  <text x="837" y="548" class="box-sub">stations, acquisition</text>
-  <text x="837" y="566" class="tiny">module now, daemon later</text>
+  <path class="soft" d="M418 590 L418 680"/>
+  <path class="soft" d="M645 590 L645 680"/>
+  <path class="soft" d="M872 590 L872 680"/>
+  <path class="soft" d="M1098 590 L1098 680"/>
 
-  <rect x="1056" y="482" width="210" height="92" rx="8" class="data" filter="url(#shadow)"/>
-  <text x="1079" y="510" class="box-title">helm-layerd</text>
-  <text x="1079" y="530" class="box-sub">user layers, overlays</text>
-  <text x="1079" y="548" class="box-sub">inspection metadata</text>
-  <text x="1079" y="566" class="tiny">target service</text>
+  <rect x="250" y="680" width="265" height="92" rx="8" class="hard"/>
+  <text x="272" y="715" class="label">helm-renderd</text>
+  <text x="272" y="738" class="small">neutral render model</text>
+  <text x="272" y="758" class="small">draw-only backend contract</text>
 
-  <rect x="54" y="700" width="1292" height="142" rx="10" class="lane"/>
-  <text x="70" y="727" class="lane-title">Data, Cache, Optional Services</text>
+  <rect x="540" y="680" width="265" height="92" rx="8" class="core"/>
+  <text x="562" y="715" class="label">helm-cache</text>
+  <text x="562" y="738" class="small">rebuildable GPU/tile artifacts</text>
+  <text x="562" y="758" class="small">cache/proxy behavior</text>
 
-  <rect x="88" y="760" width="210" height="58" rx="8" class="data" filter="url(#shadow)"/>
-  <text x="111" y="785" class="box-title">helm-packd</text>
-  <text x="111" y="804" class="box-sub">packs, catalog, bundle</text>
+  <rect x="830" y="680" width="265" height="92" rx="8" class="core"/>
+  <text x="852" y="715" class="label">helm-inspectd</text>
+  <text x="852" y="738" class="small">source-to-render trace</text>
+  <text x="852" y="758" class="small">object / pixel provenance</text>
 
-  <rect x="330" y="760" width="210" height="58" rx="8" class="data" filter="url(#shadow)"/>
-  <text x="353" y="785" class="box-title">basemap-cache</text>
-  <text x="353" y="804" class="box-sub">online-fill / remote cache</text>
+  <path class="arrow" d="M190 590 L190 830"/>
+  <rect x="70" y="830" width="245" height="88" rx="8" class="box"/>
+  <text x="92" y="864" class="label">Hardware Inputs</text>
+  <text x="92" y="888" class="small">NMEA 0183 / NMEA 2000</text>
+  <text x="92" y="906" class="small">Signal K / AIS / GPS / depth</text>
 
-  <rect x="572" y="760" width="210" height="58" rx="8" class="data" filter="url(#shadow)"/>
-  <text x="595" y="785" class="box-title">helm-envd</text>
-  <text x="595" y="804" class="box-sub">weather / metocean bundles</text>
+  <rect x="370" y="825" width="880" height="100" rx="8" class="anchor"/>
+  <text x="394" y="858" class="label">Public OpenCPN Source Anchors</text>
+  <text x="394" y="883" class="small">model/: comms, AIS, routes, tracks, ownship, nav objects, notifications, local APIs</text>
+  <text x="394" y="903" class="small">gui/include/gui + s57 + data/s57data: chart DB, S-57/S-52, quilting, canvas, presentation assets</text>
+  <text x="394" y="923" class="small">include/ocpn_plugin.h + cli/: plugin data-flow contracts and bounded headless proof slices</text>
 
-  <rect x="814" y="760" width="210" height="58" rx="8" class="tool" filter="url(#shadow)"/>
-  <text x="837" y="785" class="box-title">helm-ai</text>
-  <text x="837" y="804" class="box-sub">optional advisory backend</text>
-
-  <rect x="1056" y="760" width="210" height="58" rx="8" class="tool" filter="url(#shadow)"/>
-  <text x="1079" y="785" class="box-title">helm-forged</text>
-  <text x="1079" y="804" class="box-sub">offline symbol asset pipeline</text>
-
-  <rect x="1056" y="604" width="210" height="58" rx="8" class="future" filter="url(#shadow)"/>
-  <text x="1079" y="629" class="box-title">helm-controld</text>
-  <text x="1079" y="648" class="box-sub">future actuation boundary</text>
-
-  <path class="arrow" d="M700 372 L700 430"/>
-  <path class="arrow" d="M700 430 C630 446 230 446 193 482"/>
-  <path class="arrow" d="M700 430 C660 450 468 452 435 482"/>
-  <path class="arrow" d="M700 430 C700 452 690 460 677 482"/>
-  <path class="arrow" d="M700 430 C760 452 880 452 919 482"/>
-  <path class="arrow" d="M700 430 C820 456 1110 456 1161 482"/>
-
-  <path class="arrow-soft" d="M435 574 C455 625 600 635 677 760"/>
-  <path class="arrow-soft" d="M193 574 C185 640 188 690 193 760"/>
-  <path class="arrow-soft" d="M1161 574 C1145 630 1045 695 919 760"/>
-  <path class="arrow-soft" d="M1161 574 L1161 604"/>
-  <path class="arrow-soft" d="M1161 574 C1165 675 1165 705 1161 760"/>
-  <path class="arrow-soft" d="M677 574 L677 760"/>
-  <path class="arrow-soft" d="M193 760 C240 690 340 635 435 574"/>
-  <path class="arrow-soft" d="M435 760 L435 574"/>
-
-  <rect x="76" y="878" width="414" height="64" rx="8" class="legend"/>
-  <text x="96" y="902" class="box-title">First implementation slice</text>
-  <text x="96" y="922" class="box-sub">Extract modules from helm_server.cpp before daemonizing.</text>
-
-  <rect x="525" y="878" width="360" height="64" rx="8" class="danger"/>
-  <text x="545" y="902" class="box-title">Hard boundary</text>
-  <text x="545" y="922" class="box-sub">Presentation/chartd own official chart portrayal.</text>
-
-  <rect x="920" y="878" width="350" height="64" rx="8" class="legend"/>
-  <text x="940" y="902" class="box-title">Process rule</text>
-  <text x="940" y="922" class="box-sub">Service boundary first; separate process when stable.</text>
-
-  <text x="70" y="960" class="small">Source: docs/proposals/TARGET-SERVICE-ARCHITECTURE.md. Boxes show target ownership, not all day-one processes.</text>
+  <rect x="72" y="940" width="1190" height="28" rx="6" fill="#fff8e8" stroke="#d69e2e"/>
+  <text x="92" y="959" class="tiny">Hard boundary: helm-chartd/presentation owns official chart portrayal. Renderers, caches, symbols, overlays, and clients do not choose official chart semantics.</text>
 </svg>

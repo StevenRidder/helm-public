@@ -30,14 +30,14 @@ languages," this is the hierarchy that ties them together.
 |---|---|---|
 | **`engine/` → `helm-server`** | C++ | The safety core. A headless OpenCPN-derived navigation + S-52 chart engine that serves `/nav`, `/chart`, `/catalog`, and `/health` on one local origin. |
 | **`web/`** | Browser / MapLibre | The cockpit UI — a thin client over the server. Runs on the same machine or another display on the boat LAN. |
-| **`services/`** | Python | Optional local helpers (e.g. basemap fill). Not required to understand the core. |
-| **`pipeline/`** | Python / shell | Tools to generate and import *your own* local chart, depth, and weather data. No chart packs are bundled. |
+| **runtime services** | C++ | Local package serving, cache/proxy behavior, and environmental bundle replay as they become required boat-side services. |
+| **data preparation** | native tools / scripts | Tools to generate and import *your own* local chart, depth, and weather data. No chart packs are bundled. |
 
 ```text
    web/ cockpit  ──HTTP+WebSocket──▶  engine/ helm-server (C++)  ──▶  local charts + boat data
   (browser/tablet)   one local origin      OpenCPN nav core            ENC/MBTiles · NMEA/SignalK
                                                   ▲
-                                   optional  services/ · pipeline/
+                                   C++ runtime services · local data tools
 ```
 
 The C++ process owns navigation-critical computation and chart rendering; everything
@@ -98,8 +98,8 @@ chart data and NMEA/SignalK input. See [docs/OPENCPN-REUSE.md](docs/OPENCPN-REUS
 | [docs/REPO-MAP.md](docs/REPO-MAP.md) | Quick orientation to the directories and contribution areas |
 | [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) | Contributor workflow, ports, tests, local data rules |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Headless C++ boat server + browser/mobile client boundary |
-| [docs/RUNTIME-SERVICES.md](docs/RUNTIME-SERVICES.md) | End-state C++ runtime microservices; Python limited to tooling/prototypes |
-| [docs/proposals/TARGET-SERVICE-ARCHITECTURE.md](docs/proposals/TARGET-SERVICE-ARCHITECTURE.md) | Proposed service end state and extraction order |
+| [docs/RUNTIME-SERVICES.md](docs/RUNTIME-SERVICES.md) | End-state C++ runtime services and HELMC++ acceptance guardrails |
+| [docs/proposals/TARGET-SERVICE-ARCHITECTURE.md](docs/proposals/TARGET-SERVICE-ARCHITECTURE.md) | OpenCPN-source audit, proposed C++ service end state, and extraction order |
 | [docs/proposals/INTERFACE-CATALOG.md](docs/proposals/INTERFACE-CATALOG.md) | Draft interface contracts between proposed services |
 | [docs/proposals/STANDARDS-LAYER-MAP.md](docs/proposals/STANDARDS-LAYER-MAP.md) | Existing standards by layer, and where Helm-specific RFCs/proposals fit |
 | [docs/STREAMING-API.md](docs/STREAMING-API.md) | Boat server ↔ iOS thin clients — the world-class streaming/API contract |
@@ -152,16 +152,14 @@ demo, or inviting testers.
 
 ## Requirements
 
-There is intentionally no root `requirements.txt`: Helm is not one Python app.
-It is a mixed C++/browser/Python/Node source tree, so dependencies are scoped to
+There is intentionally no root runtime dependency file: Helm is a C++ boat
+server plus browser client and local data tools, so dependencies are scoped to
 the part you are running.
 
 | Area | Requirements |
 |---|---|
-| Main macOS runtime | Xcode CLT, Homebrew, `wxwidgets@3.2`, `gpatch`, `cmake`, `gdal`, `node`, `python3` |
+| Main macOS runtime | Xcode CLT, Homebrew, `wxwidgets@3.2`, `gpatch`, `cmake`, `gdal`, `node` |
 | C++ engine | Built by `engine/bootstrap.sh`; see [docs/RUNBOOK.md](docs/RUNBOOK.md) |
-| Optional backend agent service | `backend/requirements.txt` |
-| Optional weather service | `services/wx/requirements.txt` |
 | Web tests | `web/test/package.json` |
 | Runtime chart data | NOAA ENC `.000` cells, pointed to with `HELM_ENC` |
 | Runtime basemap data | User-owned MBTiles/raster packs served locally, outside Git |
@@ -185,12 +183,10 @@ The current public-alpha path is the one-origin `helm-server`: it serves the
 browser UI, `/nav`, `/chart`, `/catalog`, and `/health` on one private port.
 
 ```bash
-brew install wxwidgets@3.2 gpatch cmake gdal node python3
+brew install wxwidgets@3.2 gpatch cmake gdal node
 engine/bootstrap.sh
 scripts/install-sample-enc.sh
-python3 -m venv services/wx/.venv
-services/wx/.venv/bin/python -m pip install -r services/wx/requirements.txt
-scripts/start-helm.sh --port 9001 --weather --fill
+scripts/start-helm.sh --port 9001 --fill
 
 open http://127.0.0.1:9001/
 ```
@@ -241,7 +237,7 @@ Multi-license — see [LICENSE](LICENSE), [LICENSE.BSL](LICENSE.BSL), and
 
 - **OpenCPN-derived engine work:** GPLv2-or-later, source-visible, and kept in a
   separate boat-server process behind the HTTP/WebSocket protocol boundary.
-- **Helm-authored web/backend/pipeline/docs:** Business Source License 1.1
+- **Helm-authored web, runtime-service, data-tooling, and docs code:** Business Source License 1.1
   today, with personal boat use, self-hosting, internal use, modification,
   redistribution, non-commercial use, and contribution allowed now. It converts
   to Apache-2.0 on the change date.
