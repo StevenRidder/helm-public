@@ -2,11 +2,12 @@
 
 Status: HELMC++-1 contract for the final C++ runtime acceptance gate.
 
-This document defines what "Helm is C++" means for the project. It does not mean every
-line of Helm becomes C++. It means every required boat-side chartplotter runtime daemon is
-C++/CMake/OpenCPN-native. Non-C++ code may exist around clients, tooling,
-fixtures, experiments, and optional non-safety features, but not as a required
-boat-side runtime daemon.
+This document defines what "Helm is C++" means for the project. It does not mean
+the current repo is already C++-only, and it does not mean every line of Helm
+becomes C++. It means every required boat-side chartplotter runtime daemon is
+C++/CMake/OpenCPN-native before final acceptance. Non-C++ code may exist around
+clients, tooling, fixtures, experiments, transitional reference/oracle paths, and
+optional non-safety features, but not as a required boat-side runtime daemon.
 
 ## Scope
 
@@ -16,6 +17,13 @@ local packs, environmental packs, cache serving, health reporting, or offline op
 
 The gate does not cover client UI language, one-shot data preparation tools, test harnesses, or
 optional advisory/community features unless those paths become required for normal runtime.
+
+The practical supported-stack target is:
+
+- C++/CMake/OpenCPN-native for required boat-side backend/runtime;
+- browser JavaScript/WebGPU for the cockpit UI;
+- Python only for AI/lab/dev tooling, fixture generation, transitional references/oracles,
+  and optional non-safety companion services.
 
 ## Required C++ runtime shape
 
@@ -49,7 +57,8 @@ The service names are less important than the boundary. Required boat daemons mu
 | `helm-packd` | Local MBTiles/PMTiles packs, catalog, layers, prefetch, bundle manifests | Required C++ runtime. |
 | `helm-basemap-cache` | Cache/proxy for online fill and remote/local pack fallback | C++ when enabled as a runtime service; not required for chart-only installs. |
 | `helm-envd` | Environmental model-run bundle replay/materialization | Required C++ runtime after WX-19 proves the contract. |
-| optional advisory/community features | Research, recommendation, publishing, or community integrations | Must remain optional and non-safety unless promoted through a separate C++ runtime decision. |
+| Python `services/wx` | Current/reference environmental gateway while the contract is proven | Transitional only; replaced by C++ runtime before HELMC++ final acceptance. |
+| optional advisory/community features | Research, recommendation, publishing, or community integrations | May remain Python/FastAPI only if optional, removable, and non-safety. |
 | offline data tooling | Import, bake, conversion, sample generation, fixture tooling | Outside required runtime. |
 | `web/` | Browser cockpit, MapLibre, WebGPU, UI tests | Not intended to be C++; client surface remains web-native. |
 | native Apple clients | WKWebView, SwiftUI, MapLibre Native, Metal | Not intended to be C++; thin client over the boat server. |

@@ -25,9 +25,11 @@ The public alpha has four intentional parts:
 This split can look like "several apps" at first glance. It is really a
 boat-server architecture: the C++ process owns navigation-critical computation
 and chart rendering, while the web client is a thin, fast cockpit surface that
-can run on the same machine or another display on the boat LAN. Optional helper
-services exist for data and cache seams, but the end state is **small C++
-runtime services around OpenCPN-native contracts**.
+can run on the same machine or another display on the boat LAN. The current
+alpha is still hybrid: Python helper services and pipelines remain where they
+work, especially weather/reference tooling and optional AI/community features.
+The end state for the maintained product is **small C++ runtime services around
+OpenCPN-native contracts**, plus the browser/WebGPU cockpit.
 See [RUNTIME-SERVICES.md](RUNTIME-SERVICES.md) and the final
 [HELMC++ acceptance contract](HELMCXX-ACCEPTANCE.md).
 
@@ -47,6 +49,12 @@ The server is built from `engine/vendor/cli/helm_server.cpp` by
 or mobile packaging is a future distribution layer, not the thing you need in
 order to test the alpha.
 
+Weather/environment services and some local data tooling are still transitional
+Python paths. They should be treated as current/reference implementations or
+offline tools until each contract has C++ parity. Python is allowed for optional
+non-safety AI/community features; it is not the target dependency for required
+boat-side chart/nav/weather runtime.
+
 ## Why These Parts Exist
 
 ### `engine/`
@@ -65,11 +73,12 @@ state.
 
 ### Runtime Services
 
-Runtime services are C++/CMake/OpenCPN-native when they are required for normal
-boat-side operation. Examples include local package serving, tile cache/proxy
-behavior, and environmental bundle replay. A boundary may start inside the
-current boat server, but the contract should be narrow enough to extract and
-test independently.
+Runtime services are moving to C++/CMake/OpenCPN-native when they are required
+for normal boat-side operation. Examples include local package serving, tile
+cache/proxy behavior, and environmental bundle replay. A boundary may start in
+Python or inside the current boat server while the contract is being proven, but
+the maintained required-runtime target is C++ with narrow, testable HTTP/file
+contracts.
 
 ### Data Preparation
 

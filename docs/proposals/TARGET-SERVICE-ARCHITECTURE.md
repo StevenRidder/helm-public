@@ -7,11 +7,16 @@ Scope: C++/OpenCPN-native target service architecture based on the public OpenCP
 ## Purpose
 
 This document starts from OpenCPN's public source layout, then proposes the
-C++ service boundaries Helm should expose around it.
+C++ service boundaries Helm should expose around it. It describes the target
+architecture, not a claim that every current public-alpha service has already
+been ported.
 
 The goal is not "many processes everywhere." The goal is a boat system made of
 small, inspectable, independently testable C++ building blocks with explicit
 contracts. Required boat-side runtime services are C++/CMake/OpenCPN-native.
+Today, Python remains in working weather/reference services, pipelines,
+fixtures, and optional AI/community surfaces. Those paths are useful while the
+contracts are proven, but they are not the intended required-runtime end state.
 
 Interface catalog: [INTERFACE-CATALOG.md](INTERFACE-CATALOG.md)
 

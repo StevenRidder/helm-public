@@ -1,21 +1,41 @@
-# Runtime Services End State
+# Runtime Services
 
-Helm remains a small-service boat system, not a single monolith. The correction is that
-**required boat-side runtime daemons are C++/CMake/OpenCPN-native by default**.
+Helm remains a small-service boat system, not a single monolith. The current
+repo is a working hybrid: core nav/chart runtime is already C++, while Python
+still exists for weather/reference paths, data tooling, fixtures, and optional
+AI/community experiments. The target maintained product is smaller:
+**required boat-side runtime daemons are C++/CMake/OpenCPN-native by default**,
+and the cockpit remains browser JavaScript/WebGPU.
 
 The final acceptance gate for this policy is [HELMCXX-ACCEPTANCE.md](HELMCXX-ACCEPTANCE.md). That
 contract defines what must be C++, what may remain outside required runtime, and what evidence is
 required before the runtime can be called C++-only.
 
-This is an architecture guardrail, not a rewrite order to stop all product work. The rule is:
+This is an architecture guardrail, not a rewrite order to stop all product work
+or break working helpers before parity exists. The rule is:
 
 - C++ owns required boat/runtime infrastructure.
 - Browser JavaScript/WebGPU owns the cockpit UI and client rendering.
-- Data-preparation tools and test harnesses stay outside required boat runtime.
+- Python may remain for AI/lab/dev tooling, fixture generation, transitional
+  reference/oracle implementations, and explicitly optional non-safety companion services.
+- Data-preparation tools and test harnesses stay outside required boat runtime unless
+  they become part of a shipped boat appliance path.
 - Any non-C++ daemon that becomes required for normal chartplotter runtime needs a frozen contract
   and a C++ ownership decision before it can be accepted.
 - Service boundaries are still the desired shape. The target is small, testable C++ services, not
   one giant process.
+
+## Current Versus Target
+
+| Surface | Current status | Target status |
+|---|---|---|
+| `helm-server` nav/chart core | C++ one-origin boat server | C++ required runtime |
+| `helm-packd` local packs | C++ port merged; Python oracle may remain for tests | C++ required runtime |
+| tile cache/proxy | C++ cache/proxy merged for runtime use | C++ when enabled |
+| weather/environment bundles | Python `services/wx` remains current/reference while WebGPU scene and contract stabilize | C++ `helm-envd`/`helm-wxd` required runtime after parity |
+| `backend/` FastAPI/AI/community | Optional prototype/companion path | Optional non-safety only, or ported if ever promoted to required runtime |
+| `pipeline/` and generators | Python and shell tooling | Allowed outside required runtime; selected appliance paths may be ported |
+| `web/` cockpit | Browser JavaScript/MapLibre/WebGPU | Browser JavaScript/WebGPU product UI |
 
 ## Maintainability Bar For C++ Services
 

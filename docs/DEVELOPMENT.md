@@ -12,8 +12,15 @@ Helm has a boat-side server and thin clients:
 
 - the C++ `helm-server` is the local navigation/chart server;
 - the browser UI in `web/` is the reference cockpit;
-- optional services add local helper behavior;
-- pipeline scripts prepare local/user-owned data.
+- optional Python services currently add local helper behavior while C++ runtime
+  parity is built;
+- pipeline scripts prepare local/user-owned data and may remain outside the
+  required runtime.
+
+The maintained product target is C++ for required boat-side backend/runtime and
+browser JavaScript/WebGPU for the frontend. Python is still allowed for working
+helpers, AI/lab experiments, fixtures, and reference/oracle paths, but should not
+be introduced as a new required runtime dependency.
 
 You usually do not need to understand every part to contribute. Pick one area,
 make a small change, and include a test or verification note.

@@ -4,10 +4,12 @@
 
 Helm is a source-available, pre-alpha marine chartplotter experiment. Today it
 is **not** a packaged macOS app, Windows installer, Linux package, or mobile
-app. The current runnable shape is a local C++ `helm-server` that reuses
-[OpenCPN](https://opencpn.org)'s `model/` navigation core and S-52/S-57 renderer
-headlessly, serves a browser client from `web/`, and exposes `/nav`, `/chart`,
-`/catalog`, and `/health` on one localhost port.
+app. The current public alpha is a working hybrid: the primary nav/chart path is
+a local C++ `helm-server` that reuses [OpenCPN](https://opencpn.org)'s `model/`
+navigation core and S-52/S-57 renderer headlessly, while Python remains in
+weather/reference services, data tools, and optional AI/community experiments.
+The maintained product target is narrower: C++ for required boat-side runtime
+and browser JavaScript/WebGPU for the cockpit.
 
 The long-term direction is a modern, cross-platform chartplotter that carries
 OpenCPN's feature set forward and fuses the data a sailor currently juggles
@@ -30,19 +32,21 @@ languages," this is the hierarchy that ties them together.
 |---|---|---|
 | **`engine/` → `helm-server`** | C++ | The safety core. A headless OpenCPN-derived navigation + S-52 chart engine that serves `/nav`, `/chart`, `/catalog`, and `/health` on one local origin. |
 | **`web/`** | Browser / MapLibre | The cockpit UI — a thin client over the server. Runs on the same machine or another display on the boat LAN. |
-| **runtime services** | C++ | Local package serving, cache/proxy behavior, and environmental bundle replay as they become required boat-side services. |
-| **data preparation** | native tools / scripts | Tools to generate and import *your own* local chart, depth, and weather data. No chart packs are bundled. |
+| **runtime services** | C++ target | Local package serving and cache/proxy behavior are already moving into C++; environmental bundle replay is still in transition. |
+| **data preparation** | tools / scripts | Tools to generate and import *your own* local chart, depth, and weather data. These may stay outside required runtime. No chart packs are bundled. |
+| **Python surfaces** | transitional / optional | Current weather/reference paths, offline tooling, fixtures, and optional non-safety AI/community services. They are not the target required boat runtime. |
 
 ```text
    web/ cockpit  ──HTTP+WebSocket──▶  engine/ helm-server (C++)  ──▶  local charts + boat data
   (browser/tablet)   one local origin      OpenCPN nav core            ENC/MBTiles · NMEA/SignalK
                                                   ▲
-                                   C++ runtime services · local data tools
+                                   C++ runtime services · Python/tooling references
 ```
 
-The C++ process owns navigation-critical computation and chart rendering; everything
-else orbits it behind the HTTP/WebSocket boundary. That split is what lets Helm grow
-toward browser, mobile, and native clients later. Full detail in
+The C++ process owns navigation-critical computation and chart rendering today.
+The target is to move every required boat-side backend/runtime daemon behind the
+same kind of narrow HTTP/WebSocket contract into C++ as well. The browser
+cockpit is already the product UI and stays web-native. Full detail in
 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## Status
@@ -57,9 +61,11 @@ toolchain, Homebrew paths, wxWidgets 3.2, and Helm's bootstrap script.
 
 The current code includes a reusable data pipeline + MapLibre browser client,
 plus a one-origin [Helm Engine](engine/) that drives OpenCPN's real `Routeman`
-headlessly and serves S-52 ENC chart tiles over HTTP. The web app can show
-OpenCPN-rendered charts under OpenCPN-computed navigation state when you provide
-chart data and NMEA/SignalK input. See [docs/OPENCPN-REUSE.md](docs/OPENCPN-REUSE.md).
+headlessly and serves S-52 ENC chart tiles over HTTP. Python weather/tooling
+paths are still present because they work and are useful references while C++
+runtime parity is built. The web app can show OpenCPN-rendered charts under
+OpenCPN-computed navigation state when you provide chart data and NMEA/SignalK
+input. See [docs/OPENCPN-REUSE.md](docs/OPENCPN-REUSE.md).
 
 ## What You Can Run Today
 
@@ -67,6 +73,8 @@ chart data and NMEA/SignalK input. See [docs/OPENCPN-REUSE.md](docs/OPENCPN-REUS
 |---|---|
 | macOS source build | Documented path. Build `helm-server`, run it locally, open the browser UI. |
 | Browser UI | Reference client. Served by `helm-server`; can also be served as a static demo with `web/serve.py`. |
+| Weather/environment | Hybrid today. Python `services/wx` remains the working/reference gateway while the C++ environmental daemon target is proven. |
+| Optional AI/community backend | Python/FastAPI prototype. Optional, non-safety, and not required for chart/nav runtime. |
 | Charts | Helm does not include chart packs. Real S-52 tiles require user-provided OpenCPN-compatible charts such as NOAA ENC `.000` cells, pointed to with `HELM_ENC`. |
 | Local basemaps | User-owned MBTiles/raster packs stay local and are served at runtime; do not commit chart packs or private imagery to Git. |
 | Boat data | Live movement requires NMEA 0183, SignalK, or another configured input. The server does not silently invent live boat data. |
@@ -98,7 +106,7 @@ chart data and NMEA/SignalK input. See [docs/OPENCPN-REUSE.md](docs/OPENCPN-REUS
 | [docs/REPO-MAP.md](docs/REPO-MAP.md) | Quick orientation to the directories and contribution areas |
 | [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) | Contributor workflow, ports, tests, local data rules |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Headless C++ boat server + browser/mobile client boundary |
-| [docs/RUNTIME-SERVICES.md](docs/RUNTIME-SERVICES.md) | End-state C++ runtime services and HELMC++ acceptance guardrails |
+| [docs/RUNTIME-SERVICES.md](docs/RUNTIME-SERVICES.md) | Current hybrid runtime, target C++ services, and HELMC++ acceptance guardrails |
 | [docs/proposals/TARGET-SERVICE-ARCHITECTURE.md](docs/proposals/TARGET-SERVICE-ARCHITECTURE.md) | OpenCPN-source audit, proposed C++ service end state, and extraction order |
 | [docs/proposals/INTERFACE-CATALOG.md](docs/proposals/INTERFACE-CATALOG.md) | Draft interface contracts between proposed services |
 | [docs/proposals/STANDARDS-LAYER-MAP.md](docs/proposals/STANDARDS-LAYER-MAP.md) | Existing standards by layer, and where Helm-specific RFCs/proposals fit |
@@ -153,14 +161,16 @@ demo, or inviting testers.
 ## Requirements
 
 There is intentionally no root runtime dependency file: Helm is a C++ boat
-server plus browser client and local data tools, so dependencies are scoped to
-the part you are running.
+server plus browser client, with Python still used for current helper services,
+tooling, fixtures, and optional non-safety experiments. Dependencies are scoped
+to the part you are running.
 
 | Area | Requirements |
 |---|---|
 | Main macOS runtime | Xcode CLT, Homebrew, `wxwidgets@3.2`, `gpatch`, `cmake`, `gdal`, `node` |
 | C++ engine | Built by `engine/bootstrap.sh`; see [docs/RUNBOOK.md](docs/RUNBOOK.md) |
 | Web tests | `web/test/package.json` |
+| Current Python helpers | Scoped under `services/`, `pipeline/`, and optional `backend/`; not the target required runtime |
 | Runtime chart data | NOAA ENC `.000` cells, pointed to with `HELM_ENC` |
 | Runtime basemap data | User-owned MBTiles/raster packs served locally, outside Git |
 | Runtime boat data | NMEA 0183, SignalK, or configured connection input |

@@ -30,7 +30,8 @@ Today Helm is:
 - a headless OpenCPN-derived navigation/chart server;
 - a browser cockpit UI served from `web/`;
 - a MapLibre-based chart surface with layered navigation context;
-- a set of optional local services and data pipelines;
+- a hybrid set of optional local services and data pipelines, including Python
+  paths that still work and serve as references while C++ runtime parity is built;
 - a bring-your-own chart/basemap system.
 
 The browser UI opens from the local server, usually at a private development
@@ -80,6 +81,8 @@ The current codebase includes:
   `/health`;
 - headless OpenCPN chart/nav reuse behind an HTTP/WebSocket boundary;
 - MapLibre browser cockpit;
+- Python weather/tooling/reference paths that are current but not the target
+  required boat-side runtime;
 - local/user-owned chart and depth overlay paths;
 - AIS, route, track, alarm, weather, and instrument UI surfaces in active
   development;
